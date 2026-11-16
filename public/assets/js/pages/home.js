@@ -7,22 +7,29 @@ const pad = (n) => String(n).padStart(2, '0');
    part of the design system, not admin content, so they cannot be broken by a
    branding change. Each category falls back to the hero object if a future
    category has no artwork yet. */
+/* Bases are extension-less so one helper can build every variant. Keeping the
+   `.png` in the base produced `/assets/art/field-robotics.png-sm.png`, which does
+   not exist — every non-WebP browser got a broken card image. */
 const FIELD_ART = {
-  robotics: '/assets/art/field-robotics.png',
-  science: '/assets/art/field-science.png',
-  engineering: '/assets/art/field-engineering.png',
-  technology: '/assets/art/field-technology.png',
+  robotics: '/assets/art/field-robotics',
+  science: '/assets/art/field-science',
+  engineering: '/assets/art/field-engineering',
+  technology: '/assets/art/field-technology',
 };
 
 export const fieldArt = (id) => FIELD_ART[id] || '/assets/art/hero';
 
-/** <picture> markup: WebP first, half-size for phones, PNG as the fallback. */
+/**
+ * <picture> markup: half-size WebP/PNG for phones, full-size WebP for desktop,
+ * and a PNG fallback that always exists. `base` must have no extension.
+ */
 export function artPicture(base, { width, height, eager = false, className = '' } = {}) {
+  const root = String(base).replace(/\.[a-z0-9]+$/i, '');
   return `<picture${className ? ` class="${className}"` : ''}>
-      <source media="(max-width: 640px)" type="image/webp" srcset="${base}-sm.webp">
-      <source media="(max-width: 640px)" srcset="${base}-sm.png">
-      <source type="image/webp" srcset="${base}.webp">
-      <img src="${base}-sm.png" alt="" width="${width}" height="${height}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+      <source media="(max-width: 640px)" type="image/webp" srcset="${root}-sm.webp">
+      <source media="(max-width: 640px)" srcset="${root}-sm.png">
+      <source type="image/webp" srcset="${root}.webp">
+      <img src="${root}-sm.png" alt="" width="${width}" height="${height}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
     </picture>`;
 }
 
@@ -30,12 +37,7 @@ function orbitalPlate({ venue, city, kicker }) {
   return `
   <figure class="plate" data-plate aria-label="Cover object: a machined orbital sculpture">
     <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
-    <picture class="plate__object">
-      <source media="(max-width: 640px)" type="image/webp" srcset="/assets/art/hero-sm.webp">
-      <source media="(max-width: 640px)" srcset="/assets/art/hero-sm.png">
-      <source type="image/webp" srcset="/assets/art/hero.webp">
-      <img src="/assets/art/hero-sm.png" alt="" width="1000" height="1000" loading="eager" decoding="async" fetchpriority="high">
-    </picture>
+    ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
     <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
     <figcaption class="plate__label plate__label--tl">
       ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Exhibition object</b>

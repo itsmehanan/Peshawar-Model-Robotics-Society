@@ -122,6 +122,7 @@ async function waitFor(fn, timeout = 4000, label = 'condition') {
 
 const text = () => global.document.getElementById('main')?.textContent || '';
 const q = (sel) => global.document.querySelector(sel);
+const qAll = (sel) => [...global.document.querySelectorAll(sel)];
 
 /* ----------------------------------------------------------------- tests */
 console.log('\nLanding page');
@@ -147,6 +148,30 @@ await test('renders the hero, nav and footer from API content', async () => {
   const cardMedia = q('.field-card .field-card__media img');
   assert.ok(cardMedia, 'field cards must carry artwork');
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
+});
+
+await test('every artwork variant in the page resolves to a real file', async () => {
+  // The helper used to append "-sm.png" to a base that already ended in ".png",
+  // producing /assets/art/field-robotics.png-sm.png — a 404 on every browser
+  // that fell back to the PNG <img>. Fetch each declared URL and insist on 200.
+  const urls = new Set();
+  for (const pic of qAll('picture')) {
+    const img = pic.querySelector('img');
+    if (img?.getAttribute('src')) urls.add(img.getAttribute('src'));
+    for (const source of pic.querySelectorAll('source')) {
+      for (const part of (source.getAttribute('srcset') || '').split(',')) {
+        const url = part.trim().split(' ')[0];
+        if (url) urls.add(url);
+      }
+    }
+  }
+  assert.ok(urls.size >= 8, `expected hero + card variants, found ${urls.size}`);
+  const broken = [];
+  for (const url of urls) {
+    const res = await fetch(`${ORIGIN}${url}`, { method: 'GET' });
+    if (res.status !== 200) broken.push(`${url} → ${res.status}`);
+  }
+  assert.deepEqual(broken, [], `broken artwork: ${broken.join(', ')}`);
 });
 
 await test('header shows Register, not the dashboard, when signed out', async () => {
