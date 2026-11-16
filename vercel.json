@@ -2,27 +2,48 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm ci --omit=dev --no-audit --no-fund",
-  "regions": ["bom1"],
+  "regions": [
+    "bom1"
+  ],
   "functions": {
     "api/index.js": {
       "memory": 1024,
       "maxDuration": 30,
-      "includeFiles": ["server/**", "public/**"]
+      "includeFiles": "{server,public}/**"
     }
   },
   "rewrites": [
-    { "source": "/assets/:path*", "destination": "/public/assets/:path*" },
-    { "source": "/fonts/:path*", "destination": "/public/fonts/:path*" },
-    { "source": "/((?!assets|fonts|api).*)", "destination": "/api/index.js" }
+    {
+      "source": "/assets/:path*",
+      "destination": "/public/assets/:path*"
+    },
+    {
+      "source": "/fonts/:path*",
+      "destination": "/public/fonts/:path*"
+    },
+    {
+      "source": "/((?!assets|fonts|api).*)",
+      "destination": "/api/index.js"
+    }
   ],
   "headers": [
     {
       "source": "/public/fonts/:path*",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/public/assets/:path*",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
 }
