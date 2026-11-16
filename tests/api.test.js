@@ -538,6 +538,17 @@ await test('application scripts are not served immutable', async () => {
   assert.doesNotMatch(String(res.headers.get('cache-control')), /immutable/);
 });
 
+await test('the deployment health check answers before the API 404 does', async () => {
+  const res = await fetch(`${BASE}/api/health`);
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.ok, true);
+  assert.match(body.database, /^(postgres|pglite)$/);
+  // and the catch-all still rejects genuinely unknown endpoints
+  const unknown = await fetch(`${BASE}/api/definitely-not-a-route`);
+  assert.equal(unknown.status, 404);
+});
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} tests passed`);

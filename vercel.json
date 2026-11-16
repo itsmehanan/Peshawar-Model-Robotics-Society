@@ -6,7 +6,8 @@
   "functions": {
     "api/index.js": {
       "memory": 1024,
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": ["server/**", "public/**"]
     }
   },
   "rewrites": [
@@ -16,11 +17,11 @@
   ],
   "headers": [
     {
-      "source": "/fonts/:path*",
+      "source": "/public/fonts/:path*",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
-      "source": "/assets/:path*",
+      "source": "/public/assets/:path*",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     }
   ]

@@ -89,6 +89,16 @@ app.use('/api', (req, res, next) => {
 /* ---------------------------------------------------------------- */
 /* API                                                               */
 /* ---------------------------------------------------------------- */
+/** Liveness probe. Registered before the routers so it is never shadowed. */
+app.get('/api/health', async (req, res) => {
+  try {
+    await query('SELECT 1');
+    res.json({ ok: true, database: cfg.databaseUrl ? 'postgres' : 'pglite', uptime: Math.round(process.uptime()) });
+  } catch {
+    res.status(503).json({ ok: false, error: 'Database unavailable.' });
+  }
+});
+
 app.use('/api', publicRouter);
 app.use('/api', authRouter);
 app.use('/api', studentRouter);
@@ -135,16 +145,6 @@ app.get(['/favicon.ico', '/favicon.svg'], async (req, res, next) => {
     return res.redirect(302, favicon);
   } catch {
     next();
-  }
-});
-
-/** Cheap liveness probe used by the deployment health check. */
-app.get('/api/health', async (req, res) => {
-  try {
-    await query('SELECT 1');
-    res.json({ ok: true, database: cfg.databaseUrl ? 'postgres' : 'pglite', uptime: process.uptime() });
-  } catch (error) {
-    res.status(503).json({ ok: false, error: 'Database unavailable.' });
   }
 });
 
