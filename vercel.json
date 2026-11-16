@@ -22,7 +22,7 @@
       "destination": "/public/fonts/:path*"
     },
     {
-      "source": "/((?!assets|fonts|api).*)",
+      "source": "/((?!assets|fonts|api/index\\.js).*)",
       "destination": "/api/index.js"
     }
   ],
