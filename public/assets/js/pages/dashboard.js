@@ -411,7 +411,7 @@ function noTeamView(student) {
       </div>
       <div class="split" style="gap:1.5rem">
         <form class="stack" id="createTeamForm" novalidate>
-          <h3 class="h4" style="font-family:var(--serif);font-size:1.05rem">Create a team</h3>
+          <h3 class="h4" style="font-family:var(--display);font-weight:600;font-size:1.02rem;letter-spacing:-.02em">Create a team</h3>
           <div class="field">
             <label for="nt-name">Team name</label>
             <input class="input" id="nt-name" name="teamName" required maxlength="60" placeholder="e.g. Circuit Breakers">
@@ -432,7 +432,7 @@ function noTeamView(student) {
         </form>
 
         <form class="stack" id="joinTeamForm" novalidate>
-          <h3 class="h4" style="font-family:var(--serif);font-size:1.05rem">Join a team</h3>
+          <h3 class="h4" style="font-family:var(--display);font-weight:600;font-size:1.02rem;letter-spacing:-.02em">Join a team</h3>
           <div class="field">
             <label for="jt-select">Available teams at ${esc(student.school)}</label>
             <select class="select" id="jt-select" name="teamId" required>

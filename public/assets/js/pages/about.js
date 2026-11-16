@@ -24,12 +24,12 @@ export function aboutPage() {
             <dl class="mt-2" style="display:grid;gap:.9rem">
               <div>
                 <dt class="tiny muted" style="text-transform:uppercase;letter-spacing:.1em">Date</dt>
-                <dd style="margin:.2rem 0 0;font-family:var(--serif);font-size:1.1rem">${esc(event.dateLabel || 'To be announced')}</dd>
+                <dd style="margin:.2rem 0 0;font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:-.02em">${esc(event.dateLabel || 'To be announced')}</dd>
                 <dd class="small muted" style="margin:.15rem 0 0">${esc(event.doorsLabel || '')}</dd>
               </div>
               <div>
                 <dt class="tiny muted" style="text-transform:uppercase;letter-spacing:.1em">Venue</dt>
-                <dd style="margin:.2rem 0 0;font-family:var(--serif);font-size:1.1rem">${esc(event.venue || 'To be announced')}</dd>
+                <dd style="margin:.2rem 0 0;font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:-.02em">${esc(event.venue || 'To be announced')}</dd>
                 <dd class="small muted" style="margin:.15rem 0 0">${esc(event.address || event.city || '')}</dd>
               </div>
               ${

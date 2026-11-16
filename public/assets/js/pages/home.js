@@ -3,32 +3,47 @@ import { state } from '../store.js';
 
 const pad = (n) => String(n).padStart(2, '0');
 
+/* Field artwork. Generated studio renders shipped as static assets: they are
+   part of the design system, not admin content, so they cannot be broken by a
+   branding change. Each category falls back to the hero object if a future
+   category has no artwork yet. */
+const FIELD_ART = {
+  robotics: '/assets/art/field-robotics.png',
+  science: '/assets/art/field-science.png',
+  engineering: '/assets/art/field-engineering.png',
+  technology: '/assets/art/field-technology.png',
+};
+
+export const fieldArt = (id) => FIELD_ART[id] || '/assets/art/hero';
+
+/** <picture> markup: WebP first, half-size for phones, PNG as the fallback. */
+export function artPicture(base, { width, height, eager = false, className = '' } = {}) {
+  return `<picture${className ? ` class="${className}"` : ''}>
+      <source media="(max-width: 640px)" type="image/webp" srcset="${base}-sm.webp">
+      <source media="(max-width: 640px)" srcset="${base}-sm.png">
+      <source type="image/webp" srcset="${base}.webp">
+      <img src="${base}-sm.png" alt="" width="${width}" height="${height}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+    </picture>`;
+}
+
 function orbitalPlate({ venue, city, kicker }) {
   return `
-  <figure class="plate reveal" data-delay="1" data-plate aria-label="Cover plate: orbital diagram of the exhibition">
-    <div class="plate__stage" aria-hidden="true">
-      <div class="plate__rings">
-        <span class="plate__ring plate__ring--a"></span>
-        <span class="plate__ring plate__ring--b"></span>
-        <span class="plate__ring plate__ring--c"></span>
-        <span class="plate__ring plate__ring--d"></span>
-      </div>
-      <span class="plate__meridian"></span>
-      <span class="plate__core"></span>
-      <span class="plate__satellite plate__satellite--1"></span>
-      <span class="plate__satellite plate__satellite--2"></span>
-      <span class="plate__satellite plate__satellite--3"></span>
-      <span class="plate__ticks"><span></span><span></span><span></span><span></span></span>
-    </div>
+  <figure class="plate" data-plate aria-label="Cover object: a machined orbital sculpture">
+    <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
+    <picture class="plate__object">
+      <source media="(max-width: 640px)" type="image/webp" srcset="/assets/art/hero-sm.webp">
+      <source media="(max-width: 640px)" srcset="/assets/art/hero-sm.png">
+      <source type="image/webp" srcset="/assets/art/hero.webp">
+      <img src="/assets/art/hero-sm.png" alt="" width="1000" height="1000" loading="eager" decoding="async" fetchpriority="high">
+    </picture>
+    <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
     <figcaption class="plate__label plate__label--tl">
-      ${esc((kicker || 'Season 04').toUpperCase())}
-      <b>Exhibition</b>
+      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Exhibition object</b>
     </figcaption>
     <div class="plate__label plate__label--br">
-      ${esc((venue || 'Main hall').toUpperCase())}
-      <b>${esc(city || '—')}</b>
+      ${esc((venue || 'Main hall').toUpperCase())}<br><b>${esc(city || '—')}</b>
     </div>
-    <span class="plate__caption">Orbital diagram · plate 01</span>
+    <span class="plate__caption">Plate 01 / machined orbit</span>
   </figure>`;
 }
 
@@ -45,15 +60,18 @@ function noticeBar(notice) {
 
 function fieldCard(category, index) {
   return `
-  <a class="field-card reveal" data-delay="${Math.min(index, 4)}" data-tilt href="#/fields/${esc(category.id)}" data-link>
+  <a class="field-card reveal" data-delay="${Math.min(index, 4)}" href="#/fields/${esc(category.id)}" data-link>
+    <div class="field-card__media">
+      ${artPicture(fieldArt(category.id), { width: 880, height: 660 })}
+    </div>
     <div class="field-card__top">
       <span class="field-card__index">${pad(index + 1)} / Field</span>
       <span class="field-card__symbol" aria-hidden="true">${esc(category.symbol || '◇')}</span>
     </div>
     <h3>${esc(category.name)}</h3>
-    <p class="small ink2">${esc(category.summary)}</p>
+    <p>${esc(category.summary)}</p>
     <div class="field-card__foot">
-      <span>Explore</span>
+      <span>Read the brief</span>
       <span class="field-card__arrow" aria-hidden="true">→</span>
     </div>
   </a>`;
@@ -61,7 +79,7 @@ function fieldCard(category, index) {
 
 function journalCard(article, index) {
   return `
-  <a class="journal-card reveal" data-delay="${Math.min(index + 1, 4)}" data-tilt href="#/journal/${esc(article.slug)}" data-link>
+  <a class="journal-card reveal" data-delay="${Math.min(index + 1, 4)}" href="#/journal/${esc(article.slug)}" data-link>
     <div class="journal-card__meta">
       <span>${esc(article.label)}</span>
       <span aria-hidden="true">·</span>
@@ -101,11 +119,12 @@ export function homePage() {
     <section class="hero">
       <div class="wrap hero__grid">
         <div>
-          <div class="hero__date">
+          <span class="eyebrow">${esc((event.kicker || 'Season 04').toUpperCase())} · ${esc(event.city || '')}</span>
+          <div class="hero__date mt-2">
             <span class="dot" aria-hidden="true"></span>
             ${esc(event.dateLabel || 'Date to be announced')}
             <span aria-hidden="true">·</span>
-            ${esc(event.city || '')}
+            ${esc(event.doorsLabel || 'Exhibition day')}
           </div>
           <h1 class="display">${richInk(event.headline)}</h1>
           <p class="lede hero__lede">${esc(event.intro)}</p>
@@ -113,7 +132,7 @@ export function homePage() {
             <a class="btn btn--solid btn--lg" href="${primaryCta}" data-link>
               ${esc(ctaLabel)} <span class="btn__arrow" aria-hidden="true">↗</span>
             </a>
-            <a class="btn btn--ghost btn--lg" href="#/about" data-link>About the exhibition</a>
+            <a class="btn btn--lg" href="#/fields" data-link>Explore the fields</a>
           </div>
           <dl class="hero__facts">
             ${facts
@@ -204,17 +223,17 @@ export function homePage() {
           </p>
         </div>
         <div class="steps">
-          <article class="step">
+          <article class="step" data-step="01">
             <span class="step__num">Step 01</span>
             <h3>Create your account</h3>
             <p>Name, class, school, one field of entry. About forty seconds, and you can edit all of it later.</p>
           </article>
-          <article class="step">
+          <article class="step" data-step="02">
             <span class="step__num">Step 02</span>
             <h3>Start or join a team</h3>
             <p>Leaders create a team, set its size and share the passcode. Everyone else joins with that code — same school, same field.</p>
           </article>
-          <article class="step">
+          <article class="step" data-step="03">
             <span class="step__num">Step 03</span>
             <h3>Build, then present</h3>
             <p>Prepare the object and a two-minute explanation. Judges visit every booth and leave written feedback.</p>
@@ -359,7 +378,6 @@ function richInk(headline) {
 
 export function mountHome(root) {
   mountFaq(root);
-  mountPlate(root);
   const close = root.querySelector('[data-dismiss-notice]');
   close?.addEventListener('click', () => {
     const bar = close.closest('.notice-bar');
@@ -367,40 +385,4 @@ export function mountHome(root) {
     bar.style.opacity = '0';
     setTimeout(() => bar.remove(), 180);
   });
-}
-
-/**
- * Pointer parallax for the cover plate.
- *
- * The plate is decorative and fixed — it is deliberately not admin-editable,
- * because it is the one piece of the identity that should look the same in
- * every deployment. Movement is capped so it reads as a heavy object settling,
- * not a toy. Skipped entirely for reduced-motion users and touch devices.
- */
-function mountPlate(root) {
-  const plate = root.querySelector('[data-plate]');
-  if (!plate) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  const stage = plate.querySelector('.plate__stage');
-  if (!stage) return;
-
-  let frame = 0;
-  const onMove = (event) => {
-    if (frame) return;
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      const rect = plate.getBoundingClientRect();
-      const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
-      const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
-      stage.style.setProperty('--ry', `${(-12 - dx * 14).toFixed(2)}deg`);
-      stage.style.setProperty('--rx', `${(14 + dy * 10).toFixed(2)}deg`);
-    });
-  };
-  const reset = () => {
-    stage.style.removeProperty('--ry');
-    stage.style.removeProperty('--rx');
-  };
-  plate.addEventListener('pointermove', onMove);
-  plate.addEventListener('pointerleave', reset);
 }

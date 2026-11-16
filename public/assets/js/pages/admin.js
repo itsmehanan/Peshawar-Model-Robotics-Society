@@ -101,11 +101,13 @@ function adminLoginView() {
       </div>
     </div>
     <aside class="auth-art" aria-hidden="true">
-      <div>
-        <p class="auth-art__quote">Every published change updates the public site immediately — the exhibition
-          database stays the single source of truth.</p>
-        <p class="auth-art__cite">Control room</p>
-      </div>
+      <picture>
+        <source type="image/webp" srcset="/assets/art/hero-sm.webp">
+        <img src="/assets/art/hero-sm.png" alt="" width="1000" height="1000" loading="lazy" decoding="async">
+      </picture>
+      <p class="auth-art__quote">Every published change updates the public site immediately — the exhibition
+        database stays the single source of truth.</p>
+      <p class="auth-art__cite">Control room</p>
     </aside>
   </div>`;
 }

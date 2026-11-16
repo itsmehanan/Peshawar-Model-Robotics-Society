@@ -1,4 +1,5 @@
 import { esc, richText } from '../ui.js';
+import { fieldArt, artPicture } from './home.js';
 import { state } from '../store.js';
 
 export function fieldsPage() {
@@ -23,13 +24,16 @@ export function fieldsPage() {
           ${categories
             .map(
               (c, index) => `
-            <a class="field-card reveal" data-delay="${Math.min(index, 3)}" href="#/fields/${esc(c.id)}" data-link style="min-height:17rem">
+            <a class="field-card reveal" data-delay="${Math.min(index, 3)}" href="#/fields/${esc(c.id)}" data-link>
+              <div class="field-card__media">
+                ${artPicture(fieldArt(c.id), { width: 880, height: 660 })}
+              </div>
               <div class="field-card__top">
                 <span class="field-card__index">${String(index + 1).padStart(2, '0')} / Field</span>
                 <span class="field-card__symbol" aria-hidden="true">${esc(c.symbol)}</span>
               </div>
-              <h3 style="font-size:1.4rem;margin-top:2rem">${esc(c.name)}</h3>
-              <p style="font-size:.92rem;max-width:44ch">${esc(c.summary)}</p>
+              <h3>${esc(c.name)}</h3>
+              <p>${esc(c.summary)}</p>
               <div class="field-card__foot">
                 <span>Read the brief</span>
                 <span class="field-card__arrow" aria-hidden="true">→</span>
@@ -70,11 +74,19 @@ export function fieldDetailPage({ id }) {
           <p class="lede">${esc(category.summary)}</p>
         </div>
         <div class="page-hero__aside">
-          <span class="field-card__symbol" style="font-size:3rem" aria-hidden="true">${esc(category.symbol)}</span>
-          <p class="tiny muted mt-1">Field ${String(index + 1).padStart(2, '0')}</p>
+          <span class="field-card__symbol" style="font-size:2rem" aria-hidden="true">${esc(category.symbol)}</span>
+          <p class="tiny muted mt-1">Field ${String(index + 1).padStart(2, '0')} of ${categories.length}</p>
         </div>
       </div>
     </section>
+
+    <figure class="art-band">
+      ${artPicture(fieldArt(category.id), { width: 880, height: 660, eager: true })}
+      <figcaption class="art-band__caption">
+        <span>Object study / ${esc(category.name)}</span>
+        <span>Plate ${String(index + 1).padStart(2, '0')}</span>
+      </figcaption>
+    </figure>
 
     <section class="section section--tight">
       <div class="wrap split split--wide">

@@ -68,6 +68,8 @@ export function renderFooter() {
         </div>
       </div>
 
+      <div class="foot__wordmark" aria-hidden="true">${esc(site.name)}</div>
+
       <div class="foot__bottom">
         <span>© ${year} ${esc(footer?.copyright || site.fullName || site.name)}. All rights reserved.</span>
         <span>${esc(footer?.credit || '')}${footer?.credit ? ' · ' : ''}Designed and built for the exhibition.</span>

@@ -33,7 +33,7 @@ export function registerPage({ query }) {
         </div>
         <div class="page-hero__aside">
           <p class="tiny muted">Registration closes</p>
-          <p class="h4 mt-0" style="font-family:var(--serif)">${esc(registration.deadlineLabel || 'see programme')}</p>
+          <p class="h4 mt-0">${esc(registration.deadlineLabel || 'see programme')}</p>
         </div>
       </div>
     </section>

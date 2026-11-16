@@ -14,29 +14,32 @@ and `olympiad_portal.html`) into one production-grade application:
 
 ## Design direction
 
-The 3D orbital language of the supplied `olympiad_portal.html` is kept and
-sharpened, not replaced:
+Built against the studio reference boards, not a component library.
 
-- **Palette** — deep blue-black (`#070c15`) instead of flat navy, one instrument
-  cyan (`#74e3e6`), one warm brass (`#dcc08a`) as the second accent. Colour is
-  used for hierarchy, never decoration.
-- **Depth without effects** — the hero plate is a real CSS 3D scene
-  (`transform-style: preserve-3d`) of a lit sphere inside four independently
-  rotating orbital planes, with a capped pointer parallax. Panels get depth from
-  extruded edges, hairline drafting ticks and a 2px milled bottom edge on
-  buttons. No glassmorphism, no blur glows, no gradient soup, no oversized
-  rounded cards (radius is 2–3px throughout).
-- **Motion** — staggered hero entrance, scroll reveals with IntersectionObserver,
-  a reading-progress hairline, counting statistics, pointer tilt on cards, a
-  marquee band. Every one of them is disabled under
-  `prefers-reduced-motion: reduce`.
-- **The plate is fixed.** Branding (name, logo, favicon, colours of chrome) is
-  admin-editable; the hero artwork deliberately is not, so every deployment
-  shares the same identity anchor.
-
-Nothing about a registration lives in `localStorage`. Accounts, teams and
-settings are rows in a real database, so they survive refreshes, restarts and
-follow the student to any device they sign in from.
+- **Palette** — neutral near-black (`#0a0a0b`) rather than navy or purple, one
+  cool instrument accent (`#86e9ec`), one warm metal (`#e4c894`), and a single
+  highlight yellow used twice in the whole site. Everything else is greyscale,
+  so the renders and the type carry the page.
+- **Type** — Archivo (variable, weight + width) for the giant condensed
+  headlines at `-0.042em` optical tracking; Instrument Serif italic for the one
+  accented word in a headline; DM Mono for the technical labels that run
+  through the whole interface. All self-hosted, `font-display: swap`, 256 KB
+  total for the three families.
+- **Imagery** — five purpose-rendered studio objects (one hero sculpture, one
+  per field). Each is pre-masked with a radial alpha dissolve in the page
+  colour, so the object sits in the same void as the type instead of inside a
+  photo box. Served as WebP (54 KB hero / 15–52 KB cards) with half-size
+  sources for phones and PNG fallbacks.
+- **Structure** — a hairline grid, oversized watermark numerals behind the
+  steps and the footer wordmark, outlined pill controls, and full-bleed render
+  bands on the field pages. No glassmorphism, no glow, no gradient washes, and
+  no card radius above 3px.
+- **Motion** — hero lines rise on separate beats, scroll reveals, a hairline
+  reading-progress bar, counters, a marquee strip and a slow object hover.
+  Every one is disabled under `prefers-reduced-motion`.
+- **The hero object is fixed.** Branding (name, logo, favicon, copy) is
+  admin-editable; the sculpture is a design asset, so no branding change can
+  break the identity anchor.
 
 ---
 

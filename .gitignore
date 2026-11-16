@@ -6,3 +6,5 @@ data/
 .DS_Store
 coverage/
 .vercel/
+# master renders — the optimised derivatives are committed in public/assets/art
+art/

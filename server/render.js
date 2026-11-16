@@ -34,15 +34,15 @@ export async function renderDocument(settings) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullName)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="#070c15">
+<meta name="theme-color" content="#0a0a0b">
 ${favicon}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullName)}">
 <meta property="og:description" content="${esc(description)}">
 ${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImageUrl)}">` : ''}
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" href="/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/archivo-var-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/art/hero.webp" as="image" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
 <script type="application/json" id="boot-content">${safeJson(settings)}</script>

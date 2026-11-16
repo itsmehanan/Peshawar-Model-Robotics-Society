@@ -132,11 +132,19 @@ await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
   assert.match(text(), /Fields of entry/);
   assert.ok(q('#siteFoot').textContent.includes('ORBIT'));
-  // The cover plate is now a CSS 3D scene (stage + rings + core), not an SVG.
-  assert.ok(q('.plate .plate__stage'), 'hero plate stage must render');
-  assert.ok(q('.plate .plate__core'), 'hero plate core sphere must render');
-  assert.ok(q('.plate .plate__ring'), 'hero plate rings must render');
-  assert.equal(q('.plate svg'), null, 'the flat SVG plate was replaced by the 3D scene');
+  // The cover plate is a real studio render shipped as a static asset
+  // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
+  const plate = q('.plate .plate__object');
+  assert.ok(plate, 'hero object must render');
+  const plateImg = plate.querySelector('img');
+  assert.ok(plateImg, 'hero object must contain an image');
+  assert.match(plateImg.getAttribute('src'), /\/assets\/art\/hero-sm\.png$/);
+  assert.ok(plate.querySelector('source[type="image/webp"]'), 'hero must offer WebP');
+  assert.ok(q('.plate .plate__guides'), 'orbital guides must frame the object');
+  assert.ok(q('.plate .plate__ticks span'), 'registration ticks must render');
+  const cardMedia = q('.field-card .field-card__media img');
+  assert.ok(cardMedia, 'field cards must carry artwork');
+  assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
 });
 
 await test('header shows Register, not the dashboard, when signed out', async () => {
