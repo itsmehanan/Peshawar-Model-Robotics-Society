@@ -8,17 +8,19 @@ const uid = () => randomUUID();
 
 export const DEFAULT_SETTINGS = {
   site: {
+    // The event name stays short for the wordmark; the society that runs it is
+    // named in full so the organisation is never reduced to an acronym.
     name: 'ORBIT',
-    fullName: 'ORBIT School Olympiad',
+    fullName: 'ORBIT Olympiad — Peshawar Model Robotics Society',
     tagline: 'A school olympiad for builders, thinkers and makers.',
     description:
-      'ORBIT is an annual exhibition of student work in robotics, science, engineering and technology — built around one idea: curiosity deserves a stage.',
+      'ORBIT is an annual exhibition of student work in robotics, science, engineering and technology, run by the Peshawar Model Robotics Society — built around one idea: curiosity deserves a stage.',
     logoMark: 'O',
     logoUrl: '',
     faviconUrl: '',
     metaDescription:
-      'ORBIT School Olympiad — an annual student exhibition of robotics, science, engineering and technology projects. Register your team, choose a field and present your work.',
-    footerNote: 'Organised by students, for students.',
+      'ORBIT Olympiad — an annual student exhibition of robotics, science, engineering and technology projects in Peshawar, run by the Peshawar Model Robotics Society. Register your team, choose a field and present your work.',
+    footerNote: 'Organised by the Peshawar Model Robotics Society.',
   },
   event: {
     headline: 'Build something the future needs.',
@@ -36,10 +38,12 @@ export const DEFAULT_SETTINGS = {
     aboutTitle: 'An exhibition, not a competition of polish.',
     aboutBody:
       'ORBIT began as a hallway table with three robots on it. Today it is a full exhibition day: teams from schools across the city set up booths, present prototypes to judges, and explain their work to anyone who stops to ask a question.\n\nWe score the thinking, not the budget. A working cardboard mechanism that solves a real problem will always outrank a polished box that does nothing. Judges spend time with every team, ask two questions, and write comments you can keep.\n\nEvery participant leaves with feedback, a certificate, and at least one idea for next year.',
+    // Deliberately describes the programme, not attendance: claimed exhibitor
+    // and school counts were invented and would be a false claim to the public.
     stats: [
       { value: '04', label: 'Fields of entry' },
-      { value: '120+', label: 'Student exhibitors' },
-      { value: '18', label: 'Schools invited' },
+      { value: '02', label: 'Students minimum per team' },
+      { value: '06', label: 'Students maximum per team' },
       { value: '01', label: 'Exhibition day' },
     ],
   },
