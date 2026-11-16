@@ -138,6 +138,11 @@ First boot creates the tables, the default content and the admin account. Open
 - a missing `DATABASE_URL` produces an explanatory page rather than a crash;
 - `/api/health` reports whether the database is reachable.
 
+> **Deploying the live site:** see [`docs/deploy-vercel.md`](docs/deploy-vercel.md).
+> The Vercel project, the environment variables and the database are already
+> provisioned; that page covers the one step (connecting GitHub to Vercel) that
+> has to be done from the account owner's side, plus the post-deploy checks.
+
 **Security note:** the browser never talks to Supabase. Only the Node function
 connects, over `DATABASE_URL`. Do not expose these tables with the anon key and
 never ship a service-role key to the frontend — this app doesn't load either.
