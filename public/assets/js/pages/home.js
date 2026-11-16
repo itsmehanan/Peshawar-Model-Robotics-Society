@@ -119,7 +119,7 @@ export function homePage() {
     <section class="hero">
       <div class="wrap hero__grid">
         <div>
-          <span class="eyebrow">${esc((event.kicker || 'Season 04').toUpperCase())} · ${esc(event.city || '')}</span>
+          <span class="eyebrow">${esc((event.kicker || 'Season 04').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''}</span>
           <div class="hero__date mt-2">
             <span class="dot" aria-hidden="true"></span>
             ${esc(event.dateLabel || 'Date to be announced')}
