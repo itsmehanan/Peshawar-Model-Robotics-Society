@@ -1,113 +1,108 @@
-# Deploy this site to Vercel
+# Deployed: peshawarmodelroboticssociety.vercel.app
 
-Everything is prepared. The project `peshawarmodelroboticssociety` already
-exists in your Vercel account (team **HANAX**) with its production environment
-variables set, and the PostgreSQL database is already provisioned and its schema
-applied. **All that is left is the build itself**, and that build needs a GitHub
-connection that the automation in this session does not have.
+**Status: live in production.** Last verified against the real deployment, not a
+local build.
 
----
-
-## Why one manual step is needed
-
-The app is a Node/Express server, so Vercel has to build it from the repository.
-Vercel can only read the repository through a **GitHub Login Connection** on your
-Vercel account. That connection is not set up, so Vercel refuses to link
-`itsmehanan/Peshawar-Model-Robotics-Society`:
-
-```
-400 — Failed to link itsmehanan/Peshawar-Model-Robotics-Society.
-You need to add a Login Connection to your GitHub account first.
-```
-
-Deploying the files directly is also not possible from here: this app ships
-about 1.5 MB of rendered artwork and font binaries, and the deployment API
-expects those files to be uploaded as part of the request.
-
-## Option 1 — connect GitHub, then click Deploy (2 minutes, recommended)
-
-1. In Vercel: **Settings → (your avatar) → Account → Integrations** or
-   [vercel.com/account/login-connections](https://vercel.com/account/login-connections)
-   → connect **GitHub** and grant access to
-   `itsmehanan/Peshawar-Model-Robotics-Society`.
-2. Open the existing project
-   [vercel.com/hanax/peshawarmodelroboticssociety](https://vercel.com/hanax/peshawarmodelroboticssociety).
-3. **Settings → Git → Connect Git Repository** → choose the repository, and set
-   the **Production Branch** to
-   `arena/79190411-peshawar-model-robotics-societ`
-   (or merge that branch into `main` first and use `main`).
-4. **Deployments → Deploy** (or just push a commit; the branch will build).
-
-No build command is needed: `vercel.json` sets `framework: null`, uses
-`npm ci --omit=dev` and routes everything to `api/index.js`.
-
-## Option 2 — deploy from your own machine
-
-```bash
-git clone https://github.com/itsmehanan/Peshawar-Model-Robotics-Society.git
-cd Peshawar-Model-Robotics-Society
-git checkout arena/79190411-peshawar-model-robotics-societ
-
-npm i -g vercel
-vercel login
-vercel link            # chooses your existing peshawarmodelroboticssociety project
-vercel --prod
-```
-
-`vercel link` will reuse the environment variables that are already set, so you
-do not need to type the database URL again.
-
----
-
-## The domain
-
-The Vercel project name gives you:
-
-```
-https://peshawarmodelroboticssociety.vercel.app
-```
-
-`pmrs.vercel.app` is a differently named project, so it cannot serve this
-deployment. Once the domain is live and the site is verified, it is a single
-rename (**Project → Settings → General → Name**, or `vercel domains`) to move to
-`pmrs`. Confirm the domain with the society before advertising either address:
-`.vercel.app` is Vercel's domain, not a domain the society owns. A custom domain
-(such as `pmrs.org.pk`) added through **Project → Settings → Domains** is the
-right long-term home.
-
-## Environment variables already configured
-
-| Variable | Status |
+| | |
 | --- | --- |
-| `DATABASE_URL` | set — Supabase pooler, Mumbai (`ap-south-1`), port 6543 |
+| Site | <https://peshawarmodelroboticssociety.vercel.app> |
+| Health | <https://peshawarmodelroboticssociety.vercel.app/api/health> → `{"ok":true,"database":"postgres"}` |
+| Vercel project | `peshawarmodelroboticssociety` (team HANAX) |
+| Region | `bom1` — Mumbai, the closest Vercel region to Peshawar |
+| Repository | `itsmehanan/Peshawar-Model-Robotics-Society`, branch `arena/79190411-peshawar-model-robotics-societ` |
+| Database | Supabase project `pmrs-olympiad`, PostgreSQL 17.12, `ap-south-1` |
+
+## How it runs
+
+The site is one serverless function, `api/index.js`, wrapped around the same
+Express app the local server uses. There is no build step and no framework
+preset.
+
+```
+/assets/*  → CDN (public/assets/*)      static, no-cache + ETag
+/fonts/*   → CDN (public/fonts/*)       immutable, 1 year
+everything else → api/index.js          pages + JSON API
+```
+
+The database is Supabase, reached over the transaction pooler on port 6543. The
+function keeps a one-connection pool with `allowExitOnIdle`, so instances can
+exit cleanly and the pooler is not exhausted.
+
+## Environment variables (set on Vercel, production + preview)
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Supabase pooler URI (secret) |
 | `DATABASE_SSL` | `true` |
 | `NODE_ENV` | `production` |
 | `ADMIN_EMAIL` | `organizer@peshawarmodelroboticssociety.org` |
-| `ADMIN_PASSWORD` | set — **change it after signing in** (Admin → Account) |
+| `ADMIN_PASSWORD` | bootstrap password — **change it after signing in** |
 | `ADMIN_NAME` | `Event Organizer` |
 
-The database (project `pmrs-olympiad`, PostgreSQL 17.12) is live and all 12
-tables are applied. First request fills in the default content and the admin
-account.
+## Signing in as an administrator
 
-## After the first deploy — three checks
+Go to `/#/admin` and use `ADMIN_EMAIL` with the bootstrap password. To change the
+password, sign in and use **Admin → Account**, or run:
 
 ```bash
-curl -s https://peshawarmodelroboticssociety.vercel.app/api/health
-# {"ok":true,"database":"postgres",...}
-
-curl -sI https://peshawarmodelroboticssociety.vercel.app/ | head -3
-# 200, text/html
-
-curl -sI https://peshawarmodelroboticssociety.vercel.app/assets/art/hero.webp | head -3
-# 200, image/webp
+npm run admin:set-password
 ```
 
-Then sign in at `/#/admin`, and fill in the parts only the society knows:
-the exhibition date and venue, the contact phone/email, the real Instagram,
-Facebook, YouTube and TikTok URLs (unconfigured platforms stay hidden), and the
-event description.
+## Deploying a change
 
-> **Before advertising the link:** set a real `ADMIN_PASSWORD` (never the one
-> shown above), and check that Admin → Registration is showing the state you
-> want — open for entries, or closed.
+Pushes to the session branch do not auto-promote to the domain (the project's
+production branch is `main`). Either:
+
+- merge the branch into `main` and let Vercel build it, or
+- deploy the commit explicitly:
+
+```bash
+curl -X POST https://api.vercel.com/v13/deployments \
+  -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"peshawarmodelroboticssociety","project":"prj_s9Bjhh5seR9SnLgcDRtch2nDRjqb",
+       "target":"production","gitSource":{"type":"github","repoId":1460206921,"ref":"<sha>"}}' \
+  -G -d teamId=team_clprO4Bp2auNOJCw91hFa9vG
+```
+
+## What the first deploy caught
+
+Shipping to a real host found four defects that local tests could not:
+
+1. `includeFiles` was an array — Vercel rejects that with a 400 before building.
+   It must be a single glob string (`{server,public}/**`).
+2. `/api/*` returned Vercel's 404. A plain serverless file is mounted only at its
+   own path; it does not get Next-style `/api/*` prefix routing, and the
+   catch-all rewrite was excluding `api`. Only `assets`, `fonts` and the
+   function's own path are excluded now.
+3. Field-card artwork 404'd on every non-WebP browser: the helper appended
+   `-sm.png` to a path that already ended in `.png`. A browser test now fetches
+   every `<picture>` URL and fails on any non-200.
+4. `/api/assets/<junk>` returned 500 rather than 404, because Postgres rejects a
+   non-uuid against a uuid column.
+
+Each is covered by a test, so they cannot come back silently.
+
+## Before you advertise the link
+
+- **Change the admin password** and confirm **Admin → Registration** is in the
+  state you want.
+- Fill in the parts only the society knows: exhibition date and venue, contact
+  phone/email, and the real Instagram, Facebook, YouTube and TikTok URLs.
+  Unconfigured platforms stay hidden, so nothing dead is published.
+- `.vercel.app` is Vercel's domain, not the society's. For a permanent address,
+  add a custom domain the society owns in **Project → Settings → Domains**. A
+  differently named project such as `pmrs.vercel.app` cannot serve this
+  deployment — that would be a project rename, and the rename is not
+  recommended while the current address is being shared.
+
+## Known limits of this deployment
+
+- Hobby plan, single region, 30 s function limit. Fine for a school event; not
+  sized for a registration stampede at the deadline.
+- The Supabase free tier pauses inactive projects. Check the URL a few days
+  before the event so a cold database is not a surprise on the day.
+- Login throttling is in memory, so it is per function instance rather than
+  global. Real credential stuffing would not be rate-limited across instances.
+- No email verification or password reset — see `README.md` → *Honest
+  limitations*.
