@@ -91,18 +91,23 @@ boot instead.
 
 ### Option A — Vercel + Supabase (recommended for a hosted site)
 
-**1. Create a Supabase project** (this repo ships tooling for it; the
-`supabase` app is available in this environment, or use the dashboard).
+The app runs on Vercel as **one serverless function** (`api/index.js`) that
+serves the pages, the JSON API and the static assets. Because serverless has no
+writable disk, the embedded database is replaced by a hosted PostgreSQL — the
+Supabase free tier is enough for a school event.
 
-**2. Get the pooled connection string.** Supabase → *Project settings →
-Database → Connection string → URI*. Use the **pooler** host and port `6543`
-(Vercel functions are short-lived; the pooler prevents connection exhaustion):
+**1. Create a Supabase project** and copy the **pooled** connection string
+(*Project settings → Database → Connection string → URI*). Use the pooler host
+and port `6543`; short-lived functions would otherwise exhaust Postgres
+connections:
 
 ```
-postgresql://postgres.<project-ref>:<db-password>@aws-0-<region>.pooler.supabase.com:6543/postgres
+postgresql://postgres.<project-ref>:<db-password>@aws-1-<region>.pooler.supabase.com:6543/postgres
 ```
 
-**3. Deploy the folder to Vercel** and set these environment variables:
+**2. Import the repository** into Vercel (or `vercel link` + `vercel --prod`).
+
+**3. Set these environment variables** (Production and Preview):
 
 | Variable | Value |
 | --- | --- |
@@ -114,17 +119,26 @@ postgresql://postgres.<project-ref>:<db-password>@aws-0-<region>.pooler.supabase
 | `SESSION_DAYS` | `30` |
 | `TRUST_PROXY` | `1` |
 
-`vercel.json` is included: it builds `server/index.js` as a Node function and
-routes `/assets/*` and `/fonts/*` to the static folders.
+**4. Deploy.** `vercel.json` already contains the routing: `/assets` and
+`/fonts` are served from the CDN, everything else rewrites to the function.
+First boot creates the tables, the default content and the admin account. Open
+`/#/admin` and sign in.
 
-**4. First request seeds the database** — tables, default content and the admin
-account are created automatically. Open `/#/admin` and sign in.
-
-> If you prefer to provision the schema yourself, run
+> Prefer to provision the schema yourself? Run
 > [`sql/supabase-setup.sql`](sql/supabase-setup.sql) in the Supabase SQL editor
-> first. It is identical to what the app creates.
+> first. It is identical to what the app creates, and the app is idempotent
+> either way.
 
-**Security note:** the browser never talks to Supabase. Only the Node server
+**Serverless specifics that are already handled:**
+
+- the schema, seed and admin bootstrap run in one advisory-locked transaction,
+  so several cold starts cannot double-seed the journal or the FAQs;
+- the Postgres pool is one connection per instance with `allowExitOnIdle`, so
+  invocations can exit cleanly and the pooler is not overwhelmed;
+- a missing `DATABASE_URL` produces an explanatory page rather than a crash;
+- `/api/health` reports whether the database is reachable.
+
+**Security note:** the browser never talks to Supabase. Only the Node function
 connects, over `DATABASE_URL`. Do not expose these tables with the anon key and
 never ship a service-role key to the frontend — this app doesn't load either.
 
