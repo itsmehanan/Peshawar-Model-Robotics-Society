@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["public/**", "server/**"]
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/public/assets/$1" },
+    { "src": "/fonts/(.*)", "dest": "/public/fonts/$1" },
+    { "src": "/(.*)", "dest": "/server/index.js" }
+  ]
+}

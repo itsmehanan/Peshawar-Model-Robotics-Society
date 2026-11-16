@@ -1,0 +1,27 @@
+{
+  "name": "orbit-olympiad",
+  "version": "2.0.0",
+  "private": true,
+  "description": "ORBIT School Olympiad - production website, registration portal and admin CMS",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node tests/api.test.js",
+    "admin:set-password": "node scripts/set-admin-password.js",
+    "db:reset": "node scripts/reset-db.js",
+    "test:ui": "node tests/ui.test.js",
+    "test:all": "node tests/api.test.js && node tests/ui.test.js"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "express": "^4.22.3",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

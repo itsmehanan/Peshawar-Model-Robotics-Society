@@ -1,0 +1,225 @@
+/**
+ * ORBIT Olympiad server.
+ *
+ *   npm start          → http://localhost:3000
+ *
+ * Architecture: Express + a single SQL database (embedded PostgreSQL by default,
+ * any hosted PostgreSQL when DATABASE_URL is set), server-rendered static shell
+ * with a progressively-enhanced client app, and cookie sessions on the server.
+ */
+import express from 'express';
+import path from 'node:path';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+
+import { loadEnv, config } from './config.js';
+loadEnv();
+
+import { initDb, query, q1 } from './db.js';
+import { hashPassword, uuid } from './security.js';
+import { errorHandler, cleanupSessions } from './http.js';
+import { publicRouter } from './routes/public.js';
+import { authRouter } from './routes/auth.js';
+import { studentRouter } from './routes/student.js';
+import { adminRouter } from './routes/admin.js';
+import { renderDocument } from './render.js';
+import { getSettings } from './settings.js';
+
+const cfg = config();
+const app = express();
+
+if (cfg.trustProxy !== '') app.set('trust proxy', Number(cfg.trustProxy) || 1);
+app.disable('x-powered-by');
+
+/* ---------------------------------------------------------------- */
+/* Security headers                                                  */
+/* ---------------------------------------------------------------- */
+app.use((req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Content-Security-Policy': [
+      "default-src 'self'",
+      "img-src 'self' data: blob:",
+      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self'",
+      "font-src 'self'",
+      "connect-src 'self'",
+      "form-action 'self'",
+      "base-uri 'self'",
+      "frame-ancestors 'self'",
+    ].join('; '),
+  });
+  if (cfg.production) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
+app.use(express.json({ limit: '3mb' }));
+
+/**
+ * CSRF defence in depth. Sessions are SameSite=Lax cookies, and on top of that
+ * any state-changing request must be JSON with a same-origin `Origin`. A plain
+ * HTML form post (the classic CSRF vector) can do neither.
+ */
+app.use('/api', (req, res, next) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  const origin = req.headers.origin;
+  if (origin) {
+    const host = req.headers.host;
+    let originHost;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      return res.status(403).json({ ok: false, error: 'Invalid origin.', code: 'csrf' });
+    }
+    if (originHost !== host) {
+      return res.status(403).json({ ok: false, error: 'Cross-site request blocked.', code: 'csrf' });
+    }
+  }
+  // DELETE calls frequently carry no body at all; only insist on JSON when a
+  // body is actually present.
+  const hasBody = Number(req.headers['content-length'] || 0) > 0 || Boolean(req.headers['transfer-encoding']);
+  if (hasBody && !req.is('application/json')) {
+    return res.status(415).json({ ok: false, error: 'Expected a JSON request body.', code: 'unsupported_media' });
+  }
+  return next();
+});
+
+/* ---------------------------------------------------------------- */
+/* API                                                               */
+/* ---------------------------------------------------------------- */
+app.use('/api', publicRouter);
+app.use('/api', authRouter);
+app.use('/api', studentRouter);
+app.use('/api', adminRouter);
+app.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'Unknown endpoint.', code: 'not_found' }));
+
+/* ---------------------------------------------------------------- */
+/* Static assets + app shell                                         */
+/* ---------------------------------------------------------------- */
+const publicDir = path.resolve(process.cwd(), 'public');
+app.use(
+  '/assets',
+  express.static(path.join(publicDir, 'assets'), {
+    maxAge: cfg.production ? '1y' : 0,
+    immutable: cfg.production,
+    index: false,
+  }),
+);
+app.use(
+  '/fonts',
+  express.static(path.join(publicDir, 'fonts'), { maxAge: '1y', immutable: true, index: false }),
+);
+
+app.get(['/favicon.ico', '/favicon.svg'], async (req, res, next) => {
+  try {
+    const { rows } = await query("SELECT value FROM settings WHERE key='site'");
+    const favicon = rows[0]?.value?.faviconUrl;
+    if (!favicon) return next();
+    if (favicon.startsWith('/api/assets/')) return res.redirect(302, favicon);
+    if (favicon.startsWith('data:')) {
+      const [, mime, b64] = /^data:(.+?);base64,(.*)$/.exec(favicon) || [];
+      if (mime && b64) {
+        res.type(mime);
+        return res.send(Buffer.from(b64, 'base64'));
+      }
+    }
+    return res.redirect(302, favicon);
+  } catch {
+    next();
+  }
+});
+
+app.get(/^\/(?!api|assets|fonts).*/, async (req, res) => {
+  try {
+    // Content is embedded in the document so the first paint does not depend on
+    // a second round trip; the client still revalidates on boot.
+    const settings = await getSettings();
+    const content = {
+      site: settings.site,
+      event: settings.event,
+      registration: settings.registration,
+      contact: settings.contact,
+      socials: (settings.socials || []).filter((s) => s.enabled && s.url),
+      footer: settings.footer,
+    };
+    res.type('html').send(await renderDocument(content));
+  } catch (error) {
+    console.error('[render]', error);
+    res.status(500).type('html').send('<!doctype html><title>ORBIT</title><p>Server error. Please refresh.</p>');
+  }
+});
+
+app.use(errorHandler);
+
+/* ---------------------------------------------------------------- */
+/* Bootstrap                                                         */
+/* ---------------------------------------------------------------- */
+async function ensureAdmin() {
+  const existing = await q1('SELECT count(*)::int AS n FROM admin_users');
+  if (existing.n > 0) return;
+
+  let password = cfg.adminPassword;
+  let generated = false;
+  if (!password || password === 'change-me-before-you-deploy') {
+    password = crypto.randomBytes(9).toString('base64url');
+    generated = true;
+  }
+  await query('INSERT INTO admin_users (id, email, name, password_hash) VALUES ($1,$2,$3,$4)', [
+    uuid(),
+    cfg.adminEmail.toLowerCase(),
+    cfg.adminName,
+    await hashPassword(password),
+  ]);
+
+  const banner = [
+    '',
+    '────────────────────────────────────────────────────────────',
+    '  Administrator account created',
+    `  email:    ${cfg.adminEmail}`,
+    `  password: ${password}`,
+    generated ? '  (generated once — change it in Admin → Account)' : '',
+    '────────────────────────────────────────────────────────────',
+    '',
+  ].filter(Boolean).join('\n');
+  console.log(banner);
+  try {
+    fs.mkdirSync(path.resolve(process.cwd(), cfg.dataDir), { recursive: true });
+    fs.writeFileSync(
+      path.resolve(process.cwd(), cfg.dataDir, 'admin-credentials.txt'),
+      `email: ${cfg.adminEmail}\npassword: ${password}\ncreated: ${new Date().toISOString()}\n`,
+      { mode: 0o600 },
+    );
+  } catch {
+    /* non-fatal */
+  }
+}
+
+export async function start() {
+  await initDb(cfg);
+  await ensureAdmin();
+  await cleanupSessions();
+  setInterval(() => cleanupSessions().catch(() => {}), 6 * 60 * 60 * 1000).unref?.();
+
+  const server = app.listen(cfg.port, '0.0.0.0', () => {
+    const dbKind = cfg.databaseUrl ? 'postgres' : 'embedded postgres (pglite)';
+    console.log(`ORBIT Olympiad ready on http://localhost:${cfg.port}  ·  database: ${dbKind}`);
+  });
+  server.on('error', (err) => {
+    console.error('[server]', err.message);
+    process.exitCode = 1;
+  });
+  return server;
+}
+
+if (process.argv[1] && process.argv[1].endsWith('server/index.js')) {
+  start().catch((error) => {
+    console.error('Failed to start:', error);
+    process.exit(1);
+  });
+}
+
+export { app };
