@@ -15,6 +15,8 @@ const DATA_DIR = path.join(ROOT, 'data-ui-test');
 fs.rmSync(DATA_DIR, { recursive: true, force: true });
 
 process.env.DATA_DIR = DATA_DIR;
+// Set TEST_DATABASE_URL to run this suite against a real hosted PostgreSQL.
+if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
 process.env.PORT = '3998';
 process.env.NODE_ENV = 'test';
 process.env.ADMIN_EMAIL = 'ui-admin@test.local';

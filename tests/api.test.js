@@ -19,6 +19,9 @@ const DATA_DIR = path.join(ROOT, 'data-test');
 fs.rmSync(DATA_DIR, { recursive: true, force: true });
 
 process.env.DATA_DIR = DATA_DIR;
+// Set TEST_DATABASE_URL to run this suite against a real hosted PostgreSQL
+// (the exact driver production uses) instead of the embedded one.
+if (process.env.TEST_DATABASE_URL) process.env.DATABASE_URL = process.env.TEST_DATABASE_URL;
 process.env.PORT = '3999';
 process.env.NODE_ENV = 'test';
 process.env.ADMIN_EMAIL = 'admin@test.local';

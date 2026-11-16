@@ -47,10 +47,18 @@ async function createPglite(dataDir) {
 
 async function createPostgres(url, ssl) {
   const { default: pg } = await import('pg');
+  // Serverless functions run many short-lived instances, and every hosted
+  // Postgres has a hard connection ceiling — including the Supabase transaction
+  // pooler. Keep the pool tiny and let a stalled connection fail fast instead of
+  // hanging the whole invocation.
+  const serverless = Boolean(process.env.VERCEL);
   const pool = new pg.Pool({
     connectionString: url,
     ssl: ssl ? { rejectUnauthorized: false } : undefined,
-    max: Number(process.env.PG_POOL_MAX || 5),
+    max: Number(process.env.PG_POOL_MAX || (serverless ? 1 : 5)),
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT || 10_000),
+    allowExitOnIdle: serverless,
   });
   return {
     kind: 'postgres',
@@ -66,8 +74,11 @@ async function createPostgres(url, ssl) {
       try {
         await client.query('BEGIN');
         const result = await fn({
-          async query(sql, params = []) {
-            const r = await client.query(sql, params);
+          async query(sql, params) {
+            // With no parameters, keep the simple query protocol: the schema is a
+            // multi-statement string, and the extended protocol refuses more than
+            // one command per statement.
+            const r = params && params.length ? await client.query(sql, params) : await client.query(sql);
             return { rows: r.rows, rowCount: r.rowCount ?? 0 };
           },
         });
@@ -113,7 +124,24 @@ export const q1 = async (sql, params) => (await query(sql, params)).rows[0] ?? n
 import { SCHEMA } from './schema.js';
 import { seedDatabase } from './seed.js';
 
+/**
+ * Apply the schema and first-boot content.
+ *
+ * On a hosted Postgres several serverless instances can cold-start at the same
+ * moment. Both would see empty tables and both would seed, duplicating the
+ * journal and FAQs. A transaction-scoped advisory lock serialises that work:
+ * the second instance waits, then finds the rows already there and inserts
+ * nothing. PGlite is single-process, so it needs no lock.
+ */
 async function migrate() {
+  if (driver.kind === 'postgres') {
+    await driver.transaction(async (tx) => {
+      await tx.query('SELECT pg_advisory_xact_lock(918273645)');
+      await tx.query(SCHEMA);
+      await seedDatabase(tx);
+    });
+    return;
+  }
   await driver.exec(SCHEMA);
   await seedDatabase(driver);
 }
