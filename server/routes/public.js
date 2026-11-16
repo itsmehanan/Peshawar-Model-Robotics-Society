@@ -121,9 +121,14 @@ publicRouter.get(
 );
 
 /** Serve uploaded branding assets from the database. */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 publicRouter.get(
   '/assets/:id',
   wrap(async (req, res) => {
+    // Checked before the query: Postgres raises a type error on a malformed uuid,
+    // which surfaced as a 500 for any guessed URL instead of a plain 404.
+    if (!UUID_RE.test(String(req.params.id))) return res.status(404).end();
     const { rows } = await query('SELECT mime, data FROM assets WHERE id = $1', [req.params.id]);
     if (!rows.length) return res.status(404).end();
     res.set('Content-Type', rows[0].mime);

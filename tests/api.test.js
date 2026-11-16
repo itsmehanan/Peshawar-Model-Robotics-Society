@@ -549,6 +549,15 @@ await test('the deployment health check answers before the API 404 does', async 
   assert.equal(unknown.status, 404);
 });
 
+await test('a malformed asset id is a 404, not a server error', async () => {
+  // Postgres rejects a non-uuid against a uuid column, which used to surface as a
+  // 500 for any guessed /api/assets/<junk> URL.
+  for (const id of ['not-a-uuid', '00000000-0000-0000-0000-000000000000', '../server']) {
+    const res = await fetch(`${BASE}/api/assets/${encodeURIComponent(id)}`);
+    assert.equal(res.status, 404, `${id} should be 404, got ${res.status}`);
+  }
+});
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} tests passed`);
