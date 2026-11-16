@@ -12,6 +12,28 @@ and `olympiad_portal.html`) into one production-grade application:
   Postgres in production), server-side validation, hashed passwords, cookie
   sessions, audit log
 
+## Design direction
+
+The 3D orbital language of the supplied `olympiad_portal.html` is kept and
+sharpened, not replaced:
+
+- **Palette** — deep blue-black (`#070c15`) instead of flat navy, one instrument
+  cyan (`#74e3e6`), one warm brass (`#dcc08a`) as the second accent. Colour is
+  used for hierarchy, never decoration.
+- **Depth without effects** — the hero plate is a real CSS 3D scene
+  (`transform-style: preserve-3d`) of a lit sphere inside four independently
+  rotating orbital planes, with a capped pointer parallax. Panels get depth from
+  extruded edges, hairline drafting ticks and a 2px milled bottom edge on
+  buttons. No glassmorphism, no blur glows, no gradient soup, no oversized
+  rounded cards (radius is 2–3px throughout).
+- **Motion** — staggered hero entrance, scroll reveals with IntersectionObserver,
+  a reading-progress hairline, counting statistics, pointer tilt on cards, a
+  marquee band. Every one of them is disabled under
+  `prefers-reduced-motion: reduce`.
+- **The plate is fixed.** Branding (name, logo, favicon, colours of chrome) is
+  admin-editable; the hero artwork deliberately is not, so every deployment
+  shares the same identity anchor.
+
 Nothing about a registration lives in `localStorage`. Accounts, teams and
 settings are rows in a real database, so they survive refreshes, restarts and
 follow the student to any device they sign in from.
@@ -46,7 +68,7 @@ Sign in at `/#/admin`. Change the password immediately in **Account**.
 | --- | --- |
 | `npm start` | run the server (port `PORT`, default 3000) |
 | `npm run dev` | run with `--watch` for auto-restart |
-| `npm test` | 34 HTTP/API tests against a throwaway database |
+| `npm test` | 39 HTTP/API tests against a throwaway database |
 | `npm run test:ui` | 20 jsdom browser-flow tests (register → dashboard → admin) |
 | `npm run test:all` | both suites |
 | `npm run admin:set-password -- --email a@b.c --password "NewPass123"` | reset/create an admin |
@@ -229,7 +251,16 @@ sql/
 
 ---
 
-## 5. Honest limitations
+## 5. Fixes since the first build
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Sign in to admin, and it throws you straight back to the sign-in screen | The app is often embedded in a cross-site iframe (preview panes, school portals). Browsers drop `SameSite=Lax` cookies there, so the login POST succeeded server-side and the very next `/api/admin/overview` call was anonymous. `state.admin` was then nulled and the panel re-rendered as the login form. | Sessions now also return a token that the client replays as `X-Admin-Token` / `X-Session-Token` from `sessionStorage`. Cookies remain primary. A failed request re-checks `/api/admin/session` before signing anyone out, and `/api/me` is `no-store`. |
+| Enter in an admin modal wiped the form / navigated away | Modal bodies are `<form>` but the Save button lives in the modal footer, outside the form — so Enter triggered an implicit submission with no `action`, i.e. a full page load. | Modal forms intercept `submit` and trigger the primary action; footer buttons are `type="button"`. |
+| Field cards and the journal were empty on a cold load | The shell embedded only branding; a failed/slow `/api/content` left the lists undefined and an unguarded `.slice()` threw. | The server now embeds the **complete** public payload (fields, articles, FAQs, announcements, counts) and every page degrades to empty arrays instead of throwing. |
+| An old `pages/admin.js` could be served from cache after a deploy | `/assets` were served `immutable` in production. | Application scripts are `no-cache, must-revalidate` with ETags. |
+
+## 6. Honest limitations
 
 These are real and worth knowing before you rely on the site:
 
@@ -259,15 +290,22 @@ These are real and worth knowing before you rely on the site:
    "require approval", "leaders change instantly" or "locked" for the whole
    event. Per-category overrides would need another column and were not added.
 8. **Accessibility is good but not audited.** Focus states, labels, contrast and
-   reduced-motion are handled; a screen-reader pass and an axe audit are still
+   reduced-motion are handled, and an automated structural/label audit across
+   22 routes reports zero issues; a screen-reader pass and an axe audit are still
    recommended before a public launch.
+9. **The visual design has not been seen in a real browser by me.** The 3D plate
+   is plain CSS transforms and the palette was verified numerically (accent
+   contrast on `#070c15` is 11.9:1 for cyan, 9.4:1 for brass), but perspective
+   and animation timing are the kind of thing that needs human eyes. If the
+   plate reads too subtle on your screen, the two dials are
+   `--rx`/`--ry` on `.plate__stage` and the ring opacities in `.plate__ring`.
 
 ---
 
-## 6. Test status
+## 7. Test status
 
 ```
-npm test              → 34/34 passed
+npm test              → 39/39 passed
 npm run test:ui       → 20/20 passed
 ```
 

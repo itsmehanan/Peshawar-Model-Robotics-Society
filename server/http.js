@@ -23,6 +23,20 @@ export const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, nex
 
 export const COOKIES = { student: 'orbit_sid', admin: 'orbit_admin' };
 
+/** Header equivalents of the two session cookies (see `setSessionCookie`). */
+export const TOKEN_HEADERS = { student: 'x-session-token', admin: 'x-admin-token' };
+
+/**
+ * Session cookies are the primary credential and the reason accounts survive
+ * refreshes, restarts and other devices.
+ *
+ * But this app is also routinely embedded in a cross-site iframe (preview
+ * panes, dashboards, school VLEs). Browsers drop `SameSite=Lax` cookies there,
+ * which produced a "sign in and get bounced straight back" loop: the POST
+ * succeeded and the very next API call was anonymous. The token is therefore
+ * also returned in the JSON body and the client can replay it as a header —
+ * see `readToken`.
+ */
 export function setSessionCookie(res, kind, token, days) {
   const name = COOKIES[kind];
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
@@ -35,6 +49,16 @@ export function setSessionCookie(res, kind, token, days) {
 export function clearSessionCookie(res, kind) {
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   res.append('Set-Cookie', `${COOKIES[kind]}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0${secure}`);
+}
+
+/**
+ * Header fallback for contexts where cookies are unavailable. Only the value
+ * the server itself issued is accepted, and it is scoped per session kind.
+ */
+export function headerToken(req, kind) {
+  const value = req.headers[TOKEN_HEADERS[kind]];
+  if (typeof value === 'string' && value.length >= 20 && value.length <= 200) return value;
+  return null;
 }
 
 export function readCookie(req, name) {
@@ -55,17 +79,20 @@ export async function createSession(res, { kind, studentId = null, adminId = nul
     [uuid(), hashToken(token), studentId, adminId, kind, String(userAgent).slice(0, 180), String(days)],
   );
   setSessionCookie(res, kind, token, days);
+  // Returned so the client can fall back to a header when the browser refuses
+  // to keep a SameSite cookie (cross-site iframe / embedded preview).
+  return token;
 }
 
 export async function destroySession(req, res, kind) {
-  const token = readCookie(req, COOKIES[kind]);
+  const token = readCookie(req, COOKIES[kind]) || headerToken(req, kind);
   if (token) await query('DELETE FROM sessions WHERE token_hash = $1', [hashToken(token)]);
   clearSessionCookie(res, kind);
 }
 
 /** Resolve the signed-in student, or null. Cleans up expired rows lazily. */
 export async function currentStudent(req) {
-  const token = readCookie(req, COOKIES.student);
+  const token = readCookie(req, COOKIES.student) || headerToken(req, 'student');
   if (!token) return null;
   const row = await q1(
     `SELECT s.* FROM sessions se
@@ -77,7 +104,7 @@ export async function currentStudent(req) {
 }
 
 export async function currentAdmin(req) {
-  const token = readCookie(req, COOKIES.admin);
+  const token = readCookie(req, COOKIES.admin) || headerToken(req, 'admin');
   if (!token) return null;
   return q1(
     `SELECT a.id, a.email, a.name FROM sessions se

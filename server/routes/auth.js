@@ -12,6 +12,9 @@ import { getSettings } from '../settings.js';
 import { hashPassword, verifyPassword, newToken, uuid, throttle, clearThrottle } from '../security.js';
 import { ValidationError, email as vEmail, password as vPassword, phone as vPhone, str, oneOf, int, bool } from '../validation.js';
 import {
+  readCookie,
+  headerToken,
+  COOKIES,
   wrap,
   fail,
   currentStudent,
@@ -173,7 +176,12 @@ authRouter.post(
     });
     await audit('student', result.studentId, 'register', { categoryId, teamMode, teamId: result.teamId });
 
-    res.status(201).json({ ok: true, student: await loadStudent(result.studentId), admin: null });
+    res.status(201).json({
+      ok: true,
+      student: await loadStudent(result.studentId),
+      admin: null,
+      sessionToken: token,
+    });
   }),
 );
 
@@ -197,14 +205,15 @@ authRouter.post(
     if (!valid) fail(401, 'Email or password is incorrect.', { code: 'bad_credentials' });
     clearThrottle(key);
 
+    const token = newToken();
     await createSession(res, {
       kind: 'student',
       studentId: student.id,
-      token: newToken(),
+      token,
       days: Number(process.env.SESSION_DAYS || 30),
       userAgent: req.headers['user-agent'],
     });
-    res.json({ ok: true, student: await loadStudent(student.id), admin: null });
+    res.json({ ok: true, student: await loadStudent(student.id), admin: null, sessionToken: token });
   }),
 );
 
@@ -231,10 +240,11 @@ authRouter.post(
     clearThrottle(key);
 
     await query('UPDATE admin_users SET last_login_at = now() WHERE id = $1', [admin.id]);
+    const token = newToken();
     await createSession(res, {
       kind: 'admin',
       adminId: admin.id,
-      token: newToken(),
+      token,
       days: 7,
       userAgent: req.headers['user-agent'],
     });
@@ -242,7 +252,7 @@ authRouter.post(
     // Read the row back rather than re-resolving the session: the cookie is only
     // present on the *next* request.
     const profile = await q1('SELECT id, email, name FROM admin_users WHERE id = $1', [admin.id]);
-    res.json({ ok: true, admin: profile, student: null });
+    res.json({ ok: true, admin: profile, student: null, sessionToken: token, sessionDays: 7 });
   }),
 );
 
@@ -257,6 +267,10 @@ authRouter.post(
 authRouter.get(
   '/me',
   wrap(async (req, res) => {
+    // Session state must never be served from a cache — a stale copy here is
+    // what makes a signed-in admin bounce back to the login screen.
+    res.set('Cache-Control', 'no-store, must-revalidate');
+    res.set('Vary', 'Cookie');
     const [student, admin] = await Promise.all([currentStudent(req), currentAdmin(req)]);
     const settings = await getSettings();
     res.json({

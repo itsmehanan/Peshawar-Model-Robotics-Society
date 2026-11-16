@@ -2,7 +2,7 @@ import { esc, richText, formatDate } from '../ui.js';
 import { state } from '../store.js';
 
 export function journalPage() {
-  const { articles } = state.content;
+  const articles = state.content?.articles || [];
   if (!articles.length) {
     return `<div class="view"><section class="section"><div class="wrap center">
       <span class="eyebrow eyebrow--plain">Journal</span>
@@ -54,7 +54,7 @@ export function journalPage() {
 }
 
 export function articlePage({ slug }) {
-  const { articles } = state.content;
+  const articles = state.content?.articles || [];
   const article = articles.find((a) => a.slug === slug);
   if (!article) {
     return `<div class="view"><section class="section"><div class="wrap wrap--narrow center">
@@ -63,7 +63,7 @@ export function articlePage({ slug }) {
       <a class="btn btn--solid mt-2" href="#/journal" data-link>Back to the journal</a>
     </div></section></div>`;
   }
-  const others = articles.filter((a) => a.slug !== slug).slice(0, 2);
+  const others = (articles || []).filter((a) => a.slug !== slug).slice(0, 2);
 
   return `<div class="view">
     <article>

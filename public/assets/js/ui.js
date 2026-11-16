@@ -97,7 +97,7 @@ export function modal({ title, body, actions = [], onMount, size }) {
         <button class="modal__close" data-modal-close aria-label="Close">✕</button>
       </div>
       <div class="modal__body">${body}</div>
-      ${actions.length ? `<div class="modal__foot">${actions.map((a) => `<button class="btn ${a.cls || 'btn--ghost btn--sm'}" data-modal-action="${esc(a.id)}">${esc(a.label)}</button>`).join('')}</div>` : ''}
+      ${actions.length ? `<div class="modal__foot">${actions.map((a) => `<button type="button" class="btn ${a.cls || 'btn--ghost btn--sm'}" data-modal-action="${esc(a.id)}">${esc(a.label)}</button>`).join('')}</div>` : ''}
     </div>`;
 
   const dialog = root.querySelector('.modal');
@@ -105,6 +105,24 @@ export function modal({ title, body, actions = [], onMount, size }) {
 
   const close = () => closeModal();
   root.querySelectorAll('[data-modal-close]').forEach((b) => b.addEventListener('click', close));
+
+  /**
+   * Modal bodies contain real `<form>` elements, but the Save button lives in
+   * the modal footer, outside that form. Without this, pressing Enter in any
+   * field triggered the browser's implicit submission of a form with no
+   * action — a full page navigation that threw away everything typed.
+   * Enter now triggers the last (primary) action instead.
+   */
+  const primary = actions[actions.length - 1];
+  root.querySelectorAll('form').forEach((form) => {
+    if (form.dataset.modalBound === '1') return;
+    form.dataset.modalBound = '1';
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!primary) return;
+      root.querySelector(`[data-modal-action="${primary.id}"]`)?.click();
+    });
+  });
   root.addEventListener('mousedown', (e) => {
     if (e.target === root) close();
   });
@@ -256,6 +274,103 @@ export function onSubmit(form, handler) {
       setBusy(submit, false);
     }
   });
+}
+
+/**
+ * 3D pointer tilt for flat panels.
+ *
+ * Cards are flat by design; the depth comes from a small rotation that follows
+ * the cursor, capped at a couple of degrees so it reads as a physical card
+ * catching the light rather than a novelty. Disabled for reduced-motion and
+ * for touch, where there is no cursor to follow.
+ */
+export function mountTilt(root = document) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const nodes = root.querySelectorAll('[data-tilt]');
+  if (!nodes.length) return;
+  nodes.forEach((node) => {
+    let frame = 0;
+    const move = (event) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = node.getBoundingClientRect();
+        const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
+        const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
+        node.style.transform = `perspective(760px) rotateX(${(-dy * 4).toFixed(2)}deg) rotateY(${(dx * 5).toFixed(2)}deg) translateY(-5px)`;
+      });
+    };
+    const reset = () => {
+      node.style.transform = '';
+    };
+    node.addEventListener('pointermove', move);
+    node.addEventListener('pointerleave', reset);
+    node.addEventListener('blur', reset, true);
+  });
+}
+
+/**
+ * Count a figure up to its value once, when it scrolls into view.
+ * Values that are not plain numbers ("04", "120+", "ONE") keep their literal
+ * text and simply fade — guessing at a format is worse than not animating.
+ */
+export function mountCounters(root = document) {
+  const nodes = root.querySelectorAll('[data-count]');
+  if (!nodes.length) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        const node = entry.target;
+        const raw = node.dataset.count || node.textContent || '';
+        const match = /^(\d+)(.*)$/.exec(raw.trim());
+        if (!match) return;
+        const target = Number(match[1]);
+        const suffix = match[2] || '';
+        const pad = match[1].length > 1 && match[1].startsWith('0') ? match[1].length : 0;
+        const start = performance.now();
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / 900);
+          const value = Math.round(target * (1 - Math.pow(1 - t, 3)));
+          node.textContent = (pad ? String(value).padStart(pad, '0') : String(value)) + suffix;
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    },
+    { threshold: 0.6 },
+  );
+  nodes.forEach((n) => observer.observe(n));
+}
+
+/** Thin reading-progress bar under the header. */
+export function mountProgress() {
+  if (document.querySelector('.progress-line') || !document.getElementById('main')) return;
+  const bar = document.createElement('div');
+  bar.className = 'progress-line';
+  bar.setAttribute('aria-hidden', 'true');
+  bar.innerHTML = '<span></span>';
+  document.body.appendChild(bar);
+  const fill = bar.firstChild;
+  let frame = 0;
+  const update = () => {
+    frame = 0;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - window.innerHeight;
+    fill.style.setProperty('--progress', max > 40 ? `${Math.min(100, (window.scrollY / max) * 100)}%` : '0%');
+  };
+  const onScroll = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
 }
 
 /** Reveal-on-scroll. One shared observer, disconnected when nodes leave. */

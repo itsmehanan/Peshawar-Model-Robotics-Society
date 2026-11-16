@@ -1,5 +1,6 @@
 import { post } from '../api.js';
 import { state, setStudent } from '../store.js';
+import { storeToken } from '../api.js';
 import { esc, onSubmit, toast } from '../ui.js';
 
 export function loginPage() {
@@ -55,6 +56,7 @@ export function mountLogin(root, { navigate }) {
   if (!form) return;
   onSubmit(form, async (data) => {
     const result = await post('/login', { email: data.get('email'), password: data.get('password') });
+    storeToken('student', result.sessionToken);
     setStudent(result.student);
     toast('Signed in.', 'ok');
     navigate('#/dashboard');

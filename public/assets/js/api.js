@@ -11,7 +11,37 @@ export class ApiError extends Error {
   }
 }
 
-let inflight = new Map();
+/**
+ * Session token fallback.
+ *
+ * The server issues HttpOnly cookies, which is what makes accounts survive a
+ * refresh, a restart or another device. When this app is embedded in a
+ * cross-site frame (preview panes, dashboards, school portals) the browser
+ * drops those cookies, and every API call came back 401 — the visible symptom
+ * was "I sign in to admin and it throws me back to the login screen".
+ *
+ * So the same token is mirrored into sessionStorage and replayed as a header.
+ * sessionStorage is per-tab and dies with the tab; it is not the source of
+ * truth for the account, only a transport workaround. Cookies always win.
+ */
+const TOKEN_KEYS = { student: 'orbit=student', admin: 'orbit=admin' };
+
+export function storeToken(kind, token) {
+  try {
+    if (token) sessionStorage.setItem(TOKEN_KEYS[kind], token);
+    else sessionStorage.removeItem(TOKEN_KEYS[kind]);
+  } catch {
+    /* private mode / storage disabled — cookies still work */
+  }
+}
+
+function readToken(kind) {
+  try {
+    return sessionStorage.getItem(TOKEN_KEYS[kind]) || '';
+  } catch {
+    return '';
+  }
+}
 
 export async function api(path, { method = 'GET', body, silent = false } = {}) {
   const key = `${method} ${path}`;
@@ -20,6 +50,10 @@ export async function api(path, { method = 'GET', body, silent = false } = {}) {
     credentials: 'same-origin',
     headers: { Accept: 'application/json' },
   };
+  const studentToken = readToken('student');
+  const adminToken = readToken('admin');
+  if (studentToken) options.headers['X-Session-Token'] = studentToken;
+  if (adminToken) options.headers['X-Admin-Token'] = adminToken;
   if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);

@@ -40,15 +40,30 @@ function embeddedContent() {
   }
 }
 
+let booted = false;
+
 export async function boot() {
   const inline = embeddedContent();
-  if (inline && !state.content) state.content = inline;
+  // The embedded payload is complete, so it is a real first paint rather than
+  // a placeholder. It is only used before the network copy arrives.
+  if (inline && !booted) state.content = inline;
+  booted = true;
   const [content, me] = await Promise.allSettled([loadContent(), api('/me')]);
   if (content.status === 'fulfilled') state.content = content.value;
   if (me.status === 'fulfilled') {
     state.student = me.value.student;
     state.admin = me.value.admin;
     state.registration = me.value.registration || {};
+    // Session genuinely ended (expired cookie AND dead token) — forget the
+    // fallback so we do not keep replaying a token the server rejects.
+    if (!me.value.student && !me.value.admin) {
+      try {
+        sessionStorage.removeItem('orbit=student');
+        sessionStorage.removeItem('orbit=admin');
+      } catch {
+        /* ignore */
+      }
+    }
   }
   state.ready = true;
   emit();

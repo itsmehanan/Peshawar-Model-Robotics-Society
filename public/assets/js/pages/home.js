@@ -5,19 +5,20 @@ const pad = (n) => String(n).padStart(2, '0');
 
 function orbitalPlate({ venue, city, kicker }) {
   return `
-  <figure class="plate reveal" data-delay="1" aria-label="Cover plate: orbital diagram of the exhibition">
-    <div class="plate__rings" aria-hidden="true">
-      <svg viewBox="0 0 500 500" role="presentation">
-        <circle class="plate__ring" cx="250" cy="250" r="212"></circle>
-        <circle class="plate__ring plate__ring--faint" cx="250" cy="250" r="166"></circle>
-        <circle class="plate__ring" cx="250" cy="250" r="118"></circle>
-        <ellipse class="plate__meridian" cx="250" cy="250" rx="212" ry="86" transform="rotate(-24 250 250)"></ellipse>
-        <ellipse class="plate__meridian" cx="250" cy="250" rx="166" ry="62" transform="rotate(38 250 250)"></ellipse>
-        <circle class="plate__core" cx="250" cy="250" r="6"></circle>
-        <circle class="plate__satellite" cx="250" cy="38" r="5.5"></circle>
-        <circle class="plate__satellite plate__satellite--2" cx="382" cy="250" r="4"></circle>
-        <circle class="plate__satellite plate__satellite--3" cx="250" cy="368" r="3.2"></circle>
-      </svg>
+  <figure class="plate reveal" data-delay="1" data-plate aria-label="Cover plate: orbital diagram of the exhibition">
+    <div class="plate__stage" aria-hidden="true">
+      <div class="plate__rings">
+        <span class="plate__ring plate__ring--a"></span>
+        <span class="plate__ring plate__ring--b"></span>
+        <span class="plate__ring plate__ring--c"></span>
+        <span class="plate__ring plate__ring--d"></span>
+      </div>
+      <span class="plate__meridian"></span>
+      <span class="plate__core"></span>
+      <span class="plate__satellite plate__satellite--1"></span>
+      <span class="plate__satellite plate__satellite--2"></span>
+      <span class="plate__satellite plate__satellite--3"></span>
+      <span class="plate__ticks"><span></span><span></span><span></span><span></span></span>
     </div>
     <figcaption class="plate__label plate__label--tl">
       ${esc((kicker || 'Season 04').toUpperCase())}
@@ -44,13 +45,13 @@ function noticeBar(notice) {
 
 function fieldCard(category, index) {
   return `
-  <a class="field-card reveal" data-delay="${Math.min(index, 4)}" href="#/fields/${esc(category.id)}" data-link>
+  <a class="field-card reveal" data-delay="${Math.min(index, 4)}" data-tilt href="#/fields/${esc(category.id)}" data-link>
     <div class="field-card__top">
       <span class="field-card__index">${pad(index + 1)} / Field</span>
       <span class="field-card__symbol" aria-hidden="true">${esc(category.symbol || '◇')}</span>
     </div>
     <h3>${esc(category.name)}</h3>
-    <p>${esc(category.summary)}</p>
+    <p class="small ink2">${esc(category.summary)}</p>
     <div class="field-card__foot">
       <span>Explore</span>
       <span class="field-card__arrow" aria-hidden="true">→</span>
@@ -60,7 +61,7 @@ function fieldCard(category, index) {
 
 function journalCard(article, index) {
   return `
-  <a class="journal-card reveal" data-delay="${Math.min(index + 1, 4)}" href="#/journal/${esc(article.slug)}" data-link>
+  <a class="journal-card reveal" data-delay="${Math.min(index + 1, 4)}" data-tilt href="#/journal/${esc(article.slug)}" data-link>
     <div class="journal-card__meta">
       <span>${esc(article.label)}</span>
       <span aria-hidden="true">·</span>
@@ -77,9 +78,9 @@ export function homePage() {
   const site = content.site;
   const event = content.event;
   const registration = content.registration || {};
-  const categories = content.categories;
-  const articles = content.articles.slice(0, 3);
-  const faqs = content.faqs.slice(0, 4);
+  const categories = content.categories || [];
+  const articles = (content.articles || []).slice(0, 3);
+  const faqs = (content.faqs || []).slice(0, 4);
   const counts = content.counts || {};
   const deadline = registration.deadlineLabel || '';
 
@@ -159,12 +160,12 @@ export function homePage() {
 
     <section class="section section--dark">
       <div class="wrap">
-        <div class="section-head" style="border-bottom-color:var(--dark-line)">
+        <div class="section-head">
           <div>
-            <span class="eyebrow" style="color:#9fada5">02 — The day</span>
-            <h2 class="h2 mt-1" style="color:var(--paper)">A printed programme, <em style="font-style:italic;color:#e08256">not a schedule of talks.</em></h2>
+            <span class="eyebrow">02 — The day</span>
+            <h2 class="h2 mt-1">A working exhibition,<br><em>not a schedule of talks.</em></h2>
           </div>
-          <p class="section-head__aside small" style="color:#a9b6ae">
+          <p class="section-head__aside small">
             Booths open in the morning, judges circulate before lunch, and the hall is open to families and
             visiting schools in the afternoon.
           </p>
@@ -172,19 +173,19 @@ export function homePage() {
         <dl class="event-band">
           <div class="event-band__item">
             <dt>Date</dt>
-            <dd>${esc(event.dateLabel || 'To be announced')}<small>${esc(event.doorsLabel || '')}</small></dd>
+            <dd>${esc(event.dateLabel || 'To be announced')}<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${esc(event.doorsLabel || '')}</small></dd>
           </div>
           <div class="event-band__item">
             <dt>Venue</dt>
-            <dd>${esc(event.venue || 'To be announced')}<small>${esc(event.city || '')}</small></dd>
+            <dd>${esc(event.venue || 'To be announced')}<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${esc(event.city || '')}</small></dd>
           </div>
           <div class="event-band__item">
             <dt>Entries</dt>
-            <dd>${counts.students || 0} students<small>${counts.teams || 0} teams registered</small></dd>
+            <dd>${counts.students || 0} students<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${counts.teams || 0} teams registered</small></dd>
           </div>
           <div class="event-band__item">
             <dt>Registration</dt>
-            <dd>${registration.open === false ? 'Closed' : 'Open now'}<small>${esc(deadline || 'Teams of two to six')}</small></dd>
+            <dd>${registration.open === false ? 'Closed' : 'Open now'}<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${esc(deadline || 'Teams of two to six')}</small></dd>
           </div>
         </dl>
       </div>
@@ -204,14 +205,17 @@ export function homePage() {
         </div>
         <div class="steps">
           <article class="step">
+            <span class="step__num">Step 01</span>
             <h3>Create your account</h3>
             <p>Name, class, school, one field of entry. About forty seconds, and you can edit all of it later.</p>
           </article>
           <article class="step">
+            <span class="step__num">Step 02</span>
             <h3>Start or join a team</h3>
             <p>Leaders create a team, set its size and share the passcode. Everyone else joins with that code — same school, same field.</p>
           </article>
           <article class="step">
+            <span class="step__num">Step 03</span>
             <h3>Build, then present</h3>
             <p>Prepare the object and a two-minute explanation. Judges visit every booth and leave written feedback.</p>
           </article>
@@ -238,7 +242,7 @@ export function homePage() {
           <dl class="stats" style="align-self:start">
             ${(event.stats || [])
               .map(
-                (s) => `<div class="stat"><dd class="stat__value">${esc(s.value)}</dd><dt class="stat__label">${esc(s.label)}</dt></div>`,
+                (s) => `<div class="stat"><dd class="stat__value" data-count>${esc(s.value)}</dd><dt class="stat__label">${esc(s.label)}</dt></div>`,
               )
               .join('')}
           </dl>
@@ -294,7 +298,7 @@ export function homePage() {
               ${content.contact.phone ? `<a class="underline" href="tel:${esc(content.contact.phone.replace(/\s/g, ''))}">${esc(content.contact.phone)}</a>` : ''}
             </div>
             ${
-              content.socials.length
+              (content.socials || []).length
                 ? `<div class="socials mt-2">
                     ${content.socials
                       .map(
@@ -314,7 +318,7 @@ export function homePage() {
 
     <section class="section section--tight" style="padding-top:0">
       <div class="wrap">
-        <div class="stub">
+        <div class="callout callout--accent" style="display:flex;justify-content:space-between;align-items:center;gap:1.4rem;flex-wrap:wrap;padding:clamp(1.2rem,3vw,2rem)">
           <div>
             <span class="eyebrow">${registration.open === false ? 'Registration closed' : 'Entries open'}</span>
             <h2 class="stub__title mt-1">
@@ -328,7 +332,7 @@ export function homePage() {
               }
             </p>
           </div>
-          <div class="stub__actions">
+          <div class="row">
             ${
               registration.open === false
                 ? `<a class="btn btn--solid" href="#/contact" data-link>Contact the organisers</a>`
@@ -355,6 +359,7 @@ function richInk(headline) {
 
 export function mountHome(root) {
   mountFaq(root);
+  mountPlate(root);
   const close = root.querySelector('[data-dismiss-notice]');
   close?.addEventListener('click', () => {
     const bar = close.closest('.notice-bar');
@@ -362,4 +367,40 @@ export function mountHome(root) {
     bar.style.opacity = '0';
     setTimeout(() => bar.remove(), 180);
   });
+}
+
+/**
+ * Pointer parallax for the cover plate.
+ *
+ * The plate is decorative and fixed — it is deliberately not admin-editable,
+ * because it is the one piece of the identity that should look the same in
+ * every deployment. Movement is capped so it reads as a heavy object settling,
+ * not a toy. Skipped entirely for reduced-motion users and touch devices.
+ */
+function mountPlate(root) {
+  const plate = root.querySelector('[data-plate]');
+  if (!plate) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const stage = plate.querySelector('.plate__stage');
+  if (!stage) return;
+
+  let frame = 0;
+  const onMove = (event) => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const rect = plate.getBoundingClientRect();
+      const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
+      const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
+      stage.style.setProperty('--ry', `${(-12 - dx * 14).toFixed(2)}deg`);
+      stage.style.setProperty('--rx', `${(14 + dy * 10).toFixed(2)}deg`);
+    });
+  };
+  const reset = () => {
+    stage.style.removeProperty('--ry');
+    stage.style.removeProperty('--rx');
+  };
+  plate.addEventListener('pointermove', onMove);
+  plate.addEventListener('pointerleave', reset);
 }

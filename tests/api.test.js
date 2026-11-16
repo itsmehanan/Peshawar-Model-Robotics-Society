@@ -467,6 +467,74 @@ await test('signing out clears the admin session', async () => {
   assert.equal(status, 401);
 });
 
+/* ------------------------------------------------------------------ */
+/* Session transport                                                   */
+/* ------------------------------------------------------------------ */
+console.log('\nsession transport');
+
+await test('a session token works without cookies (embedded/iframe context)', async () => {
+  // The app runs inside cross-site frames in previews and school portals, where
+  // browsers drop SameSite cookies. That produced "sign in, get bounced back".
+  const login = await fetch(`${BASE}/api/admin/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: BASE },
+    body: JSON.stringify({ email: 'admin@test.local', password: 'Sup3rSecretPass' }),
+  });
+  assert.equal(login.status, 200);
+  const body = await login.json();
+  assert.ok(body.sessionToken, 'login must return a replayable session token');
+
+  // Deliberately send no Cookie header at all.
+  const me = await fetch(`${BASE}/api/me`, { headers: { Origin: BASE, 'X-Admin-Token': body.sessionToken } });
+  const meBody = await me.json();
+  assert.equal(me.status, 200);
+  assert.ok(meBody.admin, 'admin session must resolve from the header alone');
+  assert.equal(meBody.admin.email, 'admin@test.local');
+
+  const overview = await fetch(`${BASE}/api/admin/overview`, {
+    headers: { Origin: BASE, 'X-Admin-Token': body.sessionToken },
+  });
+  assert.equal(overview.status, 200, 'admin API must accept the header token');
+
+  // An admin token must not open student-scoped routes.
+  const studentScope = await fetch(`${BASE}/api/student/team`, {
+    headers: { Origin: BASE, 'X-Admin-Token': body.sessionToken },
+  });
+  assert.equal(studentScope.status, 401, 'an admin token must not open student routes');
+});
+
+await test('a forged session header is rejected', async () => {
+  const res = await fetch(`${BASE}/api/me`, { headers: { Origin: BASE, 'X-Admin-Token': 'x'.repeat(40) } });
+  const body = await res.json();
+  assert.equal(res.status, 200);
+  assert.equal(body.admin, null, 'unknown tokens must not authenticate');
+});
+
+await test('/api/me is never cached', async () => {
+  const res = await fetch(`${BASE}/api/me`);
+  assert.match(String(res.headers.get('cache-control')), /no-store/);
+  assert.match(String(res.headers.get('vary')), /Cookie/i);
+});
+
+await test('the app shell embeds the full public content, not just the chrome', async () => {
+  const html = await (await fetch(`${BASE}/`, { headers: { Origin: BASE } })).text();
+  const match = /<script type="application\/json" id="boot-content">([\s\S]*?)<\/script>/.exec(html);
+  assert.ok(match, 'boot payload must be present');
+  const payload = JSON.parse(match[1]);
+  assert.ok(payload.site.name, 'site branding');
+  assert.ok(Array.isArray(payload.categories) && payload.categories.length >= 4, 'field cards');
+  assert.ok(Array.isArray(payload.articles), 'journal teasers');
+  assert.ok(Array.isArray(payload.faqs), 'faqs');
+  assert.ok(Array.isArray(payload.announcements), 'announcements');
+  assert.ok(payload.counts && typeof payload.counts.students === 'number', 'counters');
+});
+
+await test('application scripts are not served immutable', async () => {
+  const res = await fetch(`${BASE}/assets/js/main.js`);
+  assert.equal(res.status, 200);
+  assert.doesNotMatch(String(res.headers.get('cache-control')), /immutable/);
+});
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} tests passed`);

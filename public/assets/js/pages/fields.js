@@ -2,7 +2,7 @@ import { esc, richText } from '../ui.js';
 import { state } from '../store.js';
 
 export function fieldsPage() {
-  const { categories } = state.content;
+  const categories = state.content?.categories || [];
   return `<div class="view">
     <section class="page-hero">
       <div class="wrap page-hero__inner">
@@ -55,7 +55,7 @@ export function fieldDetailPage({ id }) {
   const category = categories.find((c) => c.id === id);
   if (!category) return notFoundField();
   const index = categories.findIndex((c) => c.id === id);
-  const related = articles.slice(0, 2);
+  const related = (articles || []).slice(0, 2);
 
   return `<div class="view">
     <section class="page-hero">

@@ -18,7 +18,7 @@ loadEnv();
 import { initDb, query, q1 } from './db.js';
 import { hashPassword, uuid } from './security.js';
 import { errorHandler, cleanupSessions } from './http.js';
-import { publicRouter } from './routes/public.js';
+import { publicRouter, categoryRows, articleRows, faqRows, announcementRows, publicCounts } from './routes/public.js';
 import { authRouter } from './routes/auth.js';
 import { studentRouter } from './routes/student.js';
 import { adminRouter } from './routes/admin.js';
@@ -104,9 +104,16 @@ const publicDir = path.resolve(process.cwd(), 'public');
 app.use(
   '/assets',
   express.static(path.join(publicDir, 'assets'), {
-    maxAge: cfg.production ? '1y' : 0,
-    immutable: cfg.production,
+    // No immutable long-cache: the app is a single module graph, so one stale
+    // file (for example an old pages/admin.js) silently breaks a panel. ETags
+    // still give us cheap revalidation.
+    maxAge: 0,
+    etag: true,
+    lastModified: true,
     index: false,
+    setHeaders(res) {
+      res.set('Cache-Control', 'no-cache, must-revalidate');
+    },
   }),
 );
 app.use(
@@ -138,6 +145,17 @@ app.get(/^\/(?!api|assets|fonts).*/, async (req, res) => {
     // Content is embedded in the document so the first paint does not depend on
     // a second round trip; the client still revalidates on boot.
     const settings = await getSettings();
+    // The embedded copy is the *complete* public payload, not just the chrome.
+    // A cold load therefore paints the real page even if the follow-up
+    // /api/content request is slow, blocked or fails — the header, the field
+    // cards, the journal teasers and the FAQs are all there from byte one.
+    const [categories, articles, faqs, announcements, counts] = await Promise.all([
+      categoryRows(),
+      articleRows(),
+      faqRows(),
+      announcementRows(),
+      publicCounts(),
+    ]);
     const content = {
       site: settings.site,
       event: settings.event,
@@ -145,6 +163,11 @@ app.get(/^\/(?!api|assets|fonts).*/, async (req, res) => {
       contact: settings.contact,
       socials: (settings.socials || []).filter((s) => s.enabled && s.url),
       footer: settings.footer,
+      categories,
+      articles,
+      faqs,
+      announcements,
+      counts,
     };
     res.type('html').send(await renderDocument(content));
   } catch (error) {

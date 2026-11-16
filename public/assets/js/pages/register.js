@@ -8,7 +8,7 @@
  *   3. the passcode is verified server-side inside a transaction that re-counts
  *      seats, so a team can never be overfilled by two simultaneous joins
  */
-import { get, post, ApiError } from '../api.js';
+import { get, post, ApiError, storeToken } from '../api.js';
 import { state, setStudent, refreshContent } from '../store.js';
 import { esc, onSubmit, toast, applyFieldErrors, setBusy } from '../ui.js';
 
@@ -423,6 +423,7 @@ export async function mountRegister(root, { navigate }) {
     }
 
     const result = await post('/register', payload);
+    storeToken('student', result.sessionToken);
     setStudent(result.student);
     await refreshContent().catch(() => {});
     toast('Registration saved. Welcome to the exhibition.', 'ok');

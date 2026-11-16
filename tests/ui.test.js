@@ -132,7 +132,11 @@ await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
   assert.match(text(), /Fields of entry/);
   assert.ok(q('#siteFoot').textContent.includes('ORBIT'));
-  assert.ok(q('.plate svg'), 'hero artwork must render');
+  // The cover plate is now a CSS 3D scene (stage + rings + core), not an SVG.
+  assert.ok(q('.plate .plate__stage'), 'hero plate stage must render');
+  assert.ok(q('.plate .plate__core'), 'hero plate core sphere must render');
+  assert.ok(q('.plate .plate__ring'), 'hero plate rings must render');
+  assert.equal(q('.plate svg'), null, 'the flat SVG plate was replaced by the 3D scene');
 });
 
 await test('header shows Register, not the dashboard, when signed out', async () => {

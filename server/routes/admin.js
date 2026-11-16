@@ -15,6 +15,22 @@ import { DEFAULT_SETTINGS } from '../seed.js';
 
 export const adminRouter = Router();
 
+/**
+ * Cheap session check used by the client as a heartbeat. The control room is a
+ * long-lived screen: tabs get restored, laptops sleep, sessions expire. Without
+ * this the first failing section render silently swapped the whole panel for
+ * the sign-in form, which looked like "I logged in and got kicked out".
+ */
+adminRouter.get(
+  '/admin/session',
+  wrap(async (req, res) => {
+    res.set('Cache-Control', 'no-store, must-revalidate');
+    const admin = await currentAdmin(req);
+    if (!admin) return res.status(401).json({ ok: false, error: 'Session expired.', code: 'unauthenticated' });
+    res.json({ ok: true, admin });
+  }),
+);
+
 adminRouter.use('/admin', wrap(async (req, res, next) => {
   const admin = await currentAdmin(req);
   requireAdmin(admin);

@@ -8,7 +8,19 @@
  */
 import { state, boot, subscribe, syncChrome } from './store.js';
 import { route, setFallback, resolve, currentPath } from './router.js';
-import { mountReveal, mountFaq, toast, closeModal, modalOpen, esc, linkLabels, mountNavToggle } from './ui.js';
+import {
+  mountReveal,
+  mountFaq,
+  toast,
+  closeModal,
+  modalOpen,
+  esc,
+  linkLabels,
+  mountNavToggle,
+  mountTilt,
+  mountCounters,
+  mountProgress,
+} from './ui.js';
 import { renderFooter, syncActiveNav, setMobileNav } from './chrome.js';
 
 import { homePage, mountHome } from './pages/home.js';
@@ -41,6 +53,8 @@ async function paint(builder, afterMount) {
   syncChrome();
   mountReveal(mount);
   mountFaq(mount);
+  mountTilt(mount);
+  mountCounters(mount);
   await afterMount?.();
   document.body.dataset.lastRoute = path.split('/').slice(0, 3).join('/');
   if (!sameSection) window.scrollTo({ top: lastScroll, behavior: 'instant' in window ? 'instant' : 'auto' });
@@ -181,6 +195,7 @@ async function start() {
   });
 
   mountNavToggle();
+  mountProgress();
 
   // Close the mobile menu after any navigation click
   document.addEventListener('click', (event) => {

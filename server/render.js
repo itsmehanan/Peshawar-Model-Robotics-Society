@@ -25,7 +25,7 @@ export async function renderDocument(settings) {
 
   const logo = site.logoUrl
     ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="34" height="34">`
-    : `<span class="brand__mark" aria-hidden="true">${esc(logoMark)}</span>`;
+    : `<span class="brand__mark" aria-hidden="true"><span>${esc(logoMark)}</span></span>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -34,7 +34,7 @@ export async function renderDocument(settings) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullName)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="#f5f1e8">
+<meta name="theme-color" content="#070c15">
 ${favicon}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullName)}">

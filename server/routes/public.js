@@ -47,6 +47,17 @@ export const faqRows = async ({ activeOnly = true } = {}) =>
   ).rows;
 
 /** Everything the landing page needs, in one request. */
+/** Public counters embedded in the shell and exposed on /api/content. */
+export const publicCounts = async () =>
+  (
+    await query(
+      `SELECT
+         (SELECT count(*)::int FROM students WHERE status <> 'withdrawn') AS students,
+         (SELECT count(*)::int FROM teams) AS teams,
+         (SELECT coalesce(sum(max_members),0)::int FROM teams) AS seats`,
+    )
+  ).rows[0];
+
 publicRouter.get(
   '/content',
   wrap(async (req, res) => {
@@ -56,14 +67,7 @@ publicRouter.get(
       articleRows(),
       faqRows(),
       announcementRows(),
-      (async () =>
-        query(
-          `SELECT
-             (SELECT count(*)::int FROM students WHERE status <> 'withdrawn') AS students,
-             (SELECT count(*)::int FROM teams) AS teams,
-             (SELECT coalesce(sum(max_members),0)::int FROM teams) AS seats`,
-        )
-      )(),
+      publicCounts(),
     ]);
     res.set('Cache-Control', 'no-cache');
     res.json({
@@ -78,7 +82,7 @@ publicRouter.get(
       articles,
       faqs,
       announcements,
-      counts: counts.rows[0],
+      counts,
     });
   }),
 );

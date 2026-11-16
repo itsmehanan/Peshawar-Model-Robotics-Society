@@ -4,7 +4,7 @@
  * Sign-in hits /api/admin/login; the session lives in an HttpOnly cookie. There
  * is no password in this bundle and no admin-only data in the public payload.
  */
-import { get, post, patch, put, del, download, loadContent } from '../api.js';
+import { get, post, patch, put, del, download, loadContent, storeToken } from '../api.js';
 import { state, setAdmin, refreshContent } from '../store.js';
 import {
   esc, onSubmit, toast, modal, confirmDialog, formatDate, relative, applyFieldErrors, socialIcons, setBusy, linkLabels,
@@ -116,6 +116,7 @@ export async function mountAdmin(root, { section = 'overview', navigate, refresh
   if (loginForm) {
     onSubmit(loginForm, async (data) => {
       const result = await post('/admin/login', { email: data.get('email'), password: data.get('password') });
+      storeToken('admin', result.sessionToken);
       setAdmin(result.admin);
       toast('Signed in to the control room.', 'ok');
       navigate('#/admin/overview');
@@ -124,7 +125,8 @@ export async function mountAdmin(root, { section = 'overview', navigate, refresh
   }
 
   root.querySelector('[data-action="admin-logout"]')?.addEventListener('click', async () => {
-    await post('/admin/logout');
+    await post('/admin/logout').catch(() => {});
+    storeToken('admin', null);
     setAdmin(null);
     navigate('#/');
     toast('Signed out.', 'ok');
@@ -154,7 +156,20 @@ export async function mountAdmin(root, { section = 'overview', navigate, refresh
     else await renderOverview(body);
   } catch (error) {
     if (error.status === 401) {
+      // A single 401 does not necessarily mean the session is gone (expired
+      // cookie, restored tab, flaky network). Confirm with the server first so
+      // the panel is never replaced by the sign-in form by accident.
+      const still = await get('/admin/session').catch(() => null);
+      if (still?.admin) {
+        setAdmin(still.admin);
+        body.innerHTML = `<div class="panel"><p class="small">${esc(error.message)} Reload the panel to try again.</p>
+          <button class="btn btn--solid btn--sm mt-2" data-action="retry-section">Reload panel</button></div>`;
+        body.querySelector('[data-action="retry-section"]')?.addEventListener('click', () => refresh());
+        return;
+      }
+      storeToken('admin', null);
       setAdmin(null);
+      toast('Your organiser session expired. Sign in again.', 'error');
       navigate('#/admin');
       return;
     }
