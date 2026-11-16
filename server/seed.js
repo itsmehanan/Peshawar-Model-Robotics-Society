@@ -60,21 +60,25 @@ export const DEFAULT_SETTINGS = {
   },
   contact: {
     email: 'hello@orbit-olympiad.org',
-    phone: '+92 300 000 0000',
+    // Left blank on purpose: a placeholder number is worse than none. Fill these
+    // in from Admin → Contact and the site shows them only once they are real.
+    phone: '',
     whatsapp: '',
-    organizerName: 'Ayesha Khan',
-    organizerRole: 'Olympiad Coordinator',
+    organizerName: 'Peshawar Model Robotics Society',
+    organizerRole: 'Organising committee',
     organiserBody:
       'Questions about eligibility, projects, accessibility or visiting the exhibition? Write to the coordination desk — a real person answers within two school days.',
     address: 'Peshawar Model School, Warsak Road, Peshawar, Pakistan',
     hours: 'Mon – Fri, 09:00 – 15:00',
   },
+  // Every account starts empty. The site only renders a platform once an admin
+  // has entered a real URL, so a fresh install never publishes a dead link.
   socials: [
-    { platform: 'instagram', label: 'Instagram', handle: '@orbit.olympiad', url: 'https://www.instagram.com/orbit.olympiad', enabled: true },
-    { platform: 'facebook', label: 'Facebook', handle: 'ORBIT Olympiad', url: 'https://www.facebook.com/orbit.olympiad', enabled: true },
-    { platform: 'youtube', label: 'YouTube', handle: '@orbitolympiad', url: 'https://www.youtube.com/@orbitolympiad', enabled: true },
-    { platform: 'tiktok', label: 'TikTok', handle: '@orbit.olympiad', url: '', enabled: false },
-    { platform: 'linkedin', label: 'LinkedIn', handle: 'ORBIT Olympiad', url: '', enabled: false },
+    { platform: 'instagram', label: 'Instagram', handle: '', url: '', enabled: false },
+    { platform: 'facebook', label: 'Facebook', handle: '', url: '', enabled: false },
+    { platform: 'youtube', label: 'YouTube', handle: '', url: '', enabled: false },
+    { platform: 'tiktok', label: 'TikTok', handle: '', url: '', enabled: false },
+    { platform: 'linkedin', label: 'LinkedIn', handle: '', url: '', enabled: false },
     { platform: 'x', label: 'X', handle: '', url: '', enabled: false },
   ],
   footer: {
