@@ -150,6 +150,41 @@ await test('renders the hero, nav and footer from API content', async () => {
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
 });
 
+await test('the hidden modal backdrop cannot cover the page', async () => {
+  // `[hidden]` is only `display: none` in the UA stylesheet, so a class rule that
+  // sets `display` silently defeats it. `.modal-root` sets display:grid plus
+  // position:fixed; inset:0 and a dark background, so the always-present
+  // `<div id="modalRoot" hidden>` painted a full-screen veil over the entire site.
+  // Assert the two things that make that impossible:
+  const root = global.document.getElementById('modalRoot');
+  assert.ok(root, 'the modal root must exist');
+  assert.equal(root.hidden, true, 'the modal root starts closed');
+
+  const css = fs.readFileSync(path.join(ROOT, 'public/assets/app.css'), 'utf8');
+  assert.match(
+    css,
+    /\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/,
+    'a [hidden] override must exist, otherwise author display rules win',
+  );
+
+  // And a closed overlay must not be laid out at all.
+  const cs = global.window.getComputedStyle(root);
+  assert.notEqual(
+    cs.display !== 'none' && cs.position === 'fixed',
+    true,
+    'the closed modal must not be a fixed full-screen layer',
+  );
+
+  // The guard must not stop a real modal from opening.
+  root.hidden = false;
+  assert.notEqual(
+    global.window.getComputedStyle(root).display,
+    'none',
+    'an open modal must still render',
+  );
+  root.hidden = true;
+});
+
 await test('every artwork variant in the page resolves to a real file', async () => {
   // The helper used to append "-sm.png" to a base that already ended in ".png",
   // producing /assets/art/field-robotics.png-sm.png — a 404 on every browser

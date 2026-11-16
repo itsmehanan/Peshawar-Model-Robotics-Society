@@ -3052,6 +3052,18 @@ button {
   color: var(--cyan);
 }
 
+/* The `hidden` attribute must actually hide.
+   `[hidden]` is only `display: none` in the UA stylesheet, so ANY class rule that
+   sets `display` silently defeats it — a selector-specificity win for the author
+   sheet, not a browser bug. `.modal-root` did exactly that: it set
+   `display: grid; position: fixed; inset: 0` with a dark background, so the
+   always-present `<div id="modalRoot" hidden>` painted a full-screen veil over
+   the whole site on every load. Declared once, with !important, so no future
+   layout rule can bring the veil (or a stray toast stack) back. */
+[hidden] {
+  display: none !important;
+}
+
 /* ------------------------------------------------------------- 16 motion */
 .reveal {
   opacity: 0;
