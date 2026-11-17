@@ -722,6 +722,92 @@ await test('a student cannot reach the admin surface', async () => {
   assert.equal((await permLeader('PUT', '/api/admin/settings/site', { name: 'X' })).status, 401);
 });
 
+console.log('\nField changes and profile edits');
+
+await test('a student with no team switches field immediately', async () => {
+  const solo = makeClient();
+  const created = await solo('POST', '/api/register', {
+    ...team(31),
+    email: 'solo-field@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'none',
+  });
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+
+  const changed = await solo('POST', '/api/student/category', { categoryId: 'science' });
+  assert.equal(changed.status, 200);
+  assert.equal(changed.body.student.categoryId, 'science', 'the change is applied straight away');
+});
+
+await test('a student on a team gets a request instead of a silent move', async () => {
+  // The field belongs to the whole team, so one member cannot move it alone: the
+  // answer must say a request was made, not that the field changed.
+  const lead = makeClient();
+  const created = await lead('POST', '/api/register', {
+    ...team(32),
+    email: 'field-lead@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'create',
+    teamName: 'Field Request Team',
+    teamCode: 'field-code',
+    maxMembers: 3,
+  });
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+
+  const res = await lead('POST', '/api/student/category', { categoryId: 'engineering' });
+  assert.equal(res.status, 200);
+  assert.match(res.body.message, /request/i);
+  assert.equal(res.body.student.categoryId, 'robotics', 'the field has not moved yet');
+});
+
+await test('unknown and unchanged fields are rejected', async () => {
+  const solo = makeClient();
+  await solo('POST', '/api/register', {
+    ...team(33),
+    email: 'field-guard@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'none',
+  });
+  const bogus = await solo('POST', '/api/student/category', { categoryId: 'nonsense' });
+  assert.equal(bogus.status, 422);
+  const same = await solo('POST', '/api/student/category', { categoryId: 'robotics' });
+  assert.equal(same.status, 422);
+});
+
+await test('a profile edit persists and is revalidated', async () => {
+  const solo = makeClient();
+  await solo('POST', '/api/register', {
+    ...team(34),
+    email: 'profile-edit@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'none',
+  });
+  const blankName = await solo('PATCH', '/api/student/profile', {
+    name: '',
+    className: 'Grade 10',
+    school: 'Test High School',
+    phone: '03001234567',
+    email: 'profile-edit@test.local',
+  });
+  assert.equal(blankName.status, 422, 'an empty name is not saved');
+
+  const edited = await solo('PATCH', '/api/student/profile', {
+    name: 'Renamed Student',
+    className: 'Grade 10',
+    school: 'Test High School',
+    phone: '03009999999',
+    email: 'profile-edit@test.local',
+    projectTitle: 'A working prototype',
+  });
+  assert.equal(edited.status, 200, JSON.stringify(edited.body));
+  assert.equal(edited.body.student.name, 'Renamed Student');
+  assert.equal(edited.body.student.className, 'Grade 10');
+});
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} tests passed`);
