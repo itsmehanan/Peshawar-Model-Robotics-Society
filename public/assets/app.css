@@ -1343,6 +1343,68 @@ button {
   isolation: isolate;
 }
 
+/*
+ * The stage holds a poster render and, on capable devices, a live canvas over
+ * it. Both fill the same square box, and every layer is `contain` or a square
+ * aspect — this is what stops the centrepiece stretching, which is exactly what
+ * happens when a 1408x768 render is forced into a wide frame with width:100%.
+ */
+.plate__media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.plate__media > picture,
+.plate__media > .plate__object,
+.plate__canvas {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.plate__canvas {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.985);
+  transition: opacity 0.9s var(--ease-out), transform 1.2s var(--ease-out);
+  /* the canvas is drawn at device pixel ratio by JS; never let CSS stretch it */
+  object-fit: contain;
+  touch-action: pan-y;
+}
+
+.plate__canvas.is-live {
+  opacity: 1;
+  transform: scale(1.11);
+}
+
+/* The poster's emblem almost touches its frame; the 3D object leaves room for
+   the camera. Matching the apparent size keeps the swap from reading as a jump. */
+.plate__canvas {
+  transform-origin: center 46%;
+}
+
+/* Once the live scene is up the poster is only a safety net underneath, so its
+   idle bob is switched off: two moving objects read as a mistake. */
+.has-3d .plate__object {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate__canvas,
+  .plate__canvas.is-live {
+    transition: none;
+    transform: none;
+  }
+}
+
 .plate__object picture,
 .plate__object {
   position: relative;

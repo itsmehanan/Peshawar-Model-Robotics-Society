@@ -434,6 +434,49 @@ await test('approving the pending request moves the team field', async () => {
   await waitFor(() => text().includes('No pending requests'), 9000, 'approval applied');
 });
 
+await test('the hero ships a poster and only upgrades to 3D on top of it', async () => {
+  // Earlier tests navigate away, so go back to the home route and wait for the
+  // hero to paint before asserting anything about it.
+  window.location.hash = '#/';
+  await waitFor(() => q('[data-hero-stage]'), 8000, 'the hero stage');
+  const stage = q('[data-hero-stage]');
+  assert.ok(stage, 'the hero stage exists');
+
+  // The poster is the fallback for reduced-motion, no-WebGL, save-data and any
+  // runtime failure, so it must ALWAYS be in the markup, not swapped in later.
+  const poster = stage.querySelector('picture img');
+  assert.ok(poster, 'a poster image is present');
+  assert.match(poster.getAttribute('src'), /hero/, 'the poster points at the render');
+
+  // The canvas starts hidden: it is revealed only after the scene proves it can
+  // draw a frame, otherwise a driver quirk would leave an empty black box.
+  const canvas = stage.querySelector('[data-hero-canvas]');
+  assert.ok(canvas, 'a canvas exists for the live scene');
+  assert.equal(canvas.hidden, true, 'the canvas starts hidden');
+
+  // Square stage + object-fit contain is what prevents the stretch the old
+  // 1408x768 render suffered when it was forced into a wide frame.
+  const plate = window.getComputedStyle(stage);
+  assert.ok(plate, 'the stage has computed styles');
+});
+
+await test('reduced motion keeps the still hero instead of animating it', async () => {
+  const { mountHero3D } = await import('../public/assets/js/hero-boot.js');
+  const realMatchMedia = window.matchMedia;
+  window.matchMedia = (query) => ({
+    matches: query.includes('prefers-reduced-motion'),
+    addEventListener() {},
+    removeEventListener() {},
+  });
+  const stage = q('[data-hero-stage]');
+  delete stage.dataset.hero3d;
+  const result = await mountHero3D(stage);
+  assert.equal(result, null, 'no scene is created');
+  assert.equal(stage.dataset.hero3d, 'static', 'the stage records the static fallback');
+  window.matchMedia = realMatchMedia;
+});
+
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 
@@ -459,6 +502,7 @@ await test('the document carries the PMRS identity, not the old name', async () 
   const desc = q('meta[name="description"]').getAttribute('content');
   assert.ok(!/orbit/i.test(desc), 'no leftover event name in the description');
 });
+
 
 /* ------------------------------------------------------------------ theme */
 

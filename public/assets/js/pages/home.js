@@ -1,4 +1,5 @@
 import { esc, richText, socialIcons, mountFaq } from '../ui.js';
+import { bootHero3D } from '../hero-boot.js';
 import { state } from '../store.js';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -33,19 +34,34 @@ export function artPicture(base, { width, height, eager = false, className = '' 
     </picture>`;
 }
 
-function orbitalPlate({ venue, city, kicker }) {
+/**
+ * The hero stage.
+ *
+ * A canvas sits over a poster render. The poster is what everyone sees, on every
+ * device, immediately — it is the whole fallback strategy. Once the bundled 3D
+ * scene has proven it can render a frame (see hero-boot.js), it fades in on top.
+ * That way the centrepiece is never a blank box, and reduced-motion users keep
+ * the still image by design.
+ *
+ * The caption labels stay: they are the studio-drawing detail that keeps the
+ * object reading as an artefact rather than as a decorative blob.
+ */
+function heroStage({ venue, city, kicker }) {
   return `
-  <figure class="plate" data-plate aria-label="Cover object: a machined orbital sculpture">
+  <figure class="plate" data-plate data-hero-stage aria-label="The PMRS centrepiece: a machined arm presenting a wireframe cube inside a gear ring">
     <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
-    ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
+    <div class="plate__media">
+      ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
+      <canvas class="plate__canvas" data-hero-canvas hidden aria-hidden="true"></canvas>
+    </div>
     <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
     <figcaption class="plate__label plate__label--tl">
-      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Exhibition object</b>
+      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Society centrepiece</b>
     </figcaption>
     <div class="plate__label plate__label--br">
       ${esc((venue || 'Main hall').toUpperCase())}<br><b>${esc(city || '—')}</b>
     </div>
-    <span class="plate__caption">Plate 01 / machined orbit</span>
+    <span class="plate__caption">Plate 01 / arm &amp; cube</span>
   </figure>`;
 }
 
@@ -144,7 +160,7 @@ export function homePage() {
               .join('')}
           </dl>
         </div>
-        ${orbitalPlate({ venue: event.venue, city: event.city, kicker: event.kicker })}
+        ${heroStage({ venue: event.venue, city: event.city, kicker: event.kicker })}
       </div>
     </section>
 
@@ -380,6 +396,9 @@ function richInk(headline) {
 
 export function mountHome(root) {
   mountFaq(root);
+  // Loads the 3D scene once the hero is on screen. Any failure leaves the
+  // poster image in place, which is the whole fallback strategy.
+  bootHero3D();
   const close = root.querySelector('[data-dismiss-notice]');
   close?.addEventListener('click', () => {
     const bar = close.closest('.notice-bar');
