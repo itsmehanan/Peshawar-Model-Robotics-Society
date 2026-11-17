@@ -1,4 +1,4 @@
-# ORBIT School Olympiad — website, registration portal & organiser CMS
+# Peshawar Model Robotics Society — website, registration portal & organiser CMS
 
 A complete rebuild of the two supplied prototypes (`olympiad_landing_page.html`
 and `olympiad_portal.html`) into one production-grade application:
@@ -16,30 +16,41 @@ and `olympiad_portal.html`) into one production-grade application:
 
 Built against the studio reference boards, not a component library.
 
-- **Palette** — neutral near-black (`#0a0a0b`) rather than navy or purple, one
-  cool instrument accent (`#86e9ec`), one warm metal (`#e4c894`), and a single
-  highlight yellow used twice in the whole site. Everything else is greyscale,
-  so the renders and the type carry the page.
+- **Palette** — a neutral near-black (`#0a0d12`) rather than navy or purple, one
+  cool instrument accent (`#2fb8ea`) and one warm metal (`#e0b061`). Everything
+  else is a graphite-to-paper neutral ramp, so the renders and the type carry the
+  page. Both themes are hand-authored from the same token list rather than
+  inverted, and `tests/contrast.test.js` measures eleven text pairs in each one.
 - **Type** — Archivo (variable, weight + width) for the giant condensed
   headlines at `-0.042em` optical tracking; Instrument Serif italic for the one
   accented word in a headline; DM Mono for the technical labels that run
   through the whole interface. All self-hosted, `font-display: swap`, 256 KB
   total for the three families.
-- **Imagery** — five purpose-rendered studio objects (one hero sculpture, one
-  per field). Each is pre-masked with a radial alpha dissolve in the page
-  colour, so the object sits in the same void as the type instead of inside a
-  photo box. Served as WebP (54 KB hero / 15–52 KB cards) with half-size
-  sources for phones and PNG fallbacks.
+- **Imagery** — four purpose-rendered field objects, each pre-masked with a
+  radial alpha dissolve in the page colour, so the object sits in the same void
+  as the type instead of inside a photo box. Served as WebP with half-size
+  sources for phones and PNG fallbacks. The hero poster follows the same rule and
+  is lit to match the live scene, so the handover between them is invisible.
 - **Structure** — a hairline grid, oversized watermark numerals behind the
   steps and the footer wordmark, outlined pill controls, and full-bleed render
   bands on the field pages. No glassmorphism, no glow, no gradient washes, and
   no card radius above 3px.
-- **Motion** — hero lines rise on separate beats, scroll reveals, a hairline
+- **Themes** — a designed light theme and an equally finished dark one, switched
+  by a crescent control that reveals the new theme as an expanding circle from
+  the button. The choice is written to `data-theme` before first paint, so there
+  is no flash, and it survives refreshes. The plate (hero and field renders) is
+  the one surface that never inverts, because the artwork is lit for it.
+- **Hero** — a real Three.js scene: a gear ring, an articulated arm presenting a
+  wireframe cube, and a gold orbit path. Geometry, camera framing and fallbacks
+  are covered by `tests/hero-framing.test.js`.
+- **Motion** — headline entrances on separate beats, scroll reveals, a hairline
   reading-progress bar, counters, a marquee strip and a slow object hover.
-  Every one is disabled under `prefers-reduced-motion`.
+  `prefers-reduced-motion` neutralises all of it through one global switch, and
+  the hero falls back to its poster before Three.js is even imported.
 - **The hero object is fixed.** Branding (name, logo, favicon, copy) is
-  admin-editable; the sculpture is a design asset, so no branding change can
-  break the identity anchor.
+  admin-editable; the centrepiece is a design asset, so no branding change can
+  break the identity anchor. It is also the reason the scene is never replaced by
+  an editable image.
 
 ---
 
@@ -200,7 +211,7 @@ each one.
 | Problem | Fix |
 | --- | --- |
 | Generic "AI dark dashboard": cyan/blue glow, four-gradient page background, 54px grid overlay, glowing planet of rings, `backdrop-filter` header, uppercase mono everywhere | A warm paper-and-ink exhibition identity: `#f5f1e8` paper, deep forest ink, a single vermilion accent, hairline rules, real editorial typography, no glow, no glassmorphism |
-| Decorative hero art in three variants (planet / cube / diamond) doing the same job | One hand-built orbital **plate** — fixed artwork independent of editable branding, with a proper caption and print treatment |
+| Decorative hero art in three variants (planet / cube / diamond) doing the same job | One dimensional centrepiece: a real Three.js scene (gear ring, articulated arm, wireframe cube, gold orbit) over a matching poster, fixed artwork independent of editable branding, with progressive fallback |
 | Fonts loaded from a third-party CDN with three families and no preload | Fraunces (display) + Inter (text) self-hosted as Latin-subset variable woff2, preloaded, 187 KB total, `font-display: swap` |
 | Repeated inline styles and one-off `style=""` attributes throughout the render functions | Design-system classes; only intentional sizing uses inline styles |
 | No focus states, no labels tied to inputs in places, hover-only affordances | Visible `:focus-visible` rings, real `<label for>`, keyboard-operable modal with Escape, skip link, `aria-expanded` accordions |
