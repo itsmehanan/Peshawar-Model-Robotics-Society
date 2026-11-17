@@ -2,6 +2,12 @@ import { esc, richText, socialIcons, mountFaq } from '../ui.js';
 import { bootHero3D } from '../hero-boot.js';
 import { state } from '../store.js';
 
+/**
+ * "1 team", not "1 teams". The counts are real and start at zero, so this is
+ * visible on a fresh deployment, not a hypothetical.
+ */
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 const pad = (n) => String(n).padStart(2, '0');
 
 /* Field artwork. Generated studio renders shipped as static assets: they are
@@ -218,7 +224,7 @@ export function homePage() {
           </div>
           <div class="event-band__item">
             <dt>Entries</dt>
-            <dd>${counts.students || 0} students<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${counts.teams || 0} teams registered</small></dd>
+            <dd>${plural(counts.students || 0, 'student')}<small class="tiny muted" style="display:block;margin-top:.3rem;font-family:var(--sans)">${plural(counts.teams || 0, 'team')} registered</small></dd>
           </div>
           <div class="event-band__item">
             <dt>Registration</dt>
