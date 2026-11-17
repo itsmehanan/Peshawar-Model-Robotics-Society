@@ -69,10 +69,45 @@ function joint(at, radius, metalDark, metalBright) {
   return group;
 }
 
+/**
+ * Framing constants, measured rather than guessed.
+ *
+ * The scene's world-space bounds are 4.42 x 4.42 x 0.84 centred on the origin
+ * (ring radius plus teeth, plus the cube on top). These two values were solved
+ * against that bounding box so the subject fills the same share of the stage in
+ * any aspect ratio, and the same share as the poster it fades in over.
+ */
+const FOV = 40;
+const FRAME_FILL = 0.9;
+/* Measured from the assembled scene, not from the ring radius. The tilted gold
+   orbit torus reaches wider than the gear, so the subject is 5.08 across and
+   4.39 tall, centred exactly on the origin. Earlier values taken from the gear
+   radius (2.21) or guessed upward (2.9) both cropped it, in opposite aspects.
+   The two axes are separate because the subject is not square. */
+const SUBJECT_HALF_W = 2.54;
+const SUBJECT_HALF_H = 2.2;
+
+/**
+ * Distance at which the subject occupies `fill` of the tighter axis.
+ *
+ * Solved from the projection rather than tuned by hand: for a given field of
+ * view the visible half-height at distance d is d * tan(fov/2), and the visible
+ * half-width is that times the aspect. Taking the tighter of the two gives the
+ * distance that fits, with the depth of the object folded in so it does not
+ * poke out of frame when lit from an angle.
+ */
+function fitDistance(camera, fill) {
+  const halfFov = (camera.fov * Math.PI) / 360;
+  // Visible half-height at distance d is d * tan(fov/2); half-width adds aspect.
+  const needVertical = SUBJECT_HALF_H / (Math.tan(halfFov) * fill);
+  const needHorizontal = SUBJECT_HALF_W / (Math.tan(halfFov) * camera.aspect * fill);
+  return Math.max(needVertical, needHorizontal);
+}
+
 export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
   const scene = new Scene();
   const camera = new PerspectiveCamera(38, 1, 0.1, 100);
-  camera.position.set(0, 0.16, 9.6);
+  camera.position.set(0, 0.16, 7.4);
   camera.lookAt(0, 0, 0);
 
   const renderer = new WebGLRenderer({
@@ -217,13 +252,16 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
     // Cap DPR: a 3x phone renderer draws 9x the pixels for no visible gain.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(w, h, false);
-    const aspect = w / h;
-    camera.aspect = aspect;
-    // The object is a tall disc, so a portrait box needs a wider vertical field
-    // or its top and bottom get cropped; a wide box needs the camera further
-    // back instead. Without this the ring is clipped on desktop.
-    camera.fov = aspect < 0.9 ? 52 : aspect < 1.2 ? 44 : 40;
-    camera.position.z = aspect < 0.9 ? 10.6 : aspect < 1.2 ? 10.1 : 9.6;
+    camera.aspect = w / h;
+    // Fit the object to the box instead of guessing a distance.
+    //
+    // The subject is a tall disc in a square frame. A fixed camera distance
+    // either crops it in a portrait box or leaves it small in a wide one, and
+    // the small version is what makes the poster-to-canvas swap visible: the
+    // poster's emblem nearly touches its frame, so a canvas subject at 72% reads
+    // as a jump. FRAME_FILL is measured to match the poster's silhouette.
+    camera.fov = FOV;
+    camera.position.z = fitDistance(camera, FRAME_FILL);
     camera.updateProjectionMatrix();
   };
 

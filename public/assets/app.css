@@ -1413,13 +1413,14 @@ button {
 
 .plate__canvas.is-live {
   opacity: 1;
-  transform: scale(1.11);
+  transform: scale(1);
 }
 
-/* The poster's emblem almost touches its frame; the 3D object leaves room for
-   the camera. Matching the apparent size keeps the swap from reading as a jump. */
+/* The scene fits its own framing to match the poster's silhouette (see
+   fitDistance in hero3d.js), so no CSS scale compensates. Scaling here would
+   fight the camera and could clip at some aspect ratios. */
 .plate__canvas {
-  transform-origin: center 46%;
+  transform-origin: center center;
 }
 
 /* Once the live scene is up the poster is only a safety net underneath, so its
