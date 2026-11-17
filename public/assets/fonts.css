@@ -1,9 +1,11 @@
 /* Self-hosted fonts — no third-party requests, no layout shift.
  *
- * Archivo (variable, weight + width) is the workhorse: giant condensed
- * headlines, tight tracking, the editorial voice of the reference boards.
- * Instrument Serif italic is the single editorial accent (a word inside a
- * headline). DM Mono carries the technical labels. */
+ * Archivo (variable, weight + width) is the display voice: heavy, tight,
+ * high-contrast headlines in the uppercase instrument register. DM Mono is the
+ * second half of the system and carries every piece of metadata — dates, refs,
+ * labels, counts, states — which is what gives the interface its software
+ * quality. Instrument Serif italic remains the single editorial accent: one
+ * word inside an otherwise sans headline, never a whole sentence. */
 
 @font-face {
   font-family: 'Archivo';

@@ -22,6 +22,7 @@ import { adminRouter } from './routes/admin.js';
 import { renderDocument } from './render.js';
 import { getSettings } from './settings.js';
 import { query } from './db.js';
+import { THEME_BOOT_HASH } from './theme-boot.js';
 
 const app = express();
 
@@ -43,7 +44,7 @@ app.use((req, res, next) => {
       "default-src 'self'",
       "img-src 'self' data: blob:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self'",
+      `script-src 'self' ${THEME_BOOT_HASH}`,
       "font-src 'self'",
       "connect-src 'self'",
       "form-action 'self'",

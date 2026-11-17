@@ -16,7 +16,6 @@
 
 const KEY = 'pmrs-theme';
 const ROOT = document.documentElement;
-const media = () => window.matchMedia?.('(prefers-color-scheme: light)');
 
 export const THEMES = ['dark', 'light'];
 
@@ -24,7 +23,9 @@ export const THEMES = ['dark', 'light'];
 export function currentTheme() {
   const explicit = ROOT.getAttribute('data-theme');
   if (explicit === 'dark' || explicit === 'light') return explicit;
-  return media()?.matches ? 'light' : 'dark';
+  // The site is a dark instrument by design; light is an explicit choice, not a
+  // consequence of the OS setting.
+  return 'dark';
 }
 
 /** 'dark' | 'light' | null — null means "follow the system". */
@@ -46,7 +47,7 @@ function paint(theme) {
   // Keep the mobile browser chrome in step with the page, or the address bar
   // stays near-black above a white page.
   document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-    meta.setAttribute('content', theme === 'light' ? '#f7f8fa' : '#0a0d12');
+    meta.setAttribute('content', theme === 'light' ? '#f3f4f7' : '#08080a');
   });
   // A failed event must never abort the theme change itself, and the event has to
   // be built from the document's own realm (a CustomEvent from another realm is
@@ -132,8 +133,6 @@ export function mountThemeToggle(root = document) {
   sync();
   window.addEventListener('themechange', sync);
 
-  // If the user has never chosen, follow the OS live rather than ignoring it.
-  media()?.addEventListener?.('change', () => {
-    if (!storedTheme()) paint(media()?.matches ? 'light' : 'dark');
-  });
+  // No OS-following listener: dark is the designed default and light is a
+  // deliberate switch, so a system theme change must not repaint the page.
 }
