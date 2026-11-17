@@ -627,6 +627,101 @@ await test('a malformed asset id is a 404, not a server error', async () => {
   }
 });
 
+console.log('\nTeam permissions');
+
+// These were audited by hand against a live server; the point of pinning them
+// here is that a permission check is only worth having if it is asserted. A
+// future refactor of the team routes should fail this block, not a user.
+const permLeader = makeClient();
+const permMember = makeClient();
+const permOutsider = makeClient();
+let permTeamId;
+let permMemberId;
+
+await test('permission fixture: a leader and a member in one team', async () => {
+  const created = await permLeader('POST', '/api/register', {
+    ...team(21),
+    email: 'perm-lead@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'create',
+    teamName: 'Permission Team',
+    teamCode: 'perm-code',
+    maxMembers: 3,
+  });
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  permTeamId = created.body.student.teamId;
+
+  const joined = await permMember('POST', '/api/register', {
+    ...team(22),
+    email: 'perm-member@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'join',
+    joinTeamId: permTeamId,
+    joinCode: 'perm-code',
+  });
+  assert.equal(joined.status, 201, JSON.stringify(joined.body));
+  permMemberId = joined.body.student.id;
+
+  const outsider = await permOutsider('POST', '/api/register', {
+    ...team(23),
+    email: 'perm-outsider@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'create',
+    teamName: 'Outsider Team',
+    teamCode: 'out-code',
+    maxMembers: 3,
+  });
+  assert.equal(outsider.status, 201, JSON.stringify(outsider.body));
+});
+
+await test('only the leader may edit team details', async () => {
+  const asMember = await permMember('PATCH', '/api/student/team', { name: 'Hijacked' });
+  assert.equal(asMember.status, 403);
+  const asLeader = await permLeader('PATCH', '/api/student/team', { name: 'Renamed Team' });
+  assert.equal(asLeader.status, 200);
+});
+
+await test('editing a team can only ever touch your own team', async () => {
+  // The endpoint takes no team id at all: it resolves the caller's own team from
+  // the session. That is why an outsider gets 200 here -- they are editing their
+  // OWN team, which is correct. The assertion that matters is the next one.
+  const asOutsider = await permOutsider('PATCH', '/api/student/team', { name: 'Outsider Renamed' });
+  assert.equal(asOutsider.status, 200);
+
+  const mine = await permLeader('GET', '/api/me');
+  assert.equal(mine.status, 200);
+  assert.equal(mine.body.student.team.name, 'Renamed Team', "the leader's team is untouched");
+});
+
+await test('only the leader may remove a member', async () => {
+  const asMember = await permMember('POST', '/api/student/team/remove', { studentId: permMemberId });
+  assert.equal(asMember.status, 403, 'a member cannot remove anyone');
+  const leaderAsTarget = await permMember('POST', '/api/student/team/remove', { studentId: 'someone-else' });
+  assert.equal(leaderAsTarget.status, 403);
+});
+
+await test('an outsider cannot remove another team\'s member', async () => {
+  // 404 rather than 403 on purpose: it must not confirm that the id exists.
+  const res = await permOutsider('POST', '/api/student/team/remove', { studentId: permMemberId });
+  assert.equal(res.status, 404);
+});
+
+await test('the leader can remove a member, who then loses team access', async () => {
+  const res = await permLeader('POST', '/api/student/team/remove', { studentId: permMemberId });
+  assert.equal(res.status, 200);
+
+  const after = await permMember('PATCH', '/api/student/team', { name: 'x' });
+  assert.equal(after.status, 404, 'a removed member is no longer on a team');
+});
+
+await test('a student cannot reach the admin surface', async () => {
+  assert.equal((await permLeader('GET', '/api/admin/students')).status, 401);
+  assert.equal((await permLeader('PUT', '/api/admin/settings/site', { name: 'X' })).status, 401);
+});
+
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} tests passed`);
