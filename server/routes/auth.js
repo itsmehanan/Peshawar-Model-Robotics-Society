@@ -11,6 +11,7 @@ import { transaction, query, q1 } from '../db.js';
 import { getSettings } from '../settings.js';
 import { hashPassword, verifyPassword, newToken, uuid, throttle, clearThrottle } from '../security.js';
 import { ValidationError, email as vEmail, password as vPassword, phone as vPhone, str, oneOf, int, bool } from '../validation.js';
+import { sameSchool } from '../schools.js';
 import {
   readCookie,
   headerToken,
@@ -126,8 +127,14 @@ authRouter.post(
         );
         const team = rows[0];
         if (!team) throw new ValidationError('That team no longer exists.', { joinTeamId: 'missing' });
-        if (registration.requireSchoolMatch !== false && team.school.toLowerCase() !== school.toLowerCase()) {
-          throw new ValidationError('You can only join a team from your own school.', { joinTeamId: 'school_mismatch' });
+        if (registration.requireSchoolMatch !== false && !sameSchool(team.school, school)) {
+          // Name both schools in the error. "You can only join a team from your
+          // own school" is useless when the student believes they already are.
+          throw new ValidationError(
+            `That team is registered to ${team.school}; your account is under ${school}. ` +
+              'If one of those is wrong, fix it in your profile or ask the organisers.',
+            { joinTeamId: 'school_mismatch' },
+          );
         }
         if (team.category_id !== categoryId) {
           throw new ValidationError('Choose the same category as the team you are joining.', { categoryId: 'team_mismatch' });

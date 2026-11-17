@@ -230,6 +230,44 @@ await test('two teammates can join with the right code', async () => {
   }
 });
 
+await test('a decorated school name still matches its own team', async () => {
+  // Students write their school name however they like. An exact lower() compare
+  // blocked the join and then told them they were not from their own school,
+  // which left no way forward at all.
+  const other = makeClient();
+  const { status, body } = await other('POST', '/api/register', {
+    ...team(11),
+    email: 'decorated@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'join',
+    joinTeamId: leaderTeamId,
+    joinCode: 'breaker-code',
+    // same school as the leader, written the way a student would
+    school: 'The Test High School (Main Campus)',
+  });
+  // The team is full at this point, which proves the school check passed: the
+  // request reached the capacity rule instead of being rejected before it.
+  assert.equal(status, 409);
+  assert.equal(body.code, 'team_full');
+});
+
+await test('a genuinely different school is still refused, naming both', async () => {
+  const other = makeClient();
+  const { status, body } = await other('POST', '/api/register', {
+    ...team(12),
+    email: 'otherschool@test.local',
+    password: 'password123',
+    categoryId: 'robotics',
+    teamMode: 'join',
+    joinTeamId: leaderTeamId,
+    joinCode: 'breaker-code',
+    school: 'Warsak Model School',
+  });
+  assert.equal(status, 422);
+  assert.match(body.error, /Warsak Model School/, 'the error names the team school');
+});
+
 await test('a full team refuses further joins (capacity enforced server-side)', async () => {
   const other = makeClient();
   const { status, body } = await other('POST', '/api/register', {
