@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"
+     aria-label="Peshawar Model Robotics Society">
+  <title>PMRS</title>
+  <defs>
+  <linearGradient id="gMetal" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.18" stop-color="#d3ddea"/><stop offset="0.46" stop-color="#8f9cad"/><stop offset="0.6" stop-color="#e6edf7"/><stop offset="0.8" stop-color="#7d8a9c"/><stop offset="1" stop-color="#c2cedd"/></linearGradient>
+  <linearGradient id="gMetalLight" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.3" stop-color="#e2eaf5"/><stop offset="0.56" stop-color="#a7b4c6"/><stop offset="0.76" stop-color="#edf3fb"/><stop offset="1" stop-color="#96a4b7"/></linearGradient>
+  <linearGradient id="gMetalDeep" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#5d6877"/><stop offset="0.5" stop-color="#39424f"/><stop offset="1" stop-color="#6f7c8d"/></linearGradient>
+  <linearGradient id="gMetalDark" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.2" stop-color="#cfd9e6"/><stop offset="0.5" stop-color="#7b889a"/><stop offset="0.65" stop-color="#dee7f2"/><stop offset="1" stop-color="#8d9aac"/></linearGradient>
+  <linearGradient id="gMetalLightDark" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#e9eff7"/><stop offset="0.35" stop-color="#b6c2d2"/><stop offset="0.6" stop-color="#8593a6"/><stop offset="0.85" stop-color="#cfd9e6"/><stop offset="1" stop-color="#9aa8bb"/></linearGradient>
+  <linearGradient id="gMetalDeepDark" x1="0.12" y1="0" x2="0.82" y2="1"><stop offset="0" stop-color="#6b7888"/><stop offset="0.5" stop-color="#4a5563"/><stop offset="1" stop-color="#7d8a9a"/></linearGradient>
+  <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="0.7">
+    <stop offset="0" stop-color="#f9e3ae"/><stop offset="0.35" stop-color="#e8b866"/>
+    <stop offset="0.72" stop-color="#c89342"/><stop offset="1" stop-color="#f6d88f"/>
+  </linearGradient>
+  <linearGradient id="gSparks" x1="0" y1="0" x2="0.55" y2="1">
+    <stop offset="0" stop-color="#cdf3ff"/><stop offset="0.45" stop-color="#3ab8f3"/>
+    <stop offset="1" stop-color="#1d8ecd"/>
+  </linearGradient>
+  <linearGradient id="gCube" x1="0" y1="0" x2="0.7" y2="1">
+    <stop offset="0" stop-color="#6fd6ff" stop-opacity="0.34"/>
+    <stop offset="0.55" stop-color="#1d9fe0" stop-opacity="0.15"/>
+    <stop offset="1" stop-color="#0f6ea6" stop-opacity="0.28"/>
+  </linearGradient>
+  </defs>
+  
+  
+  <g fill="none" stroke="#0b1118" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M23 100A77 77 0 1 0 177 100A77 77 0 1 0 23 100ZM42 100A58 58 0 1 1 158 100A58 58 0 1 1 42 100Z"/>
+    <path d="M94.07 26.24L95.95 13.09L104.05 13.09L105.93 26.24ZM131.74 33.15L139.95 22.71L146.96 26.76L142.02 39.09ZM160.91 57.98L173.24 53.04L177.29 60.05L166.85 68.26ZM173.76 94.07L186.91 95.95L186.91 104.05L173.76 105.93ZM166.85 131.74L177.29 139.95L173.24 146.96L160.91 142.02ZM142.02 160.91L146.96 173.24L139.95 177.29L131.74 166.85ZM105.93 173.76L104.05 186.91L95.95 186.91L94.07 173.76ZM68.26 166.85L60.05 177.29L53.04 173.24L57.98 160.91ZM39.09 142.02L26.76 146.96L22.71 139.95L33.15 131.74ZM26.24 105.93L13.09 104.05L13.09 95.95L26.24 94.07ZM33.15 68.26L22.71 60.05L26.76 53.04L39.09 57.98ZM57.98 39.09L53.04 26.76L60.05 22.71L68.26 33.15Z"/>
+    <path d="M136 20 L166 37 L166 71 L136 88 L106 71 L106 37 Z"/>
+    <path d="M106 37 L136 54 L166 37 M136 54 L136 88"/>
+  </g>
+  <g stroke="#0b1118" stroke-linecap="round" fill="none">
+    <path d="M60 146 L88 110" stroke-width="13"/>
+    <path d="M88 110 L116 76" stroke-width="11"/>
+  </g>
+  <g fill="#0b1118">
+    <circle cx="60" cy="146" r="8.5"/>
+    <circle cx="88" cy="110" r="6.6"/>
+    <circle cx="126" cy="67" r="7"/>
+  </g>
+  <circle cx="135" cy="61" r="11.5" fill="none" stroke="#0b1118" stroke-width="3.4"/>
+</svg>
