@@ -99,3 +99,41 @@ if (failures) {
   process.exit(1);
 }
 console.log(`Theme contrast: ${PAIRS.length} pairs meet WCAG AA in both themes.`);
+
+/* ------------------------------------------------------------------ motion */
+/*
+ * Requirement 4 says motion must respect prefers-reduced-motion, and the way
+ * that fails is quietly: one new animation lands outside the global kill switch
+ * and someone with vestibular sensitivity gets a spinning element they did not
+ * ask for. There is a global rule, so all this has to prove is that the global
+ * rule is still there, still unconditional, and still covers pseudo-elements.
+ */
+const reducedBlocks = [...css.matchAll(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/g)];
+if (!reducedBlocks.length) {
+  console.error('  ✗ no prefers-reduced-motion block in app.css');
+  process.exit(1);
+}
+
+const globalKill = reducedBlocks.some((m) => {
+  const from = m.index + m[0].length;
+  let depth = 1;
+  let end = from;
+  for (let i = from; i < css.length && depth > 0; i++) {
+    if (css[i] === '{') depth++;
+    else if (css[i] === '}') depth--;
+    if (depth === 0) end = i;
+  }
+  const body = css.slice(from, end);
+  return (
+    body.includes('*::before') &&
+    body.includes('*::after') &&
+    /animation-duration:\s*0?\.?0*1ms\s*!important/.test(body) &&
+    /scroll-behavior:\s*auto/.test(body)
+  );
+});
+
+if (!globalKill) {
+  console.error('  ✗ the global reduced-motion switch no longer neutralises animations');
+  process.exit(1);
+}
+console.log('Reduced motion: a global switch neutralises animations, transitions and smooth scroll.');
