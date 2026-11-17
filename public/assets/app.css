@@ -980,6 +980,35 @@ button {
 }
 
 /* the giant silhouette wordmark that closes the page */
+/* Primary horizontal lockup, footer only. The navbar uses the compact emblem so
+   the header can stay 64px on a phone; this is the full brand, at a size where
+   the drawn letterforms and the gold slash are legible. */
+.foot__lockup {
+  display: inline-block;
+  line-height: 0;
+}
+
+.foot__lockup img {
+  width: clamp(11.5rem, 27vw, 14.5rem);
+  height: auto;
+  display: block;
+}
+
+/* The wordmark inverts with the page but the emblem does not, so both lockups
+   ship and CSS picks one. Doing it in CSS rather than JS means the correct
+   variant is painted first, with no flash and no re-render on toggle. */
+.foot__lockup .lockup--light {
+  display: none;
+}
+
+:root[data-theme='light'] .foot__lockup .lockup--dark {
+  display: none;
+}
+
+:root[data-theme='light'] .foot__lockup .lockup--light {
+  display: block;
+}
+
 .foot__wordmark {
   margin-top: clamp(1.4rem, 4vw, 2.6rem);
   font-family: var(--display);

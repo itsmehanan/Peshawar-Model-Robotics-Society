@@ -14,15 +14,19 @@ export function renderFooter() {
     <div class="wrap">
       <div class="foot__top">
         <div class="foot__brand">
-          <a class="brand" href="#/" data-link>
-            ${site.logoUrl
-              ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="34" height="34" loading="lazy" decoding="async">`
-              : '<img class="brand__img" src="/assets/logo-mark.svg" alt="" width="34" height="34" loading="lazy" decoding="async">'}
-            <span class="brand__text">
-              <span class="brand__name">${esc(site.name)}</span>
-              <span class="brand__sub">${esc((event?.kicker || 'School Olympiad').replace(/^Season \d+ — /i, ''))}</span>
-            </span>
-          </a>
+          ${
+            // The footer is where the PRIMARY horizontal lockup belongs: emblem and
+            // wordmark locked together, at a size where the letterforms read. An
+            // uploaded logo still wins, so admin branding keeps working.
+            site.logoUrl
+              ? `<a class="brand" href="#/" data-link>
+                   <img class="brand__lockup" src="${esc(site.logoUrl)}" alt="${esc(site.fullName || site.name)}" height="46" loading="lazy" decoding="async">
+                 </a>`
+              : `<a class="foot__lockup" href="#/" data-link aria-label="${esc(site.fullName || site.name)} — home">
+                   <img class="lockup--dark" src="/assets/logo-full.svg" alt="" width="230" height="51" loading="lazy" decoding="async">
+                   <img class="lockup--light" src="/assets/logo-full-light.svg" alt="" width="230" height="51" loading="lazy" decoding="async">
+                 </a>`
+          }
           <p class="foot__note">${esc(site.footerNote || site.description || '')}</p>
           ${
             socials?.length

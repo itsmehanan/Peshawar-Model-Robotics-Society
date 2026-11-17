@@ -504,6 +504,26 @@ await test('the document carries the PMRS identity, not the old name', async () 
 });
 
 
+await test('the footer carries the horizontal lockup, in both theme variants', async () => {
+  // The brief asks for a primary horizontal logo, an emblem and a compact
+  // navbar mark as a system. The emblem was everywhere and the lockup was only
+  // an og:image, so the "primary" variant was never actually on the page.
+  window.location.hash = '#/';
+  await waitFor(() => q('#siteFoot .foot__lockup'), 8000, 'the footer lockup');
+
+  const lockup = q('#siteFoot .foot__lockup');
+  const images = [...lockup.querySelectorAll('img')];
+  assert.equal(images.length, 2, 'one lockup per theme');
+  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full.svg'), 'the dark lockup');
+  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full-light.svg'), 'the light lockup');
+  assert.ok(lockup.getAttribute('aria-label'), 'the link is named for screen readers');
+
+  // The navbar keeps the compact emblem, so the two variants do different jobs.
+  const head = q('#siteHead .brand__img');
+  assert.ok(head, 'the navbar still uses the compact mark');
+  assert.equal(head.getAttribute('src'), '/assets/logo-mark.svg');
+});
+
 /* ------------------------------------------------------------------ theme */
 
 await test('the theme is applied before paint, so there is no flash', async () => {
