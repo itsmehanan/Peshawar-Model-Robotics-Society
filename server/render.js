@@ -5,24 +5,14 @@
  * every request so admin edits apply everywhere at once — while the hero
  * centrepiece stays a fixed, hand-built piece of the design.
  */
+import { THEME_BOOT } from './theme-boot.js';
+
 /** JSON is embedded in a script tag; escape the characters that could break out. */
 const safeJson = (value) =>
   JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
 
 const esc = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-/**
- * Runs before the body paints. Applying the stored theme here — rather than in
- * the deferred module — is the difference between a considered page and a flash
- * of the wrong palette on every single load.
- */
-const themeBoot = `(function(){try{
-  var k='pmrs-theme',s=localStorage.getItem(k),p=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
-  var t=(s==='light'||s==='dark')?s:p;
-  document.documentElement.setAttribute('data-theme',t);
-  document.documentElement.style.colorScheme=t;
-}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
 
 export async function renderDocument(settings) {
   const site = settings.site || {};
@@ -50,10 +40,10 @@ export async function renderDocument(settings) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>${themeBoot}</script>
+<script>${THEME_BOOT}</script>
 <title>${esc(fullName)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="#0a0d12">
+<meta name="theme-color" content="#08080a">
 <meta name="color-scheme" content="dark light">
 ${favicon}
 ${appleIcon}
@@ -63,11 +53,12 @@ ${appleIcon}
 <meta property="og:image" content="${esc(event.heroImageUrl || '/assets/logo-full.svg')}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/archivo-var-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
 <script type="application/json" id="boot-content">${safeJson(settings)}</script>
 </head>
-<body data-site-name="${esc(name)}">
+<body class="instrument" data-site-name="${esc(name)}">
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="site-head" id="siteHead">

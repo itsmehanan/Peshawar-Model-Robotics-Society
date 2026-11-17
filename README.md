@@ -14,43 +14,46 @@ and `olympiad_portal.html`) into one production-grade application:
 
 ## Design direction
 
-Built against the studio reference boards, not a component library.
+A dark, cinematic *instrument* interface: the product is a readout, not a brochure.
 
-- **Palette** — a neutral near-black (`#0a0d12`) rather than navy or purple, one
-  cool instrument accent (`#2fb8ea`) and one warm metal (`#e0b061`). Everything
-  else is a graphite-to-paper neutral ramp, so the renders and the type carry the
-  page. Both themes are hand-authored from the same token list rather than
-  inverted, and `tests/contrast.test.js` measures eleven text pairs in each one.
-- **Type** — Archivo (variable, weight + width) for the giant condensed
-  headlines at `-0.042em` optical tracking; Instrument Serif italic for the one
-  accented word in a headline; DM Mono for the technical labels that run
-  through the whole interface. All self-hosted, `font-display: swap`, 256 KB
-  total for the three families.
-- **Imagery** — four purpose-rendered field objects, each pre-masked with a
-  radial alpha dissolve in the page colour, so the object sits in the same void
-  as the type instead of inside a photo box. Served as WebP with half-size
-  sources for phones and PNG fallbacks. The hero poster follows the same rule and
-  is lit to match the live scene, so the handover between them is invisible.
-- **Structure** — a hairline grid, oversized watermark numerals behind the
-  steps and the footer wordmark, outlined pill controls, and full-bleed render
-  bands on the field pages. No glassmorphism, no glow, no gradient washes, and
-  no card radius above 3px.
-- **Themes** — a designed light theme and an equally finished dark one, switched
-  by a crescent control that reveals the new theme as an expanding circle from
-  the button. The choice is written to `data-theme` before first paint, so there
-  is no flash, and it survives refreshes. The plate (hero and field renders) is
-  the one surface that never inverts, because the artwork is lit for it.
-- **Hero** — a real Three.js scene: a gear ring, an articulated arm presenting a
-  wireframe cube, and a gold orbit path. Geometry, camera framing and fallbacks
-  are covered by `tests/hero-framing.test.js`.
-- **Motion** — headline entrances on separate beats, scroll reveals, a hairline
-  reading-progress bar, counters, a marquee strip and a slow object hover.
-  `prefers-reduced-motion` neutralises all of it through one global switch, and
-  the hero falls back to its poster before Three.js is even imported.
-- **The hero object is fixed.** Branding (name, logo, favicon, copy) is
-  admin-editable; the centrepiece is a design asset, so no branding change can
-  break the identity anchor. It is also the reason the scene is never replaced by
-  an editable image.
+- **Ground** — a deep void (`#08080a`), never a navy or a grey. A hairline
+  engineering grid is painted on the body itself (64px, `rgba(255,255,255,.062)`)
+  with one accent bloom at the top of the page, so every section below the fold
+  still sits on a structured floor. Every surface above it is either the void, a
+  translucent pane, or a photograph.
+- **Glass** — one recipe, used everywhere: `background: rgba(255,255,255,.028–.075)`,
+  `backdrop-filter: saturate(150%) blur(18px)`, a `1px` white-alpha rim and an
+  inset top highlight. Panels, metric cards, the nav capsule, the dashboard
+  sidebar, tables, modals and toasts are all cut from it, so depth comes from
+  light — blur behind, rim, sheen — rather than from grey boxes.
+- **Accent** — a single electric cyan (`#22e6ff`). It carries primary buttons
+  (with a soft bloom), active states, hairlines on focus, the metric readout
+  ticks, and a radial glow behind the hero object. Warm metal (`#e9bb6d`) is
+  reserved for achievement and status, never for interaction.
+- **Type** — Archivo for display: heavy, tight (`-0.035em`), often uppercase, in
+  the `BUILD SOMETHING THE FUTURE NEEDS` register. DM Mono carries every piece of
+  metadata — dates, refs, counts, section numbers, states — which is what gives
+  the interface its software quality. Instrument Serif italic is still the one
+  editorial accent: a single word inside a headline. All self-hosted.
+- **The hero plate** — the rendered object is screened over the void and radially
+  masked, so no photo box is visible; the accent bloom sits behind it, plotted
+  hairlines orbit it, and the annotations frame the stage instead of printing
+  over the render. The live Three.js scene still fades in over the poster.
+- **Themes** — dark is the designed default and light is an explicit choice, not
+  a consequence of the OS setting. Plates that are lit for a dark room (hero,
+  footer, ticker, auth art, field art bands) re-scope the glass and accent tokens
+  to their dark values, so a light page never hands them paper-coloured chrome.
+  The choice is written to `data-theme` before first paint by an inline script
+  whose sha256 is allowed through the CSP (see `server/theme-boot.js`).
+- **Motion** — headline beats, scroll reveals, a lit reading-progress line, a
+  marquee, a slow object hover and a drawn plus/minus on the admin menu.
+  `prefers-reduced-motion` neutralises all of it through one global switch.
+- **Contrast** — both ramps are hand-authored and `tests/contrast.test.js`
+  measures eleven text pairs in each theme on every push.
+
+The hero object is fixed. Branding (name, logo, favicon, copy) is admin-editable;
+the centrepiece is a design asset, so no branding change can break the identity
+anchor.
 
 ---
 
