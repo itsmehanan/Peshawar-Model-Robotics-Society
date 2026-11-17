@@ -81,6 +81,30 @@
   --danger: #ff7b78;
   --ok: #64d59a;
 
+  /* Surfaces below the page: a notice strip, a modal footer. Deliberately
+     darker than --bg in dark and lighter than --bg in light, so both read as
+     "set back" rather than as a hole. */
+  --surface-0: #07090c;
+  --surface-1: #0c0e12;
+
+  /* Form fields own their own ground: a field is an inset well, and it must
+     stay legible while focused (this used to hardcode near-black). */
+  --field-bg: #0b0d10;
+
+  /* Diagram marks drawn on the plate -- dashed guides and outlined numerals.
+     On the dark plate these are a whisper; on the light plate they must be
+     equally quiet, which a fixed near-black is not. */
+  --guide-line: #1a1d21;
+  --numeral-stroke: #26262a;
+
+  /* Label colour for anything sitting ON gold. The gold itself gets lighter in the
+     light theme, so the label has to move with it to stay above 4.5:1. */
+  --on-gold: #12130a;
+
+  /* Toast tints: a hint of the semantic colour, not a filled block. */
+  --toast-danger-bg: #1a1112;
+  --toast-ok-bg: #0f1712;
+
   /* always-dark surfaces: the hero stage, image wells, terminal blocks */
   --plate-bg: #06080b;
   --plate-2: #0b0f15;
@@ -141,12 +165,21 @@
   --accent-strong: #0e93c7;
   --accent-deep: #075b7d;
   --accent-wash: rgba(11, 123, 168, 0.09);
-  --gold: #9a6c22;
-  --gold-strong: #7f5716;
+  --gold: #8f6318;
+  --gold-strong: #7a5314;
   --gold-wash: rgba(154, 108, 34, 0.1);
 
   --danger: #b4261f;
   --ok: #1f7a45;
+
+  --surface-0: #eef1f5;
+  --surface-1: #f1f4f8;
+  --field-bg: #fdfefe;
+  --guide-line: #c3ccd7;
+  --numeral-stroke: #d3dae3;
+  --on-gold: #ffffff;
+  --toast-danger-bg: #fceceb;
+  --toast-ok-bg: #e9f6ee;
 
   /* still dark: artwork and the 3D stage are lit for a dark room */
   --plate-bg: #0b0f15;
@@ -1083,7 +1116,7 @@ button {
 .btn--highlight {
   background: var(--gold);
   border-color: var(--gold);
-  color: #12130a;
+  color: var(--on-gold);
   font-weight: 600;
 }
 
@@ -1450,7 +1483,7 @@ button {
   width: 76%;
   height: 76%;
   border-style: dashed;
-  border-color: #1a1a1d;
+  border-color: var(--guide-line);
 }
 
 .plate__guides span:nth-child(3) {
@@ -1741,7 +1774,7 @@ button {
   font-size: clamp(4rem, 8vw, 6.5rem);
   line-height: 1;
   color: transparent;
-  -webkit-text-stroke: 1px #26262a;
+  -webkit-text-stroke: 1px var(--numeral-stroke);
   pointer-events: none;
   user-select: none;
 }
@@ -1961,7 +1994,7 @@ button {
 .textarea:focus {
   outline: none;
   border-color: var(--ink-3);
-  background: #0b0b0d;
+  background: var(--field-bg);
 }
 
 .input:disabled,
@@ -2715,7 +2748,7 @@ button {
   padding-inline: 4px;
   border-radius: 999px;
   background: var(--brass);
-  color: #14120c;
+  color: var(--on-gold);
   font-family: var(--mono);
   font-size: 0.58rem;
 }
@@ -2950,7 +2983,7 @@ button {
 /* ---------------------------------------------------------- 14 overlays */
 .notice-bar {
   border-bottom: 1px solid var(--line);
-  background: #070708;
+  background: var(--surface-0);
   transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
 }
 
@@ -3090,7 +3123,7 @@ button {
   gap: 0.55rem;
   padding: 0.9rem 1.2rem;
   border-top: 1px solid var(--line);
-  background: #0c0c0e;
+  background: var(--surface-1);
   flex-wrap: wrap;
 }
 
@@ -3135,12 +3168,12 @@ button {
 
 .toast--error {
   border-color: rgba(240, 144, 141, 0.5);
-  background: #1a1112;
+  background: var(--toast-danger-bg);
 }
 
 .toast--ok {
   border-color: rgba(147, 217, 168, 0.4);
-  background: #0f1712;
+  background: var(--toast-ok-bg);
 }
 
 .toast__icon {
