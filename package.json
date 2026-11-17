@@ -17,7 +17,7 @@
     "test:all": "node tests/api.test.js && node tests/ui.test.js",
     "build:hero": "esbuild public/assets/js/hero3d.js --bundle --format=esm --minify --target=es2020 --outfile=public/assets/js/hero3d.build.js --log-level=warning",
     "brand": "node scripts/brand-logos.mjs",
-    "build": "npm run brand && npm run build:hero"
+    "assets": "npm run brand && npm run build:hero"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
