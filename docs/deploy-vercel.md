@@ -9,7 +9,7 @@ local build.
 | Health | <https://peshawarmodelroboticssociety.vercel.app/api/health> → `{"ok":true,"database":"postgres"}` |
 | Vercel project | `peshawarmodelroboticssociety` (team HANAX) |
 | Region | `bom1` — Mumbai, the closest Vercel region to Peshawar |
-| Repository | `itsmehanan/Peshawar-Model-Robotics-Society`, branch `arena/79190411-peshawar-model-robotics-societ` |
+| Repository | `itsmehanan/Peshawar-Model-Robotics-Society`, branch `main` (auto-deploys) |
 | Database | Supabase project `pmrs-olympiad`, PostgreSQL 17.12, `ap-south-1` |
 
 ## How it runs
@@ -35,35 +35,66 @@ exit cleanly and the pooler is not exhausted.
 | `DATABASE_URL` | Supabase pooler URI (secret) |
 | `DATABASE_SSL` | `true` |
 | `NODE_ENV` | `production` |
-| `ADMIN_EMAIL` | `organizer@peshawarmodelroboticssociety.org` |
+| `ADMIN_EMAIL` | `admin-003` (the sign-in ID, not an email) |
 | `ADMIN_PASSWORD` | bootstrap password — **change it after signing in** |
-| `ADMIN_NAME` | `Event Organizer` |
+| `ADMIN_NAME` | `HUSNAIN` |
 
 ## Signing in as an administrator
 
-Go to `/#/admin` and use `ADMIN_EMAIL` with the bootstrap password. To change the
-password, sign in and use **Admin → Account**, or run:
+Go to `/#/admin` and sign in with the administrator ID and password:
+
+| Field | Value |
+| --- | --- |
+| Administrator ID | `ADMIN-003` |
+| Password | the `ADMIN_PASSWORD` environment variable |
+
+The ID field accepts an identifier **or** an email address, case-insensitively,
+so `ADMIN-003` and `admin-003` are the same account. There is no minimum length
+and no `@` requirement — the identifier is compared against the stored value and
+the password is checked only if it matches.
+
+Set or reset it from a shell with database access:
 
 ```bash
-npm run admin:set-password
+npm run admin:set-password -- --email admin-003 --password "NewPassword123"
 ```
+
+**What `ADMIN_EMAIL` actually does:** it is only used to create the first
+administrator, and only when the `admin_users` table is empty. It never overwrites
+an existing row, so changing it does not change an existing password — use the
+command above, or **Admin → Account**, for that. Because the column is named
+`email` and is checked by `lower(email)`, a short ID is stored there verbatim;
+that is intentional, and the login lookup does not run the email validator.
 
 ## Deploying a change
 
-Pushes to the session branch do not auto-promote to the domain (the project's
-production branch is `main`). Either:
-
-- merge the branch into `main` and let Vercel build it, or
-- deploy the commit explicitly:
+**Automatic.** The project's production branch is `main`, and the GitHub
+integration has "create deployments" enabled. Push or merge to `main` and Vercel
+builds and promotes it to https://peshawarmodelroboticssociety.vercel.app on its
+own — there is no manual step, and no token needed.
 
 ```bash
-curl -X POST https://api.vercel.com/v13/deployments \
-  -H "Authorization: Bearer $VERCEL_TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"peshawarmodelroboticssociety","project":"prj_s9Bjhh5seR9SnLgcDRtch2nDRjqb",
-       "target":"production","gitSource":{"type":"github","repoId":1460206921,"ref":"<sha>"}}' \
-  -G -d teamId=team_clprO4Bp2auNOJCw91hFa9vG
+git push origin HEAD:main        # or merge a PR into main
 ```
+
+Pushes to any other branch build a **preview** deployment (staged, not promoted),
+which is what you want for review before it reaches the live domain.
+
+Check what is live without opening the dashboard:
+
+```bash
+curl -s "https://api.vercel.com/v6/deployments?projectId=prj_s9Bjhh5seR9SnLgcDRtch2nDRjqb&teamId=team_clprO4Bp2auNOJCw91hFa9vG&target=production&limit=1" \
+  -H "Authorization: Bearer $VERCEL_TOKEN"
+```
+
+`readyState: READY` with `readySubstate: PROMOTED` means the domain is serving it.
+
+### If auto-deploy ever stops
+
+The usual cause is `main` falling behind the work: a long-lived branch that is
+never merged keeps building previews while the domain stays on an older commit.
+Merge it. If that is not it, check **Project → Settings → Git** and confirm the
+Production Branch is still `main` and that the GitHub connection is healthy.
 
 ## What the first deploy caught
 

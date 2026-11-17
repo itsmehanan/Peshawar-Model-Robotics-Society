@@ -55,7 +55,8 @@ On first boot the app creates its schema and seeds default content
 (4 fields, 3 journal articles, 5 FAQs, 1 announcement). It also creates one
 administrator account:
 
-- If you set `ADMIN_PASSWORD` in `.env`, that is the password.
+- If you set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env`, those are the ID and
+  password. Any non-empty identifier works as the ID, including a short one.
 - Otherwise a strong password is generated, printed once in the console, and
   written to `data/admin-credentials.txt` (git-ignored, mode 0600).
 
@@ -71,8 +72,8 @@ Sign in at `/#/admin`. Change the password immediately in **Account**.
 | --- | --- |
 | `npm start` | run the server (port `PORT`, default 3000) |
 | `npm run dev` | run with `--watch` for auto-restart |
-| `npm test` | 39 HTTP/API tests against a throwaway database |
-| `npm run test:ui` | 20 jsdom browser-flow tests (register → dashboard → admin) |
+| `npm test` | 42 HTTP/API tests against a throwaway database |
+| `npm run test:ui` | 25 jsdom browser-flow tests (register → dashboard → admin) |
 | `npm run test:all` | both suites |
 | `npm run admin:set-password -- --email a@b.c --password "NewPass123"` | reset/create an admin |
 | `npm run db:reset` | **dev only** — wipe the embedded database and re-seed |
@@ -80,10 +81,11 @@ Sign in at `/#/admin`. Change the password immediately in **Account**.
 Both test suites spin up their own server on ports 3998/3999 with separate data
 directories and delete them afterwards. They never touch `./data`.
 
-**Demo admin for this checkout:** the running preview instance was seeded with
-`organizer@orbit-olympiad.org` / `0rbitLaunch!2026`. Change it in
-**Admin → Account** before any real use, or set `ADMIN_PASSWORD` before first
-boot instead.
+**Signing in:** the administrator field accepts an ID or an email address, so
+`ADMIN-003` and `organizer@example.org` both work — the value is compared
+against `admin_users.email`, case-insensitively, and the password is checked only
+if it matches. There is no demo password in this repository; set `ADMIN_PASSWORD`
+before the first boot, or use `npm run admin:set-password` afterwards.
 
 ---
 
