@@ -232,9 +232,15 @@ authRouter.post(
     const gate = throttle(key, 5, 15 * 60 * 1000);
     if (!gate.allowed) fail(429, `Too many attempts. Try again in ${gate.retryAfter} seconds.`, { code: 'throttled' });
 
-    const emailValue = vEmail(req.body?.email);
+    // Administrators sign in with an email OR a short ID such as "ADMIN-003".
+    // Requiring an email at this step locked out any organiser who had been given
+    // an ID, with a validation message instead of a sign-in attempt.
+    const identifier = String(req.body?.email ?? req.body?.identifier ?? '').trim().toLowerCase();
+    if (!identifier || identifier.length > 160) {
+      fail(401, 'Email or password is incorrect.', { code: 'bad_credentials' });
+    }
     const passwordValue = String(req.body?.password || '');
-    const admin = await q1('SELECT id, password_hash FROM admin_users WHERE lower(email) = $1', [emailValue]);
+    const admin = await q1('SELECT id, password_hash FROM admin_users WHERE lower(email) = $1', [identifier]);
     const valid = admin ? await verifyPassword(passwordValue, admin.password_hash) : false;
     if (!valid) fail(401, 'Email or password is incorrect.', { code: 'bad_credentials' });
     clearThrottle(key);

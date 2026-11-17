@@ -364,6 +364,54 @@ await test('admin sign-in loads the dashboard with real metrics', async () => {
   assert.match(text(), /Pending requests/);
 });
 
+await test('the admin section menu is collapsed on a phone, not covering the panel', async () => {
+  // The 14-row section list used to be a sticky sidebar at every width, so on a
+  // phone it filled the viewport and pushed the actual panel off-screen.
+  const menu = q('[data-admin-menu]');
+  assert.ok(menu, 'the admin menu must be a <details> so it can collapse');
+  assert.equal(menu.open, false, 'on a narrow viewport the menu starts collapsed');
+  assert.ok(q('.admin-menu__toggle'), 'a phone needs a visible way to open it');
+  // Opening it is a plain <details> toggle, so it still works without JS.
+  menu.open = true;
+  assert.equal(menu.open, true, 'the menu can be opened');
+  menu.open = false;
+});
+
+await test('the section menu opens on a desktop and collapses on a phone', async () => {
+  // Driven through the real mount path: build the page, run mountAdmin, read the
+  // <details> state. Going through a hash change is unreliable here because the
+  // route is already #/admin/... and re-rendering is asynchronous.
+  const { adminPage, mountAdmin } = await import('../public/assets/js/pages/admin.js');
+  const main = global.document.getElementById('main');
+  const renderWith = async (wide) => {
+    window.matchMedia = (query) => ({
+      matches: wide && query.includes('min-width: 980px'),
+      addEventListener() {},
+      removeEventListener() {},
+    });
+    main.innerHTML = adminPage({ section: 'overview' });
+    await mountAdmin(main, { section: 'overview', navigate: () => {}, refresh: async () => {} });
+    return main.querySelector('[data-admin-menu]').open;
+  };
+  assert.equal(await renderWith(true), true, 'a desktop sidebar stays open');
+  assert.equal(await renderWith(false), false, 'a phone menu starts collapsed');
+  // restore the narrow default and re-render the real page for later tests
+  window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
+  window.location.hash = '#/admin/students';
+  await waitFor(() => text().includes('ui-student@test.local'), 8000, 'students table');
+});
+
+await test('an admin session replaces the Register button', async () => {
+  // The screenshot that started this had "Register" in the header while the
+  // organiser was signed in — the header only tracked the student session.
+  const adminLink = q('[data-admin-in]');
+  assert.ok(adminLink, 'the header needs an admin affordance');
+  assert.equal(adminLink.hidden, false, 'Admin panel link is shown to a signed-in organiser');
+  for (const node of document.querySelectorAll('[data-auth-out]')) {
+    assert.equal(node.hidden, true, 'signed-in admin must not be offered Sign in / Register');
+  }
+});
+
 await test('admin students table lists the registered student', async () => {
   window.location.hash = '#/admin/students';
   await waitFor(() => text().includes('ui-student@test.local'), 8000, 'students table');

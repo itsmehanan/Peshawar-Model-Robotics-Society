@@ -538,6 +538,37 @@ await test('application scripts are not served immutable', async () => {
   assert.doesNotMatch(String(res.headers.get('cache-control')), /immutable/);
 });
 
+await test('an administrator can sign in with a short ID, not only an email', async () => {
+  // "ADMIN-003" is not an email address. Requiring one at the login step rejected
+  // the credential before it was ever checked, which locked out the organiser.
+  const { query } = await import('../server/db.js');
+  const { hashPassword, uuid } = await import('../server/security.js');
+  await query('INSERT INTO admin_users (id, email, name, password_hash) VALUES ($1,$2,$3,$4)', [
+    uuid(), 'admin-003', 'HUSNAIN', await hashPassword('Husnain12345'),
+  ]);
+
+  const ok = await fetch(`${BASE}/api/admin/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: BASE },
+    body: JSON.stringify({ email: 'admin-003', password: 'Husnain12345' }),
+  });
+  assert.equal(ok.status, 200, 'the ID must authenticate');
+  const signedIn = await ok.json();
+  assert.equal(signedIn.admin.email, 'admin-003');
+
+  // Case and whitespace should not matter, and a wrong password is still refused
+  // with the same generic message (never "that email is invalid").
+  const padded = await fetch(`${BASE}/api/admin/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: BASE },
+    body: JSON.stringify({ email: '  ADMIN-003 ', password: 'wrongpassword1' }),
+  });
+  assert.equal(padded.status, 401);
+  const body = await padded.json();
+  assert.equal(body.code, 'bad_credentials');
+  assert.doesNotMatch(body.error, /valid email/i);
+});
+
 await test('the deployment health check answers before the API 404 does', async () => {
   const res = await fetch(`${BASE}/api/health`);
   const body = await res.json();

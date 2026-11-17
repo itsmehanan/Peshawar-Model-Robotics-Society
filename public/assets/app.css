@@ -2293,15 +2293,82 @@ button {
   }
 }
 
-.admin-nav {
+/* On a phone the section list is a collapsible menu, not a sticky sidebar.
+   It used to be sticky/max-height:100vh at every width, so its ~14 rows filled
+   the viewport and the panel underneath was pushed off-screen. */
+.admin-menu {
   border: 1px solid var(--line);
   background: var(--bg-2);
+}
+
+.admin-menu__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.admin-menu__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.admin-menu__toggle::after {
+  content: '＋';
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  flex: none;
+}
+
+.admin-menu[open] > .admin-menu__toggle::after {
+  content: '－';
+}
+
+.admin-menu__current {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.admin-nav {
+  border-top: 1px solid var(--line);
+  background: var(--bg-2);
   padding: 0.4rem;
-  position: sticky;
-  top: calc(var(--head-h) + 1rem);
-  max-height: calc(100vh - var(--head-h) - 2rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
+}
+
+@media (min-width: 980px) {
+  /* Desktop keeps the always-visible sticky sidebar; the toggle is redundant. */
+  .admin-menu {
+    border: 0;
+    background: none;
+    display: block;
+  }
+  /* Force the sidebar open regardless of the summary's state. */
+  .admin-menu > .admin-nav {
+    display: block;
+  }
+  .admin-menu__toggle {
+    display: none;
+  }
+  .admin-nav {
+    border: 1px solid var(--line);
+    position: sticky;
+    top: calc(var(--head-h) + 1rem);
+    max-height: calc(100vh - var(--head-h) - 2rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
 }
 
 .admin-nav__group {

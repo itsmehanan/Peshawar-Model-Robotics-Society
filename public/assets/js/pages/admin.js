@@ -49,7 +49,12 @@ export function adminPage({ section = 'overview' }) {
 
     <section class="section section--tight">
       <div class="wrap admin-layout">
-        <nav class="admin-nav" aria-label="Admin sections">
+        <details class="admin-menu" data-admin-menu>
+          <summary class="admin-menu__toggle">
+            <span class="admin-menu__label">Sections</span>
+            <span class="admin-menu__current">${esc(SECTIONS.find((s) => s.key === section)?.label || 'Dashboard')}</span>
+          </summary>
+          <nav class="admin-nav" aria-label="Admin sections">
           ${groups
             .map(
               (group) => `
@@ -64,7 +69,8 @@ export function adminPage({ section = 'overview' }) {
               .join('')}`,
             )
             .join('')}
-        </nav>
+          </nav>
+        </details>
 
         <div id="adminBody">
           <p class="small muted">Loading…</p>
@@ -84,8 +90,9 @@ function adminLoginView() {
         Access is checked on the server with a hashed password and an HttpOnly session.</p>
         <form class="form" id="adminLoginForm" novalidate>
           <div class="field">
-            <label for="a-email">Administrator email</label>
-            <input class="input" id="a-email" name="email" type="email" autocomplete="username" required>
+            <label for="a-email">Administrator ID or email</label>
+            <input class="input" id="a-email" name="email" type="text" autocomplete="username"
+                   autocapitalize="characters" spellcheck="false" placeholder="ADMIN-003" required>
             <span class="field__error"></span>
           </div>
           <div class="field">
@@ -124,6 +131,21 @@ export async function mountAdmin(root, { section = 'overview', navigate, refresh
       navigate('#/admin/overview');
     });
     return;
+  }
+
+  /**
+   * The section menu is a <details> so it needs no JS to open on a phone, but it
+   * must START collapsed there (a 14-row list would cover the panel) and START
+   * open on a desktop sidebar. The breakpoint matches the stylesheet's 980px.
+   */
+  const menu = root.querySelector('[data-admin-menu]');
+  if (menu && window.matchMedia) {
+    const wide = window.matchMedia('(min-width: 980px)');
+    const apply = () => {
+      menu.open = wide.matches;
+    };
+    apply();
+    wide.addEventListener?.('change', apply);
   }
 
   root.querySelector('[data-action="admin-logout"]')?.addEventListener('click', async () => {

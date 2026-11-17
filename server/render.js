@@ -75,6 +75,11 @@ ${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImage
       <a class="btn btn--solid btn--sm" href="#/dashboard" data-link data-auth-in hidden>
         My dashboard
       </a>
+      <!-- An organiser is signed in: the student affordances must go away, or the
+           header keeps offering Register to the person running the event. -->
+      <a class="btn btn--solid btn--sm" href="#/admin/overview" data-link data-admin-in hidden>
+        Admin panel
+      </a>
       <button class="icon-btn nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
         <span></span><span></span>
       </button>
@@ -89,6 +94,7 @@ ${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImage
       <a href="#/contact" data-link>Contact</a>
       <a href="#/login" data-link data-auth-out>Sign in</a>
       <a href="#/dashboard" data-link data-auth-in hidden>My dashboard</a>
+      <a href="#/admin/overview" data-link data-admin-in hidden>Admin panel</a>
     </nav>
   </div>
 </header>

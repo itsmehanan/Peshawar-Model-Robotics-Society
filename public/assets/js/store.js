@@ -125,11 +125,17 @@ export function onStatusChange(callback) {
 /** Fill header/footer auth affordances without a full re-render. */
 export function syncChrome() {
   const student = state.student;
+  const admin = state.admin;
   document.querySelectorAll('[data-auth-in]').forEach((node) => {
     node.hidden = !student;
   });
+  // Signed out means no student AND no admin: an organiser who is also browsing
+  // must not be offered "Register", and must get a way back into the panel.
   document.querySelectorAll('[data-auth-out]').forEach((node) => {
-    node.hidden = Boolean(student);
+    node.hidden = Boolean(student || admin);
+  });
+  document.querySelectorAll('[data-admin-in]').forEach((node) => {
+    node.hidden = !admin;
   });
   const registerLink = document.querySelector('[data-register-link]');
   if (registerLink) {
