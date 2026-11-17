@@ -1,0 +1,10 @@
+node_modules
+data
+data-test
+data-ui-test
+.env
+.env.local
+*.log
+.DS_Store
+*.db
+*.db-journal
