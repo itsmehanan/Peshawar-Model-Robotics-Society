@@ -180,7 +180,7 @@ app.get(/^\/(?!api|assets|fonts).*/, async (req, res) => {
     res.type('html').send(await renderDocument(content));
   } catch (error) {
     console.error('[render]', error);
-    res.status(500).type('html').send('<!doctype html><title>ORBIT</title><p>Server error. Please refresh.</p>');
+    res.status(500).type('html').send('<!doctype html><title>PMRS</title><p>Server error. Please refresh.</p>');
   }
 });
 

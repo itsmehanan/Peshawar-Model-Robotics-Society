@@ -8,24 +8,26 @@ const uid = () => randomUUID();
 
 export const DEFAULT_SETTINGS = {
   site: {
-    // The event name stays short for the wordmark; the society that runs it is
-    // named in full so the organisation is never reduced to an acronym.
-    name: 'ORBIT',
-    fullName: 'ORBIT Olympiad — Peshawar Model Robotics Society',
-    tagline: 'A school olympiad for builders, thinkers and makers.',
+    // The organisation is the identity; an acronym alone tells a first-time
+    // visitor nothing, so the full name always appears alongside it.
+    name: 'PMRS',
+    fullName: 'Peshawar Model Robotics Society',
+    tagline: 'Innovate · Build · Compete',
     description:
-      'ORBIT is an annual exhibition of student work in robotics, science, engineering and technology, run by the Peshawar Model Robotics Society — built around one idea: curiosity deserves a stage.',
-    logoMark: 'O',
+      'The student robotics and engineering society of Peshawar Model School — where students design, build and compete with machines they made themselves.',
+    logoMark: 'P',
+    // Empty means "use the built-in SVG identity" (logo-mark.svg / favicon.svg),
+    // which is the shipped brand. Set a URL only to override it.
     logoUrl: '',
     faviconUrl: '',
     metaDescription:
-      'ORBIT Olympiad — an annual student exhibition of robotics, science, engineering and technology projects in Peshawar, run by the Peshawar Model Robotics Society. Register your team, choose a field and present your work.',
-    footerNote: 'Organised by the Peshawar Model Robotics Society.',
+      'Peshawar Model Robotics Society — a student robotics and engineering society in Peshawar. Register your team, choose a field of entry and present the machine you built.',
+    footerNote: 'Run by students, for students.',
   },
   event: {
     headline: 'Build something the future needs.',
     intro:
-      'One day. Four fields. Hundreds of students presenting the work they made when nobody told them what to make. ORBIT is where school science stops being a worksheet and becomes a public exhibition.',
+      'One day. Four fields. Students presenting machines they designed and built themselves. This is where school science stops being a worksheet and becomes something that moves.',
     kicker: 'Season 04 — 2026',
     dateLabel: 'Saturday, 14 March 2026',
     dateISO: '2026-03-14',
@@ -37,7 +39,7 @@ export const DEFAULT_SETTINGS = {
     heroImageUrl: '',
     aboutTitle: 'An exhibition, not a competition of polish.',
     aboutBody:
-      'ORBIT began as a hallway table with three robots on it. Today it is a full exhibition day: teams from schools across the city set up booths, present prototypes to judges, and explain their work to anyone who stops to ask a question.\n\nWe score the thinking, not the budget. A working cardboard mechanism that solves a real problem will always outrank a polished box that does nothing. Judges spend time with every team, ask two questions, and write comments you can keep.\n\nEvery participant leaves with feedback, a certificate, and at least one idea for next year.',
+      'PMRS began as a hallway table with three robots on it. Today it runs a full exhibition day: teams set up booths, present prototypes to judges, and explain their work to anyone who stops to ask a question.\n\nWe score the thinking, not the budget. A working cardboard mechanism that solves a real problem will always outrank a polished box that does nothing. Judges spend time with every team, ask two questions, and write comments you can keep.\n\nEvery participant leaves with feedback, a certificate, and at least one idea for next year.',
     // Deliberately describes the programme, not attendance: claimed exhibitor
     // and school counts were invented and would be a false claim to the public.
     stats: [
@@ -51,7 +53,7 @@ export const DEFAULT_SETTINGS = {
     open: true,
     closedTitle: 'Registration is closed for this season.',
     closedMessage:
-      'Team registration for ORBIT 2026 has closed. Follow our social accounts or contact the organisers to be told when the next season opens.',
+      'Team registration for this season has closed. Follow our social accounts or contact the organisers to be told when the next season opens.',
     deadlineLabel: 'Teams close on 28 February 2026',
     maxMembers: 4,
     minMembers: 2,
@@ -63,7 +65,7 @@ export const DEFAULT_SETTINGS = {
     enabled: true,
   },
   contact: {
-    email: 'hello@orbit-olympiad.org',
+    email: 'hello@pmrs.pk',
     // Left blank on purpose: a placeholder number is worse than none. Fill these
     // in from Admin → Contact and the site shows them only once they are real.
     phone: '',
@@ -87,7 +89,7 @@ export const DEFAULT_SETTINGS = {
   ],
   footer: {
     credit: 'Peshawar Model Robotics Society',
-    copyright: 'ORBIT School Olympiad',
+    copyright: 'Peshawar Model Robotics Society',
   },
 };
 
@@ -161,7 +163,7 @@ const ARTICLES = [
 
 const FAQS = [
   {
-    question: 'Who can take part in ORBIT?',
+    question: 'Who can take part?',
     answer:
       'Any student currently enrolled in a participating school may register, from grade 6 upwards. A team may be all from one school — mixed-school teams are not permitted, because judging is school-based.',
     sort_order: 1,

@@ -1,7 +1,9 @@
 /**
- * The document shell. Branding (name, logo, favicon, description) is injected
- * from the database on every request so admin edits apply everywhere at once —
- * while the hero centrepiece stays a fixed, hand-built piece of the design.
+ * The document shell.
+ *
+ * Branding (name, logo, favicon, description) is injected from the database on
+ * every request so admin edits apply everywhere at once — while the hero
+ * centrepiece stays a fixed, hand-built piece of the design.
  */
 /** JSON is embedded in a script tag; escape the characters that could break out. */
 const safeJson = (value) =>
@@ -10,39 +12,57 @@ const safeJson = (value) =>
 const esc = (value) =>
   String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/**
+ * Runs before the body paints. Applying the stored theme here — rather than in
+ * the deferred module — is the difference between a considered page and a flash
+ * of the wrong palette on every single load.
+ */
+const themeBoot = `(function(){try{
+  var k='pmrs-theme',s=localStorage.getItem(k),p=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+  var t=(s==='light'||s==='dark')?s:p;
+  document.documentElement.setAttribute('data-theme',t);
+  document.documentElement.style.colorScheme=t;
+}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
+
 export async function renderDocument(settings) {
   const site = settings.site || {};
   const event = settings.event || {};
 
-  const name = site.name || 'ORBIT';
-  const fullName = site.fullName || 'ORBIT School Olympiad';
-  const description = site.metaDescription || site.description || 'A school olympiad for builders, thinkers and makers.';
-  const logoMark = (site.logoMark || 'O').slice(0, 3);
+  const name = site.name || 'PMRS';
+  const fullName = site.fullName || 'Peshawar Model Robotics Society';
+  const description =
+    site.metaDescription || site.description || 'The student robotics and engineering society of Peshawar Model School.';
+  const tagline = (event.kicker || 'Innovate · Build · Compete').replace(/^Season \d+\s*[-—]\s*/i, '');
 
   const favicon = site.faviconUrl
     ? `<link rel="icon" href="${esc(site.faviconUrl)}">`
     : `<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">`;
+  const appleIcon = `<link rel="apple-touch-icon" href="/assets/logo-mark.svg">`;
 
+  // The ticker-style monogram fallback is gone: an admin-uploaded logo is still
+  // honoured, otherwise the real emblem is used.
   const logo = site.logoUrl
-    ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="34" height="34">`
-    : `<span class="brand__mark" aria-hidden="true"><span>${esc(logoMark)}</span></span>`;
+    ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="36" height="36" decoding="async">`
+    : `<img class="brand__img" src="/assets/logo-mark.svg" alt="" width="36" height="36" decoding="async" data-logo-mark>`;
 
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>${themeBoot}</script>
 <title>${esc(fullName)}</title>
 <meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="#0a0a0b">
+<meta name="theme-color" content="#0a0d12">
+<meta name="color-scheme" content="dark light">
 ${favicon}
+${appleIcon}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullName)}">
 <meta property="og:description" content="${esc(description)}">
-${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImageUrl)}">` : ''}
+<meta property="og:image" content="${esc(event.heroImageUrl || '/assets/logo-full.svg')}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/archivo-var-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/art/hero.webp" as="image" type="image/webp" fetchpriority="high">
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
 <script type="application/json" id="boot-content">${safeJson(settings)}</script>
@@ -56,7 +76,7 @@ ${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImage
       ${logo}
       <span class="brand__text">
         <span class="brand__name">${esc(name)}</span>
-        <span class="brand__sub">${esc((event.kicker || 'School Olympiad').replace(/^Season \d+ — /i, ''))}</span>
+        <span class="brand__sub">${esc(tagline)}</span>
       </span>
     </a>
 
@@ -68,6 +88,13 @@ ${event.heroImageUrl ? `<meta property="og:image" content="${esc(event.heroImage
     </nav>
 
     <div class="site-head__actions">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light theme">
+        <svg class="theme-toggle__rays" viewBox="0 0 38 38" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+          <path d="M19 3.5v3.4M19 31.1v3.4M3.5 19h3.4M31.1 19h3.4M8.2 8.2l2.4 2.4M27.4 27.4l2.4 2.4M29.8 8.2l-2.4 2.4M10.6 27.4l-2.4 2.4"/>
+        </svg>
+        <span class="theme-toggle__disc" aria-hidden="true"></span>
+      </button>
       <a class="btn btn--ghost btn--sm" href="#/login" data-link data-auth-out>Sign in</a>
       <a class="btn btn--solid btn--sm" href="#/register" data-link data-auth-out data-register-link>
         Register <span class="btn__arrow" aria-hidden="true">↗</span>

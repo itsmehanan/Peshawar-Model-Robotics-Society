@@ -15,7 +15,9 @@ export function renderFooter() {
       <div class="foot__top">
         <div class="foot__brand">
           <a class="brand" href="#/" data-link>
-            <span class="brand__mark" aria-hidden="true"><span>${esc(site.logoMark || 'O')}</span></span>
+            ${site.logoUrl
+              ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="34" height="34" loading="lazy" decoding="async">`
+              : '<img class="brand__img" src="/assets/logo-mark.svg" alt="" width="34" height="34" loading="lazy" decoding="async">'}
             <span class="brand__text">
               <span class="brand__name">${esc(site.name)}</span>
               <span class="brand__sub">${esc((event?.kicker || 'School Olympiad').replace(/^Season \d+ — /i, ''))}</span>

@@ -24,6 +24,7 @@ export class ApiError extends Error {
  * sessionStorage is per-tab and dies with the tab; it is not the source of
  * truth for the account, only a transport workaround. Cookies always win.
  */
+// Keys are frozen: renaming them would sign out every live session.
 const TOKEN_KEYS = { student: 'orbit=student', admin: 'orbit=admin' };
 
 export function storeToken(kind, token) {

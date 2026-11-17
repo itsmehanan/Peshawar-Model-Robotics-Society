@@ -45,7 +45,7 @@ export function contactPage() {
               ${esc(state.content.site.fullName || 'The olympiad')} — one reply within two school days. For team changes, include your
               team name and school so we can find your record quickly.
             </p>
-            ${contact.email ? `<a class="btn btn--solid btn--sm" style="width:max-content" href="mailto:${esc(contact.email)}?subject=${encodeURIComponent('ORBIT Olympiad enquiry')}">Write an email</a>` : ''}
+            ${contact.email ? `<a class="btn btn--solid btn--sm" style="width:max-content" href="mailto:${esc(contact.email)}?subject=${encodeURIComponent('PMRS enquiry')}">Write an email</a>` : ''}
           </div>
 
           ${

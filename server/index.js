@@ -1,5 +1,5 @@
 /**
- * ORBIT Olympiad — long-running server (local development, VPS, Docker).
+ * PMRS — long-running server (local development, VPS, Docker).
  *
  *   npm start          → http://localhost:3000
  *
@@ -28,7 +28,7 @@ export async function start() {
 
   const server = app.listen(cfg.port, '0.0.0.0', () => {
     const dbKind = cfg.databaseUrl ? 'postgres' : 'embedded postgres (pglite)';
-    console.log(`ORBIT Olympiad ready on http://localhost:${cfg.port}  ·  database: ${dbKind}`);
+    console.log(`PMRS ready on http://localhost:${cfg.port}  ·  database: ${dbKind}`);
   });
   server.on('error', (err) => {
     console.error('[server]', err.message);

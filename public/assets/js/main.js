@@ -22,6 +22,7 @@ import {
   mountProgress,
 } from './ui.js';
 import { renderFooter, syncActiveNav, setMobileNav } from './chrome.js';
+import { mountThemeToggle } from './theme.js';
 
 import { homePage, mountHome } from './pages/home.js';
 import { fieldsPage, fieldDetailPage } from './pages/fields.js';
@@ -195,6 +196,7 @@ async function start() {
   });
 
   mountNavToggle();
+  mountThemeToggle();
   mountProgress();
 
   // Close the mobile menu after any navigation click

@@ -1205,7 +1205,7 @@ function renderExports(body) {
       <div class="panel__head"><div><h2 class="panel__title">Backups</h2></div></div>
       <p class="small ink2">If you are running on the embedded database, the whole dataset lives in <span class="mono">./data/pglite</span>.
       Copy that directory to back up. On Supabase/hosted PostgreSQL use the provider's automated backups, or
-      <span class="mono">pg_dump "$DATABASE_URL" &gt; orbit-backup.sql</span>.</p>
+      <span class="mono">pg_dump "$DATABASE_URL" &gt; pmrs-backup.sql</span>.</p>
     </div>`;
   body.querySelectorAll('[data-export]').forEach((b) => b.addEventListener('click', () => download(b.dataset.export)));
 }

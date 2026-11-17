@@ -45,7 +45,7 @@ export function loginPage() {
     <aside class="auth-art" aria-hidden="true">
       <div>
         <p class="auth-art__quote">“Nobody remembers the booth with the most expensive parts. Everybody remembers the team that could explain <em>why</em>.”</p>
-        <p class="auth-art__cite">Judging notes, ORBIT</p>
+        <p class="auth-art__cite">Judging notes, PMRS</p>
       </div>
     </aside>
   </div>`;

@@ -1,5 +1,5 @@
 -- ===========================================================================
--- ORBIT Olympiad — Supabase / PostgreSQL setup
+-- PMRS — Supabase / PostgreSQL setup
 -- ---------------------------------------------------------------------------
 -- You normally do NOT need to run this by hand: the app creates its own schema
 -- on boot (`CREATE TABLE IF NOT EXISTS`). Use this file when you want to:

@@ -672,7 +672,7 @@ adminRouter.get(
       s.project_title, new Date(s.created_at).toISOString(),
     ])].map((row) => row.map(escape).join(',')).join('\r\n');
     res.set('Content-Type', 'text/csv; charset=utf-8');
-    res.set('Content-Disposition', `attachment; filename="orbit-registrations-${new Date().toISOString().slice(0, 10)}.csv"`);
+    res.set('Content-Disposition', `attachment; filename="pmrs-registrations-${new Date().toISOString().slice(0, 10)}.csv"`);
     res.send(`\ufeff${csv}`);
   }),
 );
@@ -692,7 +692,7 @@ adminRouter.get(
     const csv = [header, ...teams.map((t) => [t.name, t.school, t.category, t.member_count, t.max_members, t.leader, t.members])]
       .map((row) => row.map(escape).join(',')).join('\r\n');
     res.set('Content-Type', 'text/csv; charset=utf-8');
-    res.set('Content-Disposition', `attachment; filename="orbit-teams-${new Date().toISOString().slice(0, 10)}.csv"`);
+    res.set('Content-Disposition', `attachment; filename="pmrs-teams-${new Date().toISOString().slice(0, 10)}.csv"`);
     res.send(`\ufeff${csv}`);
   }),
 );

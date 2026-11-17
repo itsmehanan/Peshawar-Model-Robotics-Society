@@ -91,6 +91,8 @@ async function bootWindow(route = '/') {
   global.window = window;
   global.document = window.document;
   Object.defineProperty(global, 'navigator', { value: window.navigator, configurable: true, writable: true });
+  // theme.js reads localStorage off the global, which jsdom scopes to the window
+  Object.defineProperty(global, 'localStorage', { value: window.localStorage, configurable: true });
   global.HTMLElement = window.HTMLElement;
   global.Element = window.Element;
   global.Node = window.Node;
@@ -134,7 +136,7 @@ window.__app = app;
 await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
   assert.match(text(), /Fields of entry/);
-  assert.ok(q('#siteFoot').textContent.includes('ORBIT'));
+  assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
   // The cover plate is a real studio render shipped as a static asset
   // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
   const plate = q('.plate .plate__object');
@@ -420,7 +422,7 @@ await test('admin students table lists the registered student', async () => {
 await test('admin branding form renders current site name', async () => {
   window.location.hash = '#/admin/site';
   await waitFor(() => q('#settingsForm'), 8000, 'site settings');
-  assert.equal(q('#settingsForm').elements.name.value, 'ORBIT');
+  assert.equal(q('#settingsForm').elements.name.value, 'PMRS');
 });
 
 await test('approving the pending request moves the team field', async () => {
@@ -434,6 +436,66 @@ await test('approving the pending request moves the team field', async () => {
 
 /* --------------------------------------------------------------- report */
 const failed = results.filter((r) => !r.ok);
+
+/* ------------------------------------------------------------------ brand */
+
+await test('the logo is the PMRS emblem, not a letter in a box', async () => {
+  const mark = q('.site-head .brand__img');
+  assert.ok(mark, 'the header shows a logo image');
+  const src = mark.getAttribute('src');
+  assert.ok(
+    src === '/assets/logo-mark.svg' || src.startsWith('http'),
+    `expected the SVG emblem, got ${src}`,
+  );
+  // The old mark was a rotated <span> holding a monogram. It must be gone, or the
+  // favicon, header and footer disagree about what the society looks like.
+  assert.equal(q('.site-head .brand__mark'), null, 'the monogram box is gone');
+});
+
+await test('the document carries the PMRS identity, not the old name', async () => {
+  const title = window.document.title;
+  assert.ok(/Peshawar Model Robotics Society/i.test(title), `title was "${title}"`);
+  assert.ok(!/orbit/i.test(title), 'no leftover event name in the title');
+  const desc = q('meta[name="description"]').getAttribute('content');
+  assert.ok(!/orbit/i.test(desc), 'no leftover event name in the description');
+});
+
+/* ------------------------------------------------------------------ theme */
+
+await test('the theme is applied before paint, so there is no flash', async () => {
+  const html = window.document.documentElement;
+  assert.ok(['dark', 'light'].includes(html.getAttribute('data-theme')));
+  // The inline boot script must be in <head>, ahead of the module that mounts
+  // the UI: a theme set from a deferred module flashes the wrong palette first.
+  const inline = Array.from(window.document.head.querySelectorAll('script')).find(
+    (s) => !s.src && /pmrs-theme/.test(s.textContent || ''),
+  );
+  assert.ok(inline, 'the inline theme boot script is present');
+});
+
+await test('the theme toggle switches, persists and relabels itself', async () => {
+  const { currentTheme, storedTheme, mountThemeToggle } = await import('../public/assets/js/theme.js');
+  mountThemeToggle(window.document);
+  const button = q('[data-theme-toggle]');
+  assert.ok(button, 'a theme toggle exists');
+
+  const before = currentTheme();
+  assert.match(button.getAttribute('aria-label'), /switch to/i, 'the label describes the action');
+
+  button.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 60));
+
+  const after = currentTheme();
+  assert.notEqual(after, before, 'the theme actually changed');
+  assert.equal(storedTheme(), after, 'the choice was persisted');
+  assert.equal(window.document.documentElement.getAttribute('data-theme'), after);
+  assert.match(button.getAttribute('aria-label'), after === 'light' ? /dark/i : /light/i);
+
+  // put it back so later tests see the default
+  button.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 60));
+});
+
 console.log(`\n${results.length - failed.length}/${results.length} browser tests passed`);
 
 await new Promise((resolve) => server.close(resolve));

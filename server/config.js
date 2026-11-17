@@ -26,7 +26,7 @@ export function config() {
     dataDir: process.env.DATA_DIR || './data',
     databaseUrl: process.env.DATABASE_URL || '',
     databaseSsl: String(process.env.DATABASE_SSL || '').toLowerCase() === 'true',
-    adminEmail: process.env.ADMIN_EMAIL || 'organizer@orbit-olympiad.org',
+    adminEmail: process.env.ADMIN_EMAIL || 'admin-003',
     adminPassword: process.env.ADMIN_PASSWORD || '',
     adminName: process.env.ADMIN_NAME || 'Event Organizer',
     sessionDays: Number(process.env.SESSION_DAYS || 30),
