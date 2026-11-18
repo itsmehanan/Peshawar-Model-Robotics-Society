@@ -40,7 +40,7 @@ function sphere(lat=20,lon=28){const out=[];for(let y=0;y<lat;y++){const v0=y/la
 function box(){const faces=[[[0,0,1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]]],[[0,0,-1],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]]],[[1,0,0],[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1]]],[[-1,0,0],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]]],[[0,1,0],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1]]],[[0,-1,0],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]]]];const out=[];for(const [n,p] of faces){for(const i of [0,1,2,0,2,3])out.push(...p[i],...n);}return out;}
 function cylinder(segments=24){const out=[];for(let i=0;i<segments;i++){const a=i/segments*Math.PI*2,b=(i+1)/segments*Math.PI*2;const p=[Math.cos(a),-1,Math.sin(a)],q=[Math.cos(b),-1,Math.sin(b)],r=[Math.cos(b),1,Math.sin(b)],s=[Math.cos(a),1,Math.sin(a)];for(const v of [p,q,r,p,r,s])out.push(...v,v[0],0,v[2]);const bottom=[0,-1,0],top=[0,1,0];out.push(...bottom,...bottom,...q,...bottom,...p,...bottom,...top,...top,...s,...top,...r,...top);}return out;}
 function torus(major=0.78,minor=0.1,segments=32,tube=10){const out=[];const point=(u,v)=>[(major+minor*Math.cos(v))*Math.cos(u), (major+minor*Math.cos(v))*Math.sin(u), minor*Math.sin(v)];for(let i=0;i<segments;i++)for(let j=0;j<tube;j++){const u=i/segments*Math.PI*2,U=(i+1)/segments*Math.PI*2,v=j/tube*Math.PI*2,V=(j+1)/tube*Math.PI*2;const a=point(u,v),b=point(U,v),c=point(U,V),d=point(u,V);for(const p of [a,b,c,a,c,d]){const n=[Math.cos(v)*Math.cos(u),Math.cos(v)*Math.sin(u),Math.sin(v)];out.push(...p,...n);}}return out;}
-const GEO={sphere:sphere(),box:box(),cylinder:cylinder(),torus:torus(.5,.08,32,10),eyeRing:torus(.78,.11,32,10),earRing:torus(.78,.12,24,8)};
+const GEO={sphere:sphere(14,20),box:box(),cylinder:cylinder(),torus:torus(.5,.08,32,10),eyeRing:torus(.78,.11,32,10),earRing:torus(.78,.12,24,8)};
 function makeModel(){
  const parts=[];
  const add=(geo,pos,scale,color,rot=[0,0,0],explode=[0,0,0],range=[0,1])=>parts.push({geo,pos,scale,color,rot,explode,range});
@@ -92,9 +92,9 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
  const stride=9*4;
  for(const [name,size,offset] of [['pos',3,0],['normal',3,12],['color',3,24]]){gl.enableVertexAttribArray(loc[name]);gl.vertexAttribPointer(loc[name],size,gl.FLOAT,false,stride,offset);}
  gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
- const model=makeModel(),geometry=GEO;let width=1,height=1,progress=0,frame=0,disposed=false,visible=true,running=true;
+ const model=makeModel(),geometry=GEO;let width=1,height=1,progress=0,frame=0,lastFrame=0,disposed=false,visible=true,running=true;
  const pointer={x:0,y:0},target={x:0,y:0};const stage=canvas.closest('[data-hero-stage]')||canvas.parentElement;
- const resize=()=>{const r=canvas.parentElement?.getBoundingClientRect()||canvas.getBoundingClientRect();width=Math.max(1,Math.floor(r.width));height=Math.max(1,Math.floor(r.height));const dpr=Math.min(devicePixelRatio||1,1.6);canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);gl.viewport(0,0,canvas.width,canvas.height);};
+ const resize=()=>{const r=canvas.parentElement?.getBoundingClientRect()||canvas.getBoundingClientRect();width=Math.max(1,Math.floor(r.width));height=Math.max(1,Math.floor(r.height));const dpr=Math.min(devicePixelRatio||1,1.45);canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);gl.viewport(0,0,canvas.width,canvas.height);};
  const ro=new ResizeObserver(resize);if(canvas.parentElement)ro.observe(canvas.parentElement);resize();
  const onPointer=e=>{const r=stage.getBoundingClientRect();pointer.x=((e.clientX-r.left)/Math.max(1,r.width)-.5)*.5;pointer.y=((e.clientY-r.top)/Math.max(1,r.height)-.5)*-.35;};
  const onLeave=()=>{pointer.x=0;pointer.y=0;};stage.addEventListener('pointermove',onPointer,{passive:true});stage.addEventListener('pointerleave',onLeave,{passive:true});
@@ -104,7 +104,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
  const pack=[];
  function render(){
    if(disposed||!running||!visible)return;
-   const t=performance.now()*.001;target.x+=(pointer.x-target.x)*.045;target.y+=(pointer.y-target.y)*.045;
+   const now=performance.now();if(now-lastFrame<1000/40){frame=requestAnimationFrame(render);return;}lastFrame=now;const t=now*.001;target.x+=(pointer.x-target.x)*.045;target.y+=(pointer.y-target.y)*.045;
    const pgr=progress,explode=smooth(.06,.82,pgr);
    const rootY=target.x+(reducedMotion?0:pgr*.26),rootX=target.y+(reducedMotion?0:Math.sin(pgr*Math.PI)*.06);
    pack.length=0;
