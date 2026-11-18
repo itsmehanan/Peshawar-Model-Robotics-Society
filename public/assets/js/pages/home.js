@@ -24,7 +24,7 @@ export function artPicture(base, { width, height, eager = false, className = '' 
 const pad=n=>String(n).padStart(2,'0');
 function fieldCard(category,index){
   const key=['robotics','science','engineering','technology'].includes(category.id)?category.id:'technology';
-  return '<a class="target-card" href="#/fields/'+esc(category.id)+'" data-link><span class="target-card__num">'+pad(index+1)+'</span><img data-k="'+key+'" alt="'+esc(category.name)+' visual" width="320" height="320" loading="lazy"><h3>'+esc(category.name)+'</h3><span class="target-card__go" aria-hidden="true">↗</span></a>';
+  return '<a class="target-card" href="#/fields/'+esc(category.id)+'" data-link><span class="target-card__num">'+pad(index+1)+'</span>'+artPicture(fieldArt(category.id),{width:320,height:320})+'<h3>'+esc(category.name)+'</h3><span class="target-card__go" aria-hidden="true">↗</span></a>';
 }
 function journalCard(article){
   return '<a class="target-journal-card" href="#/journal/'+esc(article.slug)+'" data-link><span class="lab">'+esc(article.label)+' · '+article.readMinutes+' MIN READ</span><h3>'+esc(article.title)+'</h3><p>'+esc(article.excerpt)+'</p><span class="target-card__go" aria-hidden="true">↗</span></a>';
