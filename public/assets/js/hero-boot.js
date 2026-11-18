@@ -1,7 +1,6 @@
 /**
- * Hero loader. Loads the locally bundled Three.js scene only when the hero
- * approaches the viewport. Keeping Three.js local avoids a runtime dependency
- * on a third-party CDN (which can be blocked by mobile browsers or networks).
+ * Hero loader. Loads the pinned Three.js module and the reference scene only
+ * when the homepage hero approaches the viewport.
  */
 function supportsWebGL() {
   try {
