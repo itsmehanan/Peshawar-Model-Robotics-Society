@@ -230,3 +230,37 @@ body{background:var(--bg)!important}
 .plate.has-3d .plate__fallback{display:none}
 :root[data-theme='light'] .plate{background:radial-gradient(ellipse at 50% 48%,#f3eee7 0%,#e7e0d7 58%,#dcd3c8 100%)!important;border-color:rgba(32,29,25,.12)!important}
 :root[data-theme='light'] .plate__label,:root[data-theme='light'] .plate__caption{color:rgba(32,29,25,.55)}
+
+
+/* Sculptural crystal-hand hero: open stage, no framed card or instrument panel. */
+.hero{min-height:178svh;padding-block:1rem!important;background:transparent!important}
+.hero__grid{
+  grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr)!important;
+  gap:clamp(1.5rem,3vw,3.5rem)!important;
+  max-width:min(1600px,calc(100% - clamp(2rem,6vw,8rem)))!important;
+}
+.plate{
+  width:100%!important;max-width:none!important;height:clamp(560px,78svh,900px)!important;
+  min-height:0!important;border:0!important;border-radius:0!important;
+  background:radial-gradient(ellipse at 52% 48%,rgba(26,67,73,.22),rgba(16,19,22,.08) 42%,transparent 72%)!important;
+  box-shadow:none!important;overflow:visible!important;
+}
+.plate__media{inset:0!important;overflow:visible!important}
+.plate__canvas{inset:0!important;width:100%!important;height:100%!important}
+.plate__label{color:rgba(167,219,220,.62)!important;letter-spacing:.13em}
+.plate__caption{color:rgba(225,194,139,.68)!important}
+.plate__fallback{color:rgba(167,219,220,.7)!important}
+.hero .eyebrow::before{background:#65c5ca!important;box-shadow:0 0 12px rgba(101,197,202,.35)!important}
+@media(max-width:860px){
+  .hero{min-height:166svh}
+  .hero__grid{grid-template-columns:1fr!important;max-width:min(100% - 2rem,720px)!important;gap:1rem!important}
+  .plate{height:clamp(430px,62svh,680px)!important}
+}
+@media(max-width:560px){
+  .hero{min-height:160svh}
+  .plate{height:clamp(390px,54svh,520px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero{min-height:0}
+  .hero__grid{position:static;min-height:0}
+}
