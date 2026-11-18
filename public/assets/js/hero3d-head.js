@@ -91,7 +91,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
  const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
  const stride=9*4;
  for(const [name,size,offset] of [['pos',3,0],['normal',3,12],['color',3,24]]){gl.enableVertexAttribArray(loc[name]);gl.vertexAttribPointer(loc[name],size,gl.FLOAT,false,stride,offset);}
- gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK);gl.clearColor(0,0,0,0);
+ gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(0,0,0,0);
  const model=makeModel(),geometry=GEO;let width=1,height=1,progress=0,frame=0,disposed=false,visible=true,running=true;
  const pointer={x:0,y:0},target={x:0,y:0};const stage=canvas.closest('[data-hero-stage]')||canvas.parentElement;
  const resize=()=>{const r=canvas.parentElement?.getBoundingClientRect()||canvas.getBoundingClientRect();width=Math.max(1,Math.floor(r.width));height=Math.max(1,Math.floor(r.height));const dpr=Math.min(devicePixelRatio||1,1.6);canvas.width=Math.floor(width*dpr);canvas.height=Math.floor(height*dpr);gl.viewport(0,0,canvas.width,canvas.height);};
@@ -108,7 +108,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
    const pgr=progress,explode=smooth(.06,.82,pgr);
    const rootY=target.x+(reducedMotion?0:pgr*.26),rootX=target.y+(reducedMotion?0:Math.sin(pgr*Math.PI)*.06);
    pack.length=0;
-   const aspect=width/Math.max(1,height),f=1/Math.tan(37*Math.PI/360),camera=7.2;
+   const aspect=width/Math.max(1,height),f=1/Math.tan(37*Math.PI/360),camera=5.3;
    for(const part of model){
      const [start,end]=part.range;const open=smooth(start,end,explode);
      const off=part.explode.map(v=>v*open);
@@ -135,6 +135,5 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
  const io=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)start();else stop();},{threshold:.01});io.observe(canvas);
  const onVisibility=()=>{running=document.visibilityState==='visible';if(running)start();else stop();};document.addEventListener('visibilitychange',onVisibility);
  const onLost=e=>{e.preventDefault();stop();canvas.dispatchEvent(new CustomEvent('herocontextlost',{bubbles:true}));};canvas.addEventListener('webglcontextlost',onLost);
- start();
  return {firstFrame(){render();return !gl.isContextLost();},start,stop,dispose(){disposed=true;stop();ro.disconnect();io.disconnect();removeEventListener('scroll',onScroll);cancelAnimationFrame(scrollTick);stage.removeEventListener('pointermove',onPointer);stage.removeEventListener('pointerleave',onLeave);document.removeEventListener('visibilitychange',onVisibility);canvas.removeEventListener('webglcontextlost',onLost);gl.deleteBuffer(buffer);gl.deleteProgram(p);}};
 }
