@@ -247,7 +247,13 @@ authRouter.post(
       fail(401, 'Email or password is incorrect.', { code: 'bad_credentials' });
     }
     const passwordValue = String(req.body?.password || '');
-    const admin = await q1('SELECT id, password_hash FROM admin_users WHERE lower(email) = $1', [identifier]);
+    let admin = await q1('SELECT id, password_hash FROM admin_users WHERE lower(email) = $1', [identifier]);
+    // The original organiser ID has appeared both with and without its
+    // separator in printed instructions. Accept either spelling without
+    // changing the stored account or weakening password verification.
+    if (!admin && /^admin-?003$/.test(identifier)) {
+      admin = await q1("SELECT id, password_hash FROM admin_users WHERE lower(email) = 'admin-003'");
+    }
     const valid = admin ? await verifyPassword(passwordValue, admin.password_hash) : false;
     if (!valid) fail(401, 'Email or password is incorrect.', { code: 'bad_credentials' });
     clearThrottle(key);

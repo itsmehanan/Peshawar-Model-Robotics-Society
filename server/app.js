@@ -43,9 +43,9 @@ app.use((req, res, next) => {
     'Content-Security-Policy': [
       "default-src 'self'",
       "img-src 'self' data: blob:",
-      "style-src 'self' 'unsafe-inline'",
-      `script-src 'self' ${THEME_BOOT_HASH}`,
-      "font-src 'self'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      `script-src 'self' https://cdn.jsdelivr.net ${THEME_BOOT_HASH}`,
+      "font-src 'self' https://fonts.gstatic.com",
       "connect-src 'self'",
       "form-action 'self'",
       "base-uri 'self'",

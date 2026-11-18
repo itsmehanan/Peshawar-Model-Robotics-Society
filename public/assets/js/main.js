@@ -165,28 +165,12 @@ setFallback(notFound);
 
 /* ------------------------------------------------------------ boot logic */
 async function start() {
-  try {
-    await boot();
-  } catch (error) {
-    mount.innerHTML = `<div class="view"><section class="section"><div class="wrap wrap--narrow center">
-      <h1 class="display display--sm">The site could not load.</h1>
-      <p class="lede mt-2" style="margin-inline:auto">${esc(error.message)}</p>
-      <button class="btn btn--solid mt-2" onclick="location.reload()">Try again</button>
-    </div></section></div>`;
-    return;
-  }
-
-  if (!state.content) {
-    toast('Some content could not load. Refresh to try again.', 'error');
-  }
-  renderFooter();
-  syncChrome();
-
-  // Remember the page someone was on before signing in.
-  subscribe(() => {
-    syncChrome();
-    renderFooter();
-  });
+  // Wire the app shell immediately. Never make the first paint or navigation
+  // depend on API requests completing; the server embeds enough content for
+  // the homepage to render while session/content refreshes happen in parallel.
+  mountNavToggle();
+  mountThemeToggle();
+  mountProgress();
 
   window.addEventListener('hashchange', () => {
     closeModal();
@@ -195,27 +179,58 @@ async function start() {
     resolve();
   });
 
-  mountNavToggle();
-  mountThemeToggle();
-  mountProgress();
-
-  // Close the mobile menu after any navigation click
   document.addEventListener('click', (event) => {
     if (event.target.closest('[data-link]')) setMobileNav(false);
   });
 
-  // Escape closes overlays
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && modalOpen()) closeModal();
   });
 
-  // Sticky header border
   const head = document.getElementById('siteHead');
-  const onScroll = () => head.classList.toggle('is-stuck', window.scrollY > 8);
+  const onScroll = () => head?.classList.toggle('is-stuck', window.scrollY > 8);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  await resolve();
+  // boot() applies embedded content synchronously, then refreshes the API in
+  // the background. Paint immediately so a slow/unavailable API cannot leave
+  // visitors staring at an empty page with an inert header.
+  const bootPromise = boot();
+  if (state.content) {
+    renderFooter();
+    syncChrome();
+    await resolve();
+  } else {
+    mount.innerHTML = `<div class="view"><section class="section"><div class="wrap wrap--narrow center">
+      <h1 class="display display--sm">Peshawar Model Robotics Society</h1>
+      <p class="lede mt-2">Loading the exhibition…</p>
+    </div></section></div>`;
+  }
+
+  subscribe(() => {
+    syncChrome();
+    renderFooter();
+  });
+
+  bootPromise.then(async () => {
+    if (!state.content) {
+      toast('Some content could not load. Showing the available page while the connection is restored.', 'error');
+      return;
+    }
+    renderFooter();
+    syncChrome();
+    // Refresh auth-dependent labels and the public content when the API settles.
+    await resolve();
+  }).catch((error) => {
+    console.error('[PMRS] Application boot failed:', error);
+    if (!state.content) {
+      mount.innerHTML = `<div class="view"><section class="section"><div class="wrap wrap--narrow center">
+        <h1 class="display display--sm">The site could not load.</h1>
+        <p class="lede mt-2" style="margin-inline:auto">${esc(error.message)}</p>
+        <button class="btn btn--solid mt-2" onclick="location.reload()">Try again</button>
+      </div></section></div>`;
+    }
+  });
 }
 
 /** Exposed for tests and for re-running a route without a hash change. */

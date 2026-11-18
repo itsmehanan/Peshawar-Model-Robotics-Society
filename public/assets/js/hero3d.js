@@ -38,7 +38,7 @@ import {
   TorusGeometry,
   Vector3,
   WebGLRenderer,
-} from 'three';
+} from 'https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js';
 
 const GOLD = 0xd8a44e;
 const STEEL = 0x9dabbd;
@@ -187,23 +187,59 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
 
   const cube = new Group();
   cube.position.set(0.78, 1.18, 0.12);
-  const shell = new Mesh(
-    new BoxGeometry(0.82, 0.82, 0.82),
-    new MeshStandardMaterial({
-      color: BLUE,
-      metalness: 0.1,
-      roughness: 0.1,
-      transparent: true,
-      opacity: 0.14,
-      emissive: new Color(BLUE),
-      emissiveIntensity: 0.35,
-    }),
-  );
+
+  // The enclosure is built as moving panels around a visible circuit core.
+  // Scroll progress separates these pieces; it is not a flat texture or poster.
+  const shellMaterial = new MeshStandardMaterial({
+    color: BLUE, metalness: 0.18, roughness: 0.16,
+    transparent: true, opacity: 0.2,
+    emissive: new Color(BLUE), emissiveIntensity: 0.28,
+  });
+  const shellTop = new Group();
+  const shellBottom = new Group();
+  const topPanel = new Mesh(new BoxGeometry(0.82, 0.39, 0.82), shellMaterial);
+  topPanel.position.y = 0.215;
+  const bottomPanel = new Mesh(new BoxGeometry(0.82, 0.39, 0.82), shellMaterial);
+  bottomPanel.position.y = -0.215;
+  shellTop.add(topPanel);
+  shellBottom.add(bottomPanel);
+  cube.add(shellTop, shellBottom);
+
   const edges = new LineSegments(
     new EdgesGeometry(new BoxGeometry(0.82, 0.82, 0.82)),
-    new LineBasicMaterial({ color: 0x9fe6ff }),
+    new LineBasicMaterial({ color: 0x9fe6ff, transparent: true, opacity: 0.7 }),
   );
-  cube.add(shell, edges);
+  cube.add(edges);
+
+  const circuit = new Group();
+  const board = new Mesh(
+    new BoxGeometry(0.58, 0.045, 0.58),
+    new MeshStandardMaterial({ color: 0x172b2b, metalness: 0.72, roughness: 0.32 }),
+  );
+  circuit.add(board);
+  const chip = new Mesh(
+    new BoxGeometry(0.22, 0.075, 0.22),
+    new MeshStandardMaterial({ color: 0x252b32, metalness: 0.82, roughness: 0.24 }),
+  );
+  chip.position.y = 0.075;
+  circuit.add(chip);
+  const traceMaterial = new MeshStandardMaterial({ color: GOLD, metalness: 0.9, roughness: 0.25 });
+  for (const [x, z, sx, sz] of [
+    [-0.17, 0, 0.16, 0.018], [0.17, 0, 0.16, 0.018],
+    [0, -0.17, 0.018, 0.16], [0, 0.17, 0.018, 0.16],
+    [-0.2, -0.2, 0.1, 0.018], [0.2, 0.2, 0.1, 0.018],
+  ]) {
+    const trace = new Mesh(new BoxGeometry(sx, 0.012, sz), traceMaterial);
+    trace.position.set(x, 0.04, z);
+    circuit.add(trace);
+  }
+  const pinMaterial = new MeshStandardMaterial({ color: 0xe7bd83, metalness: 1, roughness: 0.18 });
+  for (let i = 0; i < 4; i += 1) {
+    const pin = new Mesh(new BoxGeometry(0.035, 0.04, 0.035), pinMaterial);
+    pin.position.set((i % 2 ? 1 : -1) * 0.27, 0.04, (i < 2 ? 1 : -1) * 0.27);
+    circuit.add(pin);
+  }
+  cube.add(circuit);
   cube.rotation.set(0.42, 0.62, 0.1);
   root.add(cube);
 
@@ -271,6 +307,21 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
 
   /* ----------------------------------------------------------------- loop */
   const clock = new Clock();
+  const scrollSection = stage.closest('.hero');
+  let scrollProgress = 0;
+  let scrollFrame = 0;
+  const updateScrollProgress = () => {
+    scrollFrame = 0;
+    if (!scrollSection) return;
+    const rect = scrollSection.getBoundingClientRect();
+    const travel = Math.max(1, scrollSection.offsetHeight - window.innerHeight);
+    scrollProgress = Math.max(0, Math.min(1, -rect.top / travel));
+  };
+  const onScroll = () => {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollProgress);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  updateScrollProgress();
   let frame = 0;
   let running = true;
   let visible = true;
@@ -283,20 +334,34 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
     // different rates, which is what keeps it from looking like one rigid object
     // spinning on a turntable.
     if (!reducedMotion) {
-      ring.rotation.z = 0.1 + t * 0.055;
-      orbit.rotation.z = -0.2 - t * 0.1;
-      cube.rotation.y = 0.62 + t * 0.22;
-      cube.rotation.x = 0.42 + Math.sin(t * 0.42) * 0.07;
-      arm.rotation.z = -0.06 + Math.sin(t * 0.34) * 0.022;
-      core.intensity = 8 + Math.sin(t * 1.3) * 1.6;
+      ring.rotation.z = 0.1 + t * 0.025;
+      orbit.rotation.z = -0.2 - t * 0.045;
+      cube.rotation.y = 0.62 + t * 0.08;
+      cube.rotation.x = 0.42 + Math.sin(t * 0.32) * 0.035;
+      arm.rotation.z = -0.06 + Math.sin(t * 0.28) * 0.012;
+      core.intensity = 8 + Math.sin(t * 1.1) * 1.2;
     }
+
+    // A measured scroll timeline: rotate the mechanism, lift the lid, lower
+    // the base and expose the circuit board in distinct stages.
+    const p = scrollProgress;
+    ring.rotation.z += p * 0.2;
+    orbit.rotation.z -= p * 0.34;
+    shellTop.position.y = p * 0.78;
+    shellTop.rotation.x = -p * 0.34;
+    shellBottom.position.y = -p * 0.42;
+    shellBottom.rotation.x = p * 0.18;
+    circuit.position.y = p * 0.18;
+    circuit.scale.setScalar(1 + p * 0.12);
+    edges.material.opacity = 0.7 - p * 0.42;
+    core.intensity = 8 + p * 5;
 
     // Pointer parallax, eased. Small on purpose: the object should feel
     // attentive, not glued to the cursor.
     target.x += ((pointerActive ? pointer.x : 0) * 0.2 - target.x) * 0.045;
     target.y += ((pointerActive ? pointer.y : 0) * 0.14 - target.y) * 0.045;
-    root.rotation.y = target.x;
-    root.rotation.x = target.y * 0.7;
+    root.rotation.y = target.x + p * 0.48;
+    root.rotation.x = target.y * 0.7 + Math.sin(p * Math.PI) * 0.08;
     root.position.y = Math.sin(t * 0.5) * (reducedMotion ? 0 : 0.045);
 
     renderer.render(scene, camera);
@@ -359,6 +424,8 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
       observer.disconnect();
       visibility.disconnect();
       document.removeEventListener('visibilitychange', onHidden);
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(scrollFrame);
       canvas.removeEventListener('webglcontextlost', onLost);
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose();
