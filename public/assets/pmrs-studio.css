@@ -384,3 +384,5 @@ body:has(.pmrs-target-home) .site-foot{display:none!important}
 html[data-theme='light'] .pmrs-target-home{--target-bg:#e9e7e2;--target-s1:#f4f2ed;--target-s2:#e4e1da;--target-line:rgba(20,20,20,.14);--target-text:#171719;--target-muted:#62615f;--target-paper:#171719;--target-ink:#f3f1ec}
 html[data-theme='light'] body:has(.pmrs-target-home){background:#e9e7e2!important;color:#171719!important}
 html[data-theme='light'] .pmrs-target-home .target-sticky{background:radial-gradient(ellipse 60% 55% at 70% 50%,#d2dbe0 0%,rgba(233,231,226,0) 70%)}
+
+.pmrs-target-home .target-legacy-assets{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;pointer-events:none!important}
