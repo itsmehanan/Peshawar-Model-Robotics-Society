@@ -225,3 +225,8 @@ body{background:var(--bg)!important}
 @media(prefers-reduced-motion:reduce){
  .plate__canvas{transition:none}
 }
+
+.plate__fallback{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font: .72rem var(--mono);letter-spacing:.16em;z-index:1}
+.plate.has-3d .plate__fallback{display:none}
+:root[data-theme='light'] .plate{background:radial-gradient(ellipse at 50% 48%,#f3eee7 0%,#e7e0d7 58%,#dcd3c8 100%)!important;border-color:rgba(32,29,25,.12)!important}
+:root[data-theme='light'] .plate__label,:root[data-theme='light'] .plate__caption{color:rgba(32,29,25,.55)}
