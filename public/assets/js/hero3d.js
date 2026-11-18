@@ -345,8 +345,6 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
     // A measured scroll timeline: rotate the mechanism, lift the lid, lower
     // the base and expose the circuit board in distinct stages.
     const p = scrollProgress;
-    root.rotation.y += p * 0.48;
-    root.rotation.x += Math.sin(p * Math.PI) * 0.08;
     ring.rotation.z += p * 0.2;
     orbit.rotation.z -= p * 0.34;
     shellTop.position.y = p * 0.78;
@@ -362,8 +360,8 @@ export function mountHeroScene(canvas, { reducedMotion = false } = {}) {
     // attentive, not glued to the cursor.
     target.x += ((pointerActive ? pointer.x : 0) * 0.2 - target.x) * 0.045;
     target.y += ((pointerActive ? pointer.y : 0) * 0.14 - target.y) * 0.045;
-    root.rotation.y = target.x;
-    root.rotation.x = target.y * 0.7;
+    root.rotation.y = target.x + p * 0.48;
+    root.rotation.x = target.y * 0.7 + Math.sin(p * Math.PI) * 0.08;
     root.position.y = Math.sin(t * 0.5) * (reducedMotion ? 0 : 0.045);
 
     renderer.render(scene, camera);
