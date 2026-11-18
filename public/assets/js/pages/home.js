@@ -52,23 +52,14 @@ export function artPicture(base, { width, height, eager = false, className = '' 
  * The caption labels stay: they are the studio-drawing detail that keeps the
  * object reading as an artefact rather than as a decorative blob.
  */
-function heroStage({ venue, city, kicker }) {
+function heroStage() {
   return `
-  <figure class="plate" data-plate data-hero-stage aria-label="The PMRS centrepiece: a machined arm presenting a wireframe cube inside a gear ring">
-    <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
-    <div class="plate__media">
-      ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
-      <canvas class="plate__canvas" data-hero-canvas hidden aria-hidden="true"></canvas>
-    </div>
-    <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-    <figcaption class="plate__label plate__label--tl">
-      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Society centrepiece</b>
-    </figcaption>
-    <div class="plate__label plate__label--br">
-      ${esc((venue || 'Main hall').toUpperCase())}<br><b>${esc(city || '—')}</b>
-    </div>
-    <span class="plate__caption">Plate 01 / arm &amp; cube</span>
-  </figure>`;
+  <div class="hero-omni__stage plate" data-plate data-hero-stage aria-label="The PMRS centrepiece: a transparent glass robotics module">
+    <span class="plate__guides" aria-hidden="true" hidden></span>
+    <span class="plate__ticks" aria-hidden="true" hidden></span>
+    ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
+    <canvas class="hero-omni__canvas" data-hero-canvas hidden aria-hidden="true"></canvas>
+  </div>`;
 }
 
 function noticeBar(notice) {
@@ -140,36 +131,41 @@ export function homePage() {
 
   return `<div class="view">
     ${notice ? noticeBar(notice) : ''}
-    <section class="hero hero-ip">
+    <section class="hero-omni">
       <div class="wrap">
-        <div class="hero-ip__meta">
+        <div class="hero-omni__top">
           <span class="bracket-label">[ ${esc((event.kicker || 'PMRS 2026').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''} ]</span>
           <span class="section-num">01 / 04</span>
         </div>
-        <div class="hero-ip__grid">
+        <div class="hero-omni__grid">
           <div>
-            <h1 class="hero-ip__title">${richInk(event.headline)}</h1>
-            <p class="hero-ip__lead">${esc(event.intro)}</p>
-            <div class="hero-ip__actions">
-              <a class="btn btn--solid" href="${primaryCta}" data-link>
+            <h1 class="hero-omni__title">${richInk(event.headline)}</h1>
+            <p class="hero-omni__lead">${esc(event.intro)}</p>
+            <div class="hero-omni__actions">
+              <a class="btn btn--solid btn--lg" href="${primaryCta}" data-link>
                 <span>${esc(ctaLabel)}</span>
                 <span class="btn__circle" aria-hidden="true">↗</span>
               </a>
-              <a class="btn btn--outline" href="#/fields" data-link>Explore the fields</a>
+              <a class="btn btn--outline btn--lg" href="#/fields" data-link>Explore the fields</a>
             </div>
-            <div class="hero-ip__annotations" aria-label="Exhibition disciplines">
+            <div class="hero-omni__aside" aria-label="Exhibition disciplines">
               <span>Robotics</span>
               <span>AI &amp; Vision</span>
               <span>Sensors</span>
               <span>Engineering</span>
             </div>
           </div>
-          ${heroStage({ venue: event.venue, city: event.city, kicker: event.kicker })}
+          ${heroStage()}
         </div>
-        <dl class="stat-row">
+      </div>
+    </section>
+
+    <section class="section--paper" aria-label="Event overview">
+      <div class="wrap">
+        <dl class="paper-stats">
           ${facts
             .map(
-              (f) => `<div class="stat-row__item"><dd class="stat-row__num">${esc(f.value)}</dd><dt class="stat-row__label">${esc(f.term)}</dt></div>`,
+              (f) => `<div class="paper-stats__item"><dd class="paper-stats__num">${esc(f.value)}</dd><dt class="paper-stats__label">${esc(f.term)}</dt></div>`,
             )
             .join('')}
         </dl>
