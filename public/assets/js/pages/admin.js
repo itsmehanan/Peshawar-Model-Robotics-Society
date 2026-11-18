@@ -92,7 +92,7 @@ function adminLoginView() {
           <div class="field">
             <label for="a-email">Administrator ID or email</label>
             <input class="input" id="a-email" name="email" type="text" autocomplete="username"
-                   autocapitalize="characters" spellcheck="false" placeholder="ADMIN-003" required>
+                   autocapitalize="characters" spellcheck="false" placeholder="ADMIN003" required>
             <span class="field__error"></span>
           </div>
           <div class="field">
@@ -102,7 +102,7 @@ function adminLoginView() {
           </div>
           <button class="btn btn--solid btn--lg btn--block" type="submit">Sign in</button>
         </form>
-        <p class="tiny muted mt-2">Use the administrator ID assigned by the PMRS team. Your password is checked securely on the server and is never stored in this page.</p>
+        <p class="tiny muted mt-2">Use your PMRS administrator ID with or without the hyphen. Your password is checked securely on the server and is never stored in this page.</p>
         <a class="link-arrow mt-2" href="#/" data-link><span aria-hidden="true">←</span> Back to the site</a>
       </div>
     </div>
