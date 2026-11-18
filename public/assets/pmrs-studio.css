@@ -665,3 +665,44 @@ button,.btn,a{ -webkit-tap-highlight-color:transparent }
 .pmrs-target-home .target-faq .faq__q{font-family:var(--target-font);font-weight:620}
 .pmrs-target-home .target-faq .faq__a{font-family:var(--target-font)}
 .pmrs-target-home .target-nav,.pmrs-target-home .target-footer{font-family:var(--target-font)}
+
+/* Final polish: remove decorative glow and make registration choices explicit. */
+.page-hero::before{display:none!important;background:none!important}
+.metric::before{box-shadow:none!important}
+.pmrs-target-home .target-end:after{
+  background:radial-gradient(ellipse at 50% 0,#17181a 58%,#17181a 60%);
+  box-shadow:0 -1px 0 rgba(255,255,255,.18);
+}
+#main>.view:has(#registerForm) .choice{
+  position:relative;
+  display:grid;
+  grid-template-columns:18px minmax(0,1fr);
+  align-items:start;
+  gap:.45rem .65rem;
+  padding:1rem;
+  min-height:108px;
+}
+#main>.view:has(#registerForm) .choice input{
+  position:static!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  display:block;
+  width:16px;height:16px;
+  margin:.16rem 0 0;
+  accent-color:var(--accent);
+  grid-row:1 / span 2;
+}
+#main>.view:has(#registerForm) .choice__title{
+  grid-column:2;
+  display:block;
+  position:static;
+  line-height:1.35;
+}
+#main>.view:has(#registerForm) .choice__title::before{display:none!important;content:none!important}
+#main>.view:has(#registerForm) .choice__desc{grid-column:2}
+#main>.view:has(#registerForm) .choice:has(input:checked){
+  border-color:var(--accent-line);
+  background:var(--accent-wash);
+  box-shadow:none;
+}
+#main>.view:has(#registerForm) .choice input:checked~.choice__title{color:var(--ink)}
