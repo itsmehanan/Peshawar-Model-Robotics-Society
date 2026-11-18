@@ -54,20 +54,18 @@ export function artPicture(base, { width, height, eager = false, className = '' 
  */
 function heroStage({ venue, city, kicker }) {
   return `
-  <figure class="plate" data-plate data-hero-stage aria-label="The PMRS centrepiece: a machined arm presenting a wireframe cube inside a gear ring">
-    <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
+  <figure class="plate" data-plate data-hero-stage aria-label="A three-dimensional PMRS robotic head with an opening, exploded engineering assembly">
     <div class="plate__media">
       <canvas class="plate__canvas" data-hero-canvas aria-hidden="true"></canvas>
       <noscript><span class="plate__fallback">PMRS · ROBOTICS / ENGINEERING</span></noscript>
     </div>
-    <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
     <figcaption class="plate__label plate__label--tl">
-      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Society centrepiece</b>
+      ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Robotic systems / 01</b>
     </figcaption>
     <div class="plate__label plate__label--br">
       ${esc((venue || 'Main hall').toUpperCase())}<br><b>${esc(city || '—')}</b>
     </div>
-    <span class="plate__caption">Plate 01 / arm &amp; cube</span>
+    <span class="plate__caption">PMRS / robotic systems</span>
   </figure>`;
 }
 
