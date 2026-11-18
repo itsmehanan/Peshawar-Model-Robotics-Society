@@ -44,7 +44,7 @@ app.use((req, res, next) => {
       "default-src 'self'",
       "img-src 'self' data: blob:",
       "style-src 'self' 'unsafe-inline'",
-      `script-src 'self' ${THEME_BOOT_HASH}`,
+      `script-src 'self' https://cdn.jsdelivr.net ${THEME_BOOT_HASH}`,
       "font-src 'self'",
       "connect-src 'self'",
       "form-action 'self'",
