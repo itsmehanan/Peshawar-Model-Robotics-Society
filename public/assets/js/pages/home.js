@@ -57,7 +57,7 @@ function heroStage({ venue, city, kicker }) {
   <figure class="plate" data-plate data-hero-stage aria-label="A three-dimensional PMRS robotic head with an opening, exploded engineering assembly">
     <div class="plate__media">
       <canvas class="plate__canvas" data-hero-canvas aria-hidden="true"></canvas>
-      <noscript><span class="plate__fallback">PMRS · ROBOTICS / ENGINEERING</span></noscript>
+      <span class="plate__fallback">PMRS · ROBOTICS / ENGINEERING</span>
     </div>
     <figcaption class="plate__label plate__label--tl">
       ${esc((kicker || 'Season 04').toUpperCase())}<br><b>Robotic systems / 01</b>
