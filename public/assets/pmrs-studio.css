@@ -114,3 +114,21 @@ td,th{padding:.8rem .9rem;border-bottom:1px solid var(--line)}
  html{scroll-behavior:auto}
  .field-card,.journal-card,.btn,.field-card__media img{transition:none!important}
 }
+
+/* Long-form hero chapter: the stage stays pinned while the mechanism opens. */
+.hero{min-height:178svh;position:relative}
+.hero__grid{position:sticky;top:calc(var(--head-h,74px) + 1rem);min-height:calc(100svh - var(--head-h,74px) - 2rem);align-content:center}
+.plate__canvas{will-change:opacity}
+.plate__label{transition:opacity .3s ease,transform .3s ease}
+@media(max-width:860px){
+ .hero{min-height:166svh}
+ .hero__grid{top:calc(var(--head-h,68px) + .5rem);min-height:calc(100svh - var(--head-h,68px) - 1rem)}
+}
+@media(max-width:560px){
+ .hero{min-height:154svh}
+ .hero__grid{gap:1.4rem}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero{min-height:0}
+ .hero__grid{position:static;min-height:0}
+}
