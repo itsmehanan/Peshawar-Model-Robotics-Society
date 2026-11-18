@@ -102,8 +102,7 @@ function adminLoginView() {
           </div>
           <button class="btn btn--solid btn--lg btn--block" type="submit">Sign in</button>
         </form>
-        <p class="tiny muted mt-2">Credentials are created on first server start — see
-        <span class="mono">data/admin-credentials.txt</span> or the deployment environment.</p>
+        <p class="tiny muted mt-2">Use the administrator ID assigned by the PMRS team. Your password is checked securely on the server and is never stored in this page.</p>
         <a class="link-arrow mt-2" href="#/" data-link><span aria-hidden="true">←</span> Back to the site</a>
       </div>
     </div>
