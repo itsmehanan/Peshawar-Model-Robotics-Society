@@ -37,7 +37,7 @@ export async function mountHero3D(stage) {
 
   stage.dataset.hero3d = 'loading';
   try {
-    // The robotic-head renderer is self-contained WebGL; it has no remote runtime dependency.
+    // The sculptural hand-and-crystal renderer is self-contained WebGL; it has no remote runtime dependency.
     const module = await import('./hero3d-head.js');
     if (!stage.isConnected) return null;
 
