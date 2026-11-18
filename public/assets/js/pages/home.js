@@ -2,6 +2,25 @@ import { esc, mountFaq } from '../ui.js';
 import { bootHero3D } from '../hero-boot.js';
 import { state } from '../store.js';
 
+/* Shared field artwork helpers used by the existing Fields routes. */
+const FIELD_ART = {
+  robotics: '/assets/art/field-robotics',
+  science: '/assets/art/field-science',
+  engineering: '/assets/art/field-engineering',
+  technology: '/assets/art/field-technology',
+};
+export const fieldArt = (id) => FIELD_ART[id] || '/assets/art/hero';
+export function artPicture(base, { width, height, eager = false, className = '' } = {}) {
+  const root = String(base).replace(/\\.[a-z0-9]+$/i, '');
+  return `<picture${className ? ` class="${className}"` : ''}>
+    <source media="(max-width: 640px)" type="image/webp" srcset="${root}-sm.webp">
+    <source media="(max-width: 640px)" srcset="${root}-sm.png">
+    <source type="image/webp" srcset="${root}.webp">
+    <img src="${root}-sm.png" alt="" width="${width || 880}" height="${height || 660}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">
+  </picture>`;
+}
+
+
 const pad=n=>String(n).padStart(2,'0');
 function fieldCard(category,index){
   const key=['robotics','science','engineering','technology'].includes(category.id)?category.id:'technology';
