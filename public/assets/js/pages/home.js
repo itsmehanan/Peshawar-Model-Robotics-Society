@@ -11,7 +11,7 @@ const FIELD_ART = {
 };
 export const fieldArt = (id) => FIELD_ART[id] || '/assets/art/hero';
 export function artPicture(base, { width, height, eager = false, className = '' } = {}) {
-  const root = String(base).replace(/\\.[a-z0-9]+$/i, '');
+  const root = String(base).replace(/\.[a-z0-9]+$/i, '');
   return `<picture${className ? ` class="${className}"` : ''}>
     <source media="(max-width: 640px)" type="image/webp" srcset="${root}-sm.webp">
     <source media="(max-width: 640px)" srcset="${root}-sm.png">
