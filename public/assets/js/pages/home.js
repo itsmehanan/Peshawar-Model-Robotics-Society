@@ -140,33 +140,39 @@ export function homePage() {
 
   return `<div class="view">
     ${notice ? noticeBar(notice) : ''}
-    <section class="hero">
-      <div class="wrap hero__grid">
-        <div>
-          <span class="eyebrow">${esc((event.kicker || 'Season 04').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''}</span>
-          <div class="hero__date mt-2">
-            <span class="dot" aria-hidden="true"></span>
-            ${esc(event.dateLabel || 'Date to be announced')}
-            <span aria-hidden="true">·</span>
-            ${esc(event.doorsLabel || 'Exhibition day')}
-          </div>
-          <h1 class="display">${richInk(event.headline)}</h1>
-          <p class="lede hero__lede">${esc(event.intro)}</p>
-          <div class="hero__actions">
-            <a class="btn btn--solid btn--lg" href="${primaryCta}" data-link>
-              ${esc(ctaLabel)} <span class="btn__arrow" aria-hidden="true">↗</span>
-            </a>
-            <a class="btn btn--lg" href="#/fields" data-link>Explore the fields</a>
-          </div>
-          <dl class="hero__facts">
-            ${facts
-              .map(
-                (f) => `<div class="hero__fact"><dt>${esc(f.term)}</dt><dd>${esc(f.value)}</dd></div>`,
-              )
-              .join('')}
-          </dl>
+    <section class="hero hero-ip">
+      <div class="wrap">
+        <div class="hero-ip__meta">
+          <span class="bracket-label">[ ${esc((event.kicker || 'PMRS 2026').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''} ]</span>
+          <span class="section-num">01 / 04</span>
         </div>
-        ${heroStage({ venue: event.venue, city: event.city, kicker: event.kicker })}
+        <div class="hero-ip__grid">
+          <div>
+            <h1 class="hero-ip__title">${richInk(event.headline)}</h1>
+            <p class="hero-ip__lead">${esc(event.intro)}</p>
+            <div class="hero-ip__actions">
+              <a class="btn btn--solid" href="${primaryCta}" data-link>
+                <span>${esc(ctaLabel)}</span>
+                <span class="btn__circle" aria-hidden="true">↗</span>
+              </a>
+              <a class="btn btn--outline" href="#/fields" data-link>Explore the fields</a>
+            </div>
+            <div class="hero-ip__annotations" aria-label="Exhibition disciplines">
+              <span>Robotics</span>
+              <span>AI &amp; Vision</span>
+              <span>Sensors</span>
+              <span>Engineering</span>
+            </div>
+          </div>
+          ${heroStage({ venue: event.venue, city: event.city, kicker: event.kicker })}
+        </div>
+        <dl class="stat-row">
+          ${facts
+            .map(
+              (f) => `<div class="stat-row__item"><dd class="stat-row__num">${esc(f.value)}</dd><dt class="stat-row__label">${esc(f.term)}</dt></div>`,
+            )
+            .join('')}
+        </dl>
       </div>
     </section>
 

@@ -48,56 +48,66 @@
 :root {
   color-scheme: dark;
 
-  /* ground — a true void, not a navy */
-  --void: #050506;
-  --bg: #08080a;
-  --bg-2: #0b0c0f;
-  --panel: #101217;
-  --panel-2: #14161c;
-  --panel-3: #1a1d24;
+  /* Direction A: Industrial Precision — near-black graphite ground */
+  --void: #070708;
+  --bg: #0B0B0C;
+  --bg-2: #111113;
+  --surface: #151517;
+  --surface-2: #1D1D20;
+  --panel: #151517;
+  --panel-2: #1D1D20;
+  --panel-3: #242428;
 
-  /* hairlines: white alpha, so they read as a lit edge rather than a border */
-  --line: rgba(255, 255, 255, 0.07);
-  --line-2: rgba(255, 255, 255, 0.11);
-  --line-3: rgba(255, 255, 255, 0.19);
-  --line-strong: rgba(255, 255, 255, 0.24);
+  /* hairlines: 1px crisp architectural rules */
+  --line: rgba(255, 255, 255, 0.10);
+  --line-2: rgba(255, 255, 255, 0.14);
+  --line-3: rgba(255, 255, 255, 0.22);
+  --line-strong: rgba(255, 255, 255, 0.30);
 
   /* text ramp — every step measured against --bg in tests/contrast.test.js */
-  --ink: #f2f5f9;
-  --ink-2: #c3cad6;
-  --ink-3: #8f97a6;
-  --ink-4: #666d7a;
+  --text: #F2F2F0;
+  --muted: #9A9A98;
+  --ink: #F2F2F0;
+  --ink-2: #D4D4D0;
+  --ink-3: #9A9A98;
+  --ink-4: #767674;
 
-  /* one vibrant accent. Electric cyan carries interaction, glow and CTA. */
-  --accent: #22e6ff;
-  --accent-strong: #7af2ff;
-  --accent-deep: #0a91ad;
-  --accent-wash: rgba(34, 230, 255, 0.1);
-  --accent-line: rgba(34, 230, 255, 0.34);
-  --on-accent: #04161a;
+  /* paper contrast section tokens */
+  --paper: #E9E8E4;
+  --paper-text: #0B0B0C;
+  --paper-muted: #4A4A48;
+  --paper-line: rgba(11, 11, 12, 0.14);
 
-  /* achievement: a warm metal, used only for status, never for interaction */
-  --gold: #e9bb6d;
-  --gold-strong: #ffd795;
+  /* signal orange — the ONLY accent color */
+  --accent: #FF4D14;
+  --accent-strong: #FF6B3D;
+  --accent-deep: #D93800;
+  --accent-wash: rgba(255, 77, 20, 0.12);
+  --accent-line: rgba(255, 77, 20, 0.40);
+  --on-accent: #0B0B0C;
+
+  /* status tokens */
+  --gold: #E9BB6D;
+  --gold-strong: #FFD795;
   --gold-wash: rgba(233, 187, 109, 0.12);
-  --on-gold: #120d03;
+  --on-gold: #120D03;
 
-  --danger: #ff8e8a;
-  --ok: #6fe3a3;
+  --danger: #FF7B72;
+  --ok: #56D364;
 
-  --surface-0: #060607;
-  --surface-1: #0b0d11;
-  --field-bg: #0a0b0e;
+  --surface-0: #0B0B0C;
+  --surface-1: #151517;
+  --field-bg: #151517;
 
   --guide-line: rgba(255, 255, 255, 0.08);
-  --numeral-stroke: rgba(255, 255, 255, 0.09);
+  --numeral-stroke: rgba(255, 255, 255, 0.10);
 
-  --toast-danger-bg: #1c1113;
-  --toast-ok-bg: #0c1712;
+  --toast-danger-bg: #1E1212;
+  --toast-ok-bg: #0F1A12;
 
   /* always-dark surfaces: the hero stage, image wells, the footer */
-  --plate-bg: #050506;
-  --plate-2: #0a0d12;
+  --plate-bg: #0B0B0C;
+  --plate-2: #151517;
   --plate-line: rgba(255, 255, 255, 0.09);
   --on-plate: #f2f5f9;
   --on-plate-2: #9aa3b2;
@@ -111,41 +121,40 @@
   --glass-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.07);
   --glass-blur: saturate(150%) blur(18px);
 
-  /* grid overlay + accent bloom */
-  --grid-line: rgba(255, 255, 255, 0.062);
+  /* grid overlay + accent bloom removed for clean industrial precision */
+  --grid-line: transparent;
   --grid-size: 64px;
-  --bloom-tint: rgba(34, 230, 255, 0.05);
+  --bloom-tint: transparent;
 
   /* aliases kept so older rules and page templates keep working */
   --cyan: var(--accent);
   --cyan-deep: var(--accent-deep);
   --brass: var(--gold);
-  --muted: var(--ink-3);
 
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-2: 0 30px 70px -40px rgba(0, 0, 0, 0.95), 0 10px 30px -20px rgba(0, 0, 0, 0.9);
-  --shadow-3: 0 50px 120px -50px rgba(0, 0, 0, 1);
-  --shadow-glow: 0 0 0 1px rgba(34, 230, 255, 0.28), 0 24px 70px -28px rgba(34, 230, 255, 0.45);
-  --shadow-accent: 0 18px 44px -22px rgba(34, 230, 255, 0.55);
+  --shadow-2: 0 24px 60px -36px rgba(0, 0, 0, 0.85);
+  --shadow-3: 0 40px 100px -48px rgba(0, 0, 0, 0.95);
+  --shadow-glow: 0 0 0 1px rgba(255, 77, 20, 0.30), 0 20px 50px -24px rgba(255, 77, 20, 0.35);
+  --shadow-accent: 0 14px 36px -18px rgba(255, 77, 20, 0.45);
 
-  --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Space Grotesk', 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Space Grotesk', 'Archivo', sans-serif;
+  --sans: 'Inter', 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --wrap: 1340px;
   --gut: clamp(1.15rem, 4.2vw, 3rem);
-  --head-h: 78px;
+  --head-h: 64px;
 
-  /* radii: panes are softly square, controls are pills */
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  /* radii: angular architectural panels + pill controls */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
 
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /*
@@ -158,71 +167,80 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --void: #e6e9ee;
-  --bg: #f3f4f7;
-  --bg-2: #eceef2;
-  --panel: #ffffff;
-  --panel-2: #f6f7fa;
-  --panel-3: #e9ecf1;
+  --void: #DCDAD4;
+  --bg: #E9E8E4;
+  --bg-2: #E2E0DA;
+  --surface: #F4F3EF;
+  --surface-2: #FFFFFF;
+  --panel: #F4F3EF;
+  --panel-2: #FFFFFF;
+  --panel-3: #DCDAD4;
 
-  --line: rgba(12, 20, 33, 0.09);
-  --line-2: rgba(12, 20, 33, 0.14);
-  --line-3: rgba(12, 20, 33, 0.24);
-  --line-strong: rgba(12, 20, 33, 0.34);
+  --line: rgba(11, 11, 12, 0.12);
+  --line-2: rgba(11, 11, 12, 0.18);
+  --line-3: rgba(11, 11, 12, 0.28);
+  --line-strong: rgba(11, 11, 12, 0.38);
 
-  --ink: #0a1017;
-  --ink-2: #2b3541;
-  --ink-3: #565f6d;
-  --ink-4: #78818e;
+  --text: #0B0B0C;
+  --muted: #4A4A48;
+  --ink: #0B0B0C;
+  --ink-2: #2A2A28;
+  --ink-3: #4A4A48;
+  --ink-4: #6B6B68;
 
-  --accent: #065a6b;
-  --accent-strong: #067a92;
-  --accent-deep: #04434f;
-  --accent-wash: rgba(6, 90, 107, 0.08);
-  --accent-line: rgba(6, 90, 107, 0.26);
-  --on-accent: #ffffff;
+  --paper: #0B0B0C;
+  --paper-text: #F2F2F0;
+  --paper-muted: #9A9A98;
+  --paper-line: rgba(255, 255, 255, 0.12);
 
-  --gold: #7e530d;
-  --gold-strong: #6a4409;
+  --accent: #C73200;
+  --accent-strong: #E03A00;
+  --accent-deep: #9E2800;
+  --accent-wash: rgba(199, 50, 0, 0.08);
+  --accent-line: rgba(199, 50, 0, 0.28);
+  --on-accent: #FFFFFF;
+
+  --gold: #7E530D;
+  --gold-strong: #6A4409;
   --gold-wash: rgba(126, 83, 13, 0.1);
-  --on-gold: #ffffff;
+  --on-gold: #FFFFFF;
 
-  --danger: #b0231c;
-  --ok: #116b3c;
+  --danger: #B0231C;
+  --ok: #116B3C;
 
-  --surface-0: #e8eaee;
-  --surface-1: #eef0f3;
-  --field-bg: #ffffff;
+  --surface-0: #DCDAD4;
+  --surface-1: #F4F3EF;
+  --field-bg: #FFFFFF;
 
-  --guide-line: rgba(12, 20, 33, 0.12);
-  --numeral-stroke: rgba(12, 20, 33, 0.12);
+  --guide-line: rgba(11, 11, 12, 0.12);
+  --numeral-stroke: rgba(11, 11, 12, 0.12);
 
-  --toast-danger-bg: #fdeceb;
-  --toast-ok-bg: #e9f7ef;
+  --toast-danger-bg: #FDECEB;
+  --toast-ok-bg: #E9F7EF;
 
   /* still dark: the artwork and the 3D stage are lit for a dark room */
-  --plate-bg: #07080a;
-  --plate-2: #0d1015;
+  --plate-bg: #0B0B0C;
+  --plate-2: #151517;
   --plate-line: rgba(255, 255, 255, 0.12);
-  --on-plate: #f2f5f9;
-  --on-plate-2: #9aa3b2;
+  --on-plate: #F2F2F0;
+  --on-plate-2: #9A9A98;
 
-  --glass-1: rgba(255, 255, 255, 0.55);
-  --glass-2: rgba(255, 255, 255, 0.72);
-  --glass-3: rgba(255, 255, 255, 0.86);
-  --glass-border: rgba(12, 20, 33, 0.1);
-  --glass-border-strong: rgba(12, 20, 33, 0.18);
+  --glass-1: rgba(244, 243, 239, 0.75);
+  --glass-2: rgba(244, 243, 239, 0.88);
+  --glass-3: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(11, 11, 12, 0.12);
+  --glass-border-strong: rgba(11, 11, 12, 0.20);
   --glass-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --glass-blur: saturate(140%) blur(16px);
+  --glass-blur: saturate(120%) blur(14px);
 
-  --grid-line: rgba(12, 20, 33, 0.055);
-  --bloom-tint: rgba(6, 122, 146, 0.05);
+  --grid-line: transparent;
+  --bloom-tint: transparent;
 
-  --shadow-1: 0 1px 2px rgba(16, 28, 45, 0.06);
-  --shadow-2: 0 26px 60px -40px rgba(16, 28, 45, 0.4), 0 8px 24px -18px rgba(16, 28, 45, 0.24);
-  --shadow-3: 0 50px 110px -55px rgba(16, 28, 45, 0.45);
-  --shadow-glow: 0 0 0 1px rgba(6, 90, 107, 0.22), 0 22px 60px -30px rgba(6, 90, 107, 0.3);
-  --shadow-accent: 0 16px 40px -22px rgba(6, 90, 107, 0.4);
+  --shadow-1: 0 1px 2px rgba(11, 11, 12, 0.06);
+  --shadow-2: 0 20px 50px -30px rgba(11, 11, 12, 0.25);
+  --shadow-3: 0 40px 90px -45px rgba(11, 11, 12, 0.30);
+  --shadow-glow: 0 0 0 1px rgba(199, 50, 0, 0.22);
+  --shadow-accent: 0 12px 32px -16px rgba(199, 50, 0, 0.35);
 }
 
 /* ------------------------------------------------------------------------
@@ -4268,5 +4286,534 @@ button {
   .hero {
     background: #fff !important;
     color: #111;
+  }
+}
+
+/* ============================================================================
+   DIRECTION A: INDUSTRIAL PRECISION — OVERRIDE & DESIGN SYSTEM LAYER
+   ============================================================================ */
+
+/* 1. Remove AI-made tells: no faint grid background, no glowing orbs */
+body::before,
+body::after,
+.ambient,
+.ambient__grid,
+.ambient__orb,
+.hero__bloom {
+  display: none !important;
+  background-image: none !important;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 2. Typography: Space Grotesk display + Inter body */
+h1, h2, h3, h4,
+.hero__title,
+.section-head__title,
+.display {
+  font-family: var(--display);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Remove italic serif accent words */
+h1 em, h2 em, h3 em,
+.hero__title em,
+.section-head__title em {
+  font-style: normal;
+  font-family: var(--display);
+  color: var(--muted);
+}
+
+.two-tone-accent {
+  color: var(--accent);
+}
+
+.two-tone-muted {
+  color: var(--muted);
+}
+
+.bracket-label {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* 3. Sticky 64px Navigation */
+.site-head {
+  height: 64px;
+  background: rgba(11, 11, 12, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+:root[data-theme='light'] .site-head {
+  background: rgba(233, 232, 228, 0.88);
+}
+
+.site-head__inner {
+  height: 64px;
+}
+
+/* 4. Buttons: 2 styles only (Primary solid orange pill + Secondary 1px outline pill) */
+.btn {
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 160ms var(--ease), background-color 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn--sm {
+  height: 40px;
+  padding: 0 18px;
+  font-size: 13px;
+}
+
+.btn--solid {
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid var(--accent);
+}
+
+.btn--solid:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.btn--ghost,
+.btn--outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line-3);
+}
+
+.btn--ghost:hover,
+.btn--outline:hover {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn__circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--on-accent);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.btn:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 5. Angular chamfered panels & corner bracket frames */
+.chamfer {
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
+.chamfer-sm {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.bracket-frame {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.bracket-frame::before,
+.bracket-frame::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+}
+
+.bracket-frame::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid var(--accent);
+  border-left: 1px solid var(--accent);
+}
+
+.bracket-frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1px solid var(--accent);
+  border-right: 1px solid var(--accent);
+}
+
+/* 6. Hero Section */
+.hero-ip {
+  padding: clamp(48px, 7vw, 96px) 0 clamp(32px, 5vw, 64px);
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-ip__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+}
+
+.hero-ip__title {
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 5.6vw, 5.25rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  margin: 16px 0 24px;
+  color: var(--text);
+}
+
+.hero-ip__lead {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  color: var(--muted);
+  max-width: 52ch;
+  margin-bottom: 32px;
+}
+
+.hero-ip__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-ip__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-ip__annotations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero-ip__annotations span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-ip__annotations span::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+}
+
+/* Stat Row (replaces 3 small info boxes) */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  margin-top: clamp(32px, 5vw, 56px);
+}
+
+.stat-row__item {
+  padding: 24px 24px 24px 0;
+  border-right: 1px solid var(--line);
+}
+
+.stat-row__item:not(:first-child) {
+  padding-left: 24px;
+}
+
+.stat-row__item:last-child {
+  border-right: 0;
+}
+
+.stat-row__num {
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.stat-row__label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* 7. Staggered Fields Grid */
+.fields-stagger {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .fields-stagger .field-card:nth-child(2),
+  .fields-stagger .field-card:nth-child(4) {
+    margin-top: 40px;
+  }
+}
+
+.field-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 20px;
+  transition: transform 200ms var(--ease), border-color 200ms var(--ease);
+}
+
+.field-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--accent);
+}
+
+.field-card__index {
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* 8. Paper Contrast Section */
+.section--paper {
+  background: var(--paper);
+  color: var(--paper-text);
+  padding: clamp(64px, 8vw, 112px) 0;
+  border-top: 1px solid var(--paper-line);
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.section--paper .bracket-label,
+.section--paper .two-tone-muted,
+.section--paper p {
+  color: var(--paper-muted);
+}
+
+.section--paper h2,
+.section--paper h3,
+.section--paper .stat-num {
+  color: var(--paper-text);
+}
+
+/* 9. Bento Grid for Event Details */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bento-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 28px;
+}
+
+.bento-card--wide {
+  grid-column: span 7;
+}
+
+.bento-card--side {
+  grid-column: span 5;
+}
+
+.bento-card--third {
+  grid-column: span 4;
+}
+
+/* 10. Horizontal Process Line */
+.process-line {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  position: relative;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.process-node__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  background: var(--bg);
+}
+
+/* 11. Forms (Register & Sign-in) */
+.step-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.step-header__num {
+  font-family: var(--display);
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.step-header__title {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="url"],
+select,
+textarea {
+  min-height: 52px;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--line-2) !important;
+  border-radius: 4px !important;
+  color: var(--text) !important;
+  font-size: 15px !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent) !important;
+}
+
+.field label,
+.form-field label {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--text) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  margin-bottom: 8px !important;
+}
+
+/* 12. Admin Dashboard */
+.admin-nav__item.is-active,
+.admin-sidebar a.is-active {
+  border-left: 3px solid var(--accent) !important;
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+}
+
+.admin-metrics,
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* 13. Responsive */
+@media (max-width: 1023px) {
+  .hero-ip__grid {
+    grid-template-columns: 1fr;
+  }
+  .fields-stagger {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .process-line {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bento-card--wide,
+  .bento-card--side,
+  .bento-card--third {
+    grid-column: span 12;
+  }
+  .admin-metrics,
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-row {
+    grid-template-columns: 1fr;
+  }
+  .stat-row__item {
+    padding: 16px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat-row__item:not(:first-child) {
+    padding-left: 0;
+  }
+  .fields-stagger,
+  .process-line,
+  .admin-metrics,
+  .kpi-grid {
+    grid-template-columns: 1fr;
   }
 }
