@@ -131,41 +131,43 @@ export function homePage() {
 
   return `<div class="view">
     ${notice ? noticeBar(notice) : ''}
-    <section class="hero-omni">
-      <div class="wrap">
-        <div class="hero-omni__top">
-          <span class="bracket-label">[ ${esc((event.kicker || 'PMRS 2026').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''} ]</span>
-          <span class="section-num">01 / 04</span>
-        </div>
-        <div class="hero-omni__grid">
-          <div>
-            <h1 class="hero-omni__title">${richInk(event.headline)}</h1>
-            <p class="hero-omni__lead">${esc(event.intro)}</p>
-            <div class="hero-omni__actions">
-              <a class="btn btn--solid btn--lg" href="${primaryCta}" data-link>
-                <span>${esc(ctaLabel)}</span>
-                <span class="btn__circle" aria-hidden="true">↗</span>
-              </a>
-              <a class="btn btn--outline btn--lg" href="#/fields" data-link>Explore the fields</a>
-            </div>
-            <div class="hero-omni__aside" aria-label="Exhibition disciplines">
-              <span>Robotics</span>
-              <span>AI &amp; Vision</span>
-              <span>Sensors</span>
-              <span>Engineering</span>
+    <div class="stage" id="top">
+      <div class="sticky">
+        ${heroStage()}
+        <div class="hero">
+          <div class="wrap">
+            <div class="in" id="txt">
+              <span class="lab">${esc((event.kicker || 'PMRS 2026').toUpperCase())}${event.city ? ` · ${esc(event.city.toUpperCase())}` : ''}</span>
+              <h1>${richInk(event.headline)}</h1>
+              <p>${esc(event.intro)}</p>
+              <div class="cta">
+                <a class="btn btn--solid btn--lg" href="${primaryCta}" data-link>
+                  <span>${esc(ctaLabel)}</span>
+                  <span class="btn__circle" aria-hidden="true">↗</span>
+                </a>
+                <a class="btn btn--outline btn--lg" href="#/fields" data-link>Explore the fields</a>
+              </div>
             </div>
           </div>
-          ${heroStage()}
         </div>
+        <div class="side lab" aria-hidden="true">Robotics<br>AI &amp; Vision<br>Sensors<br>Engineering</div>
+        <div class="cnt lab" aria-hidden="true">01 / 04</div>
+        <div class="call" id="c1"><div><b>Protective Shell</b><small>Ultra-durable polycarbonate</small></div></div>
+        <div class="call" id="c2"><div><b>AI Processor</b><small>High-efficiency inference</small></div></div>
+        <div class="call" id="c3"><div><b>Modular Drive</b><small>Precision gear assembly</small></div></div>
       </div>
-    </section>
+    </div>
 
-    <section class="section--paper" aria-label="Event overview">
-      <div class="wrap">
-        <dl class="paper-stats">
+    <section class="paper" aria-label="Event overview">
+      <div class="wrap pg">
+        <div>
+          <span class="lab">[ Event Overview ]</span>
+          <h2>More than <em>engineering.</em></h2>
+        </div>
+        <dl class="stats">
           ${facts
             .map(
-              (f) => `<div class="paper-stats__item"><dd class="paper-stats__num">${esc(f.value)}</dd><dt class="paper-stats__label">${esc(f.term)}</dt></div>`,
+              (f) => `<div><strong>${esc(f.value)}</strong><dt class="lab">${esc(f.term)}</dt></div>`,
             )
             .join('')}
         </dl>
