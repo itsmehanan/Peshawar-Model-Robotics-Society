@@ -661,3 +661,7 @@ button,.btn,a{ -webkit-tap-highlight-color:transparent }
   #main>.view:not(.pmrs-target-home) .section{padding-block:3.25rem}
   #main>.view:not(.pmrs-target-home) .field-card{min-height:0}
 }
+
+.pmrs-target-home .target-faq .faq__q{font-family:var(--target-font);font-weight:620}
+.pmrs-target-home .target-faq .faq__a{font-family:var(--target-font)}
+.pmrs-target-home .target-nav,.pmrs-target-home .target-footer{font-family:var(--target-font)}
