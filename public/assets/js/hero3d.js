@@ -38,7 +38,7 @@ import {
   TorusGeometry,
   Vector3,
   WebGLRenderer,
-} from 'three';
+} from 'https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js';
 
 const GOLD = 0xd8a44e;
 const STEEL = 0x9dabbd;
