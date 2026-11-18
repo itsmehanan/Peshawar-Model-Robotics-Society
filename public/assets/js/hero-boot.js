@@ -47,7 +47,7 @@ export async function mountHero3D(stage) {
   }
 
   try {
-    const module = await import('./hero3d.build.js');
+    const module = await import('./hero3d.js');
     if (stage.dataset.hero3d === 'mounted') return null;
 
     const controller = module.mountHeroScene(canvas, {
