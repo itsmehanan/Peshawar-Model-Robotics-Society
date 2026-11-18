@@ -127,6 +127,9 @@ td,th{padding:.8rem .9rem;border-bottom:1px solid var(--line)}
 @media(max-width:560px){
  .hero{min-height:154svh}
  .hero__grid{gap:1.4rem}
+ .hero__grid>div:first-child{max-width:42rem}
+ .hero .display{font-size:clamp(2.6rem,11vw,4rem)}
+ .plate{max-width:min(100%,440px)}
 }
 @media(prefers-reduced-motion:reduce){
  .hero{min-height:0}
