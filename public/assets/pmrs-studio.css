@@ -397,3 +397,267 @@ html[data-theme='light'] .pmrs-target-home .target-sticky{background:radial-grad
 .pmrs-target-home .target-mobile-menu[hidden]{display:none}
 .pmrs-target-home .target-mobile-menu a{padding:12px 0;border-bottom:1px solid var(--target-line);color:var(--target-text)}
 @media(max-width:760px){.pmrs-target-home .target-links{display:none}.pmrs-target-home .target-hide-mobile{display:none}.pmrs-target-home .target-menu-toggle{display:flex}.pmrs-target-home .target-nav__actions{gap:8px}}
+
+
+/* -------------------------------------------------------------------------
+   PMRS unified visual pass
+   Stable local typography, calmer surfaces and consistent page composition.
+   ------------------------------------------------------------------------- */
+:root{
+  --display:'Archivo',system-ui,sans-serif;
+  --sans:'Archivo',system-ui,sans-serif;
+  --target-font:'Archivo',system-ui,sans-serif;
+}
+body,button,input,select,textarea{
+  font-family:var(--sans);
+  font-synthesis:none;
+  text-rendering:optimizeLegibility;
+}
+.display,.h1,.h2,.h3,.h4,.page-hero h1,.sheet__title{
+  font-family:var(--display);
+  font-weight:650;
+  font-synthesis:none;
+  text-wrap:balance;
+}
+.display{letter-spacing:-.045em}
+.page-hero .display{line-height:.98;letter-spacing:-.045em}
+.lede{font-weight:450;line-height:1.72;max-width:58ch}
+h2,h3,h4{font-family:var(--display);font-weight:620;letter-spacing:-.025em}
+p,li,dd{ text-wrap:pretty }
+button,.btn,a{ -webkit-tap-highlight-color:transparent }
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* The homepage uses the same self-hosted variable font before and after load.
+   This prevents the lighter third-party font swap that changed its appearance. */
+.pmrs-target-home,.pmrs-target-home *{
+  font-family:var(--target-font);
+  font-synthesis:none;
+}
+.pmrs-target-home .lab,
+.pmrs-target-home .target-side,
+.pmrs-target-home .target-count{font-family:'DM Mono',ui-monospace,monospace}
+.pmrs-target-home .target-hero h1,
+.pmrs-target-home .target-paper h2,
+.pmrs-target-home .target-section-head h2,
+.pmrs-target-home .target-process h2,
+.pmrs-target-home .target-faq h2,
+.pmrs-target-home .target-end h2{
+  font-weight:650;
+  letter-spacing:-.045em;
+}
+.pmrs-target-home .target-hero p,
+.pmrs-target-home .target-section-head p,
+.pmrs-target-home .target-steps p,
+.pmrs-target-home .target-journal-card p,
+.pmrs-target-home .target-end p{font-weight:450;line-height:1.7}
+.pmrs-target-home .target-btn{font-weight:620}
+.pmrs-target-home .target-card h3,
+.pmrs-target-home .target-journal-card h3{font-weight:620}
+
+/* All secondary routes inherit the same editorial page rhythm. */
+#main>.view:not(.pmrs-target-home) .page-hero{
+  position:relative;
+  padding-block:clamp(3.75rem,7vw,6.75rem);
+  border-bottom:1px solid var(--line);
+}
+#main>.view:not(.pmrs-target-home) .page-hero__inner{
+  gap:clamp(2rem,5vw,5rem);
+}
+#main>.view:not(.pmrs-target-home) .page-hero h1{
+  max-width:13ch;
+  font-size:clamp(3rem,7vw,6.6rem);
+  line-height:.98;
+  font-weight:650;
+}
+#main>.view:not(.pmrs-target-home) .section{
+  padding-block:clamp(3.5rem,7vw,6.5rem);
+}
+#main>.view:not(.pmrs-target-home) .section--tight{
+  padding-block:clamp(2.75rem,5vw,4.75rem);
+}
+#main>.view:not(.pmrs-target-home) .panel,
+#main>.view:not(.pmrs-target-home) .sheet,
+#main>.view:not(.pmrs-target-home) .aside-card,
+#main>.view:not(.pmrs-target-home) .organiser,
+#main>.view:not(.pmrs-target-home) .contact-list,
+#main>.view:not(.pmrs-target-home) .journal-card{
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--panel);
+  box-shadow:none;
+  backdrop-filter:none;
+}
+#main>.view:not(.pmrs-target-home) .panel,
+#main>.view:not(.pmrs-target-home) .aside-card,
+#main>.view:not(.pmrs-target-home) .organiser{padding:clamp(1.2rem,2.4vw,2rem)}
+#main>.view:not(.pmrs-target-home) .eyebrow,
+#main>.view:not(.pmrs-target-home) .breadcrumb{font-family:'DM Mono',ui-monospace,monospace}
+#main>.view:not(.pmrs-target-home) .btn{
+  min-height:44px;
+  font-weight:620;
+  box-shadow:none;
+}
+#main>.view:not(.pmrs-target-home) .btn--solid:hover{box-shadow:0 8px 20px -16px var(--accent)}
+#main>.view:not(.pmrs-target-home) .field-card{
+  border-radius:8px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:none;
+  backdrop-filter:none;
+  min-height:430px;
+  padding:1.25rem;
+}
+#main>.view:not(.pmrs-target-home) .field-card__media{
+  min-height:230px;
+  margin:-.25rem -.25rem 1rem;
+  overflow:hidden;
+  border-radius:5px;
+  background:var(--bg-2);
+}
+#main>.view:not(.pmrs-target-home) .field-card__media picture{
+  width:100%;height:100%;display:grid;place-items:center;
+}
+#main>.view:not(.pmrs-target-home) .field-card__media img{
+  width:100%;height:100%;max-height:260px;object-fit:contain;
+  filter:none;mix-blend-mode:normal;
+}
+#main>.view:not(.pmrs-target-home) .field-card h3{font-weight:650;font-size:1.45rem}
+#main>.view:not(.pmrs-target-home) .field-card p{font-size:.94rem;line-height:1.65}
+#main>.view:not(.pmrs-target-home) .art-band{
+  margin-inline:auto;
+  max-width:1240px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+  background:var(--panel);
+}
+#main>.view:not(.pmrs-target-home) .art-band picture{display:block}
+#main>.view:not(.pmrs-target-home) .art-band img{
+  display:block;width:100%;max-height:520px;object-fit:contain;background:var(--bg-2);
+}
+#main>.view:not(.pmrs-target-home) .prose{font-size:1.02rem;line-height:1.85}
+#main>.view:not(.pmrs-target-home) .prose h2,
+#main>.view:not(.pmrs-target-home) .prose h3{font-weight:650;line-height:1.15}
+#main>.view:not(.pmrs-target-home) .contact-grid{gap:clamp(1.25rem,3vw,2.5rem)}
+#main>.view:not(.pmrs-target-home) .contact-row{padding:1rem 1.15rem}
+#main>.view:not(.pmrs-target-home) .contact-row dt{
+  color:var(--ink-3);font:600 .68rem 'DM Mono',ui-monospace,monospace;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:.35rem
+}
+#main>.view:not(.pmrs-target-home) .contact-row dd{margin:0;overflow-wrap:anywhere}
+#main>.view:not(.pmrs-target-home) .social{border-radius:5px;background:var(--bg-2);box-shadow:none}
+#main>.view:not(.pmrs-target-home) .faq__q{font-weight:600;line-height:1.45}
+#main>.view:not(.pmrs-target-home) .faq__a{line-height:1.75}
+
+/* Registration: stable form grid, no floating decoration over controls. */
+#main>.view:has(#registerForm) .page-hero{padding-bottom:3.5rem}
+#main>.view:has(#registerForm) .reg-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.65fr) minmax(260px,.75fr);
+  align-items:start;
+  gap:clamp(1.25rem,3vw,2.5rem);
+}
+#main>.view:has(#registerForm) #registerForm{
+  min-width:0;
+  padding:clamp(1.1rem,2.8vw,2.25rem);
+  overflow:visible;
+  position:relative;
+  isolation:isolate;
+}
+#main>.view:has(#registerForm) #registerForm::before,
+#main>.view:has(#registerForm) #registerForm::after,
+#main>.view:has(#registerForm) .reg-layout>aside::before,
+#main>.view:has(#registerForm) .reg-layout>aside::after{
+  content:none!important;display:none!important;animation:none!important;filter:none!important
+}
+#main>.view:has(#registerForm) .steps-bar{
+  position:relative;display:flex;align-items:center;gap:.75rem;
+  padding:0 0 1.4rem;margin:0 0 1.6rem;
+  border:0;border-bottom:1px solid var(--line);
+  border-radius:0;background:transparent;backdrop-filter:none;
+}
+#main>.view:has(#registerForm) .steps-bar__item{
+  min-width:0;display:flex;align-items:center;gap:.55rem;
+  flex:0 1 auto;white-space:nowrap
+}
+#main>.view:has(#registerForm) .steps-bar__num{
+  flex:0 0 30px;width:30px;height:30px;display:grid;place-items:center;
+  border-radius:50%;font-size:.78rem;font-weight:650
+}
+#main>.view:has(#registerForm) .steps-bar__label{font-size:.78rem;font-weight:600}
+#main>.view:has(#registerForm) .steps-bar__line{height:1px;min-width:12px;flex:1}
+#main>.view:has(#registerForm) .sheet__head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+  margin:1.6rem 0 1rem;padding-bottom:.8rem
+}
+#main>.view:has(#registerForm) .sheet__title{font-size:clamp(1.35rem,2vw,1.75rem);line-height:1.2}
+#main>.view:has(#registerForm) .form{gap:1rem}
+#main>.view:has(#registerForm) .form-row{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1rem;align-items:start
+}
+#main>.view:has(#registerForm) .field{min-width:0;gap:.45rem}
+#main>.view:has(#registerForm) .field label{font-weight:620;font-size:.88rem}
+#main>.view:has(#registerForm) .input,
+#main>.view:has(#registerForm) .select,
+#main>.view:has(#registerForm) input,
+#main>.view:has(#registerForm) select{
+  width:100%;max-width:100%;min-width:0;min-height:48px;
+  box-sizing:border-box;border-radius:5px;font-size:16px;
+}
+#main>.view:has(#registerForm) .field__hint,
+#main>.view:has(#registerForm) .field__error{
+  display:block;position:static;max-width:100%;font-size:.78rem;line-height:1.5;
+  overflow-wrap:anywhere
+}
+#main>.view:has(#registerForm) .choice-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.75rem;align-items:stretch
+}
+#main>.view:has(#registerForm) .choice{
+  min-width:0;min-height:112px;padding:1rem;
+  display:grid;grid-template-columns:18px minmax(0,1fr);
+  align-content:start;align-items:start;gap:.55rem;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--bg-2);box-shadow:none;overflow-wrap:anywhere
+}
+#main>.view:has(#registerForm) .choice input{grid-row:1 / span 2;width:16px;height:16px;margin:.2rem 0 0}
+#main>.view:has(#registerForm) .choice__title{font-size:.9rem;line-height:1.35;font-weight:650}
+#main>.view:has(#registerForm) .choice__desc{grid-column:2;font-size:.78rem;line-height:1.5;color:var(--ink-3)}
+#main>.view:has(#registerForm) .form-note{
+  margin-top:1.25rem;padding:1rem 1.1rem;border:1px solid var(--line);
+  border-radius:5px;background:var(--bg-2);font-size:.82rem;line-height:1.6
+}
+#main>.view:has(#registerForm) .form-actions{
+  display:flex;align-items:center;flex-wrap:wrap;gap:.8rem 1rem;
+  margin-top:1.35rem;padding-top:1.2rem;border-top:1px solid var(--line)
+}
+#main>.view:has(#registerForm) .reg-layout>aside{position:sticky;top:calc(var(--head-h,74px) + 1rem);min-width:0}
+#main>.view:has(#registerForm) .reg-layout>aside .aside-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  box-shadow:none;backdrop-filter:none;padding:1.4rem
+}
+#main>.view:has(#registerForm) .reg-layout>aside li{margin:.55rem 0;line-height:1.55}
+#main>.view:has(#registerForm) .reg-layout>aside .aside-card__stat{
+  display:flex;justify-content:space-between;gap:1rem;padding:.7rem 0;
+  border-top:1px solid var(--line)
+}
+#main>.view:has(#registerForm) .reg-layout>aside .aside-card__stat b{text-align:right}
+@media(max-width:900px){
+  #main>.view:has(#registerForm) .reg-layout{grid-template-columns:minmax(0,1fr)}
+  #main>.view:has(#registerForm) .reg-layout>aside{position:static}
+}
+@media(max-width:620px){
+  #main>.view:has(#registerForm) .form-row{grid-template-columns:minmax(0,1fr)}
+  #main>.view:has(#registerForm) .choice-grid{grid-template-columns:minmax(0,1fr)}
+  #main>.view:has(#registerForm) .choice{min-height:0}
+  #main>.view:has(#registerForm) .steps-bar{gap:.4rem}
+  #main>.view:has(#registerForm) .steps-bar__item{gap:.35rem}
+  #main>.view:has(#registerForm) .steps-bar__label{font-size:.7rem}
+  #main>.view:has(#registerForm) #registerForm{padding:1rem}
+}
+@media(max-width:600px){
+  #main>.view:not(.pmrs-target-home) .page-hero h1{font-size:clamp(2.65rem,12vw,4.2rem)}
+  #main>.view:not(.pmrs-target-home) .section{padding-block:3.25rem}
+  #main>.view:not(.pmrs-target-home) .field-card{min-height:0}
+}
