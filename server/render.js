@@ -56,6 +56,7 @@ ${appleIcon}
 <link rel="preload" href="/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/pmrs-studio.css">
 <script type="application/json" id="boot-content">${safeJson(settings)}</script>
 </head>
 <body class="instrument" data-site-name="${esc(name)}">
