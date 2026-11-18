@@ -183,3 +183,14 @@ tbody tr:hover{background:var(--glass-1)}
 @media(prefers-reduced-motion:reduce){
  .social,.dash-nav__link,.admin-nav__link{transition:none}
 }
+
+/* Visual correction pass: remove the instrument-grid/dual-neon atmosphere entirely. */
+html,body{background-color:var(--bg)!important;background-image:none!important}
+body{background:var(--bg)!important}
+.hero{background:transparent!important}
+.hero::before,.hero::after,.plate::before,.plate::after,.plate__guides{display:none!important;content:none!important}
+.plate{background:#151515!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 24px 65px -42px rgba(0,0,0,.75)!important}
+.plate__media{background:transparent!important}
+.plate__object{display:none!important}
+.plate__canvas{display:block!important;opacity:1!important;transform:none!important}
+:root[data-theme='light'] html,:root[data-theme='light'] body{background-image:none!important}
