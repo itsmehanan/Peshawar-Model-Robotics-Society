@@ -11,7 +11,7 @@
  *   3. Scene fails to build or frame: keep the poster, do nothing.
  *   4. Success: the canvas fades in over the poster.
  */
-const POSTER_FADE_MS = 900;
+const POSTER_FADE_MS = 0;
 
 function supportsWebGL() {
   try {
@@ -41,17 +41,20 @@ export async function mountHero3D(stage) {
 
   // Reduced motion gets the still render, deliberately: a slowly rotating metal
   // object is exactly the kind of ambient movement that setting exists to stop.
-  if (prefersCalm() || saveData() || !supportsWebGL()) {
-    stage.dataset.hero3d = 'static';
+  if (!supportsWebGL()) {
+    stage.dataset.hero3d = 'unsupported';
+    stage.classList.add('hero-3d-unavailable');
     return null;
   }
+  // The object itself remains rendered for reduced-motion and data-saver users;
+  // only scroll/idle movement is reduced in the scene.
 
   try {
     const module = await import('./hero3d.js');
     if (stage.dataset.hero3d === 'mounted') return null;
 
     const controller = module.mountHeroScene(canvas, {
-      reducedMotion: prefersCalm(),
+      reducedMotion: prefersCalm() || saveData(),
     });
     // Prove a frame renders before showing anything, so a driver that silently
     // produces a black canvas never replaces a good poster.
@@ -66,7 +69,7 @@ export async function mountHero3D(stage) {
       canvas.classList.add('is-live');
       stage.dataset.hero3d = 'mounted';
     });
-    window.setTimeout(() => stage.classList.add('has-3d'), POSTER_FADE_MS);
+    stage.classList.add('has-3d');
 
     canvas.addEventListener('herocontextlost', () => {
       canvas.classList.remove('is-live');
@@ -79,7 +82,8 @@ export async function mountHero3D(stage) {
   } catch {
     // Anything at all — a blocked chunk, a shader compile failure, a driver
     // quirk — leaves the poster in place. The hero is never empty.
-    stage.dataset.hero3d = 'static';
+    stage.dataset.hero3d = 'error';
+    stage.classList.add('hero-3d-unavailable');
     return null;
   }
 }
