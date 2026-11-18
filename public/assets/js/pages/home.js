@@ -57,8 +57,8 @@ function heroStage({ venue, city, kicker }) {
   <figure class="plate" data-plate data-hero-stage aria-label="The PMRS centrepiece: a machined arm presenting a wireframe cube inside a gear ring">
     <span class="plate__guides" aria-hidden="true"><span></span><span></span><span></span></span>
     <div class="plate__media">
-      ${artPicture('/assets/art/hero', { width: 1000, height: 1000, eager: true, className: 'plate__object' })}
-      <canvas class="plate__canvas" data-hero-canvas hidden aria-hidden="true"></canvas>
+      <canvas class="plate__canvas" data-hero-canvas aria-hidden="true"></canvas>
+      <noscript><span class="plate__fallback">PMRS · ROBOTICS / ENGINEERING</span></noscript>
     </div>
     <span class="plate__ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
     <figcaption class="plate__label plate__label--tl">
