@@ -16,7 +16,7 @@ function headline(value){
   return words.slice(0,2).join(' ')+' <span>'+words.slice(2,-1).join(' ')+' <em>'+words[words.length-1]+'</em></span>';
 }
 export function homePage(){
-  const {content,student,admin}=state,site=content.site||{},event=content.event||{},registration=content.registration||{};
+  const content=state.content||{},student=state.student,admin=state.admin,site=content.site||{},event=content.event||{},registration=content.registration||{};
   const categories=content.categories||[],articles=(content.articles||[]).slice(0,3),faqs=(content.faqs||[]).slice(0,5),counts=content.counts||{},contact=content.contact||{},socials=content.socials||[];
   const deadline=registration.deadlineLabel||'Teams of two to six',href=student?'#/dashboard':registration.open===false?'#/contact':'#/register',label=student?'Open my dashboard':registration.open===false?'Registration details':'Register your team';
   const stats=[{value:event.dateLabel||'To be announced',label:'Date'},{value:event.venue||'To be announced',label:'Venue'},{value:registration.open===false?'Registration closed':deadline,label:'Teams'}];
@@ -30,7 +30,7 @@ export function homePage(){
     '<nav class="target-nav" aria-label="Primary navigation"><div class="target-wrap target-nav__inner">'+
     '<a class="target-logo" href="#/" data-link><i aria-hidden="true"></i> '+esc(site.name||'PMRS')+' <span>2026</span></a>'+
     '<div class="target-links"><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a></div>'+
-    '<div class="target-nav__actions"><button class="theme-toggle target-theme" type="button" data-theme-toggle aria-label="Switch theme"><span aria-hidden="true">◐</span></button>'+navAction+registerAction+'</div></div></nav>'+
+    '<div class="target-nav__actions"><button class="theme-toggle target-theme" type="button" data-theme-toggle aria-label="Switch theme"><span aria-hidden="true">◐</span></button>'+navAction+registerAction+'<button class="target-menu-toggle" type="button" data-target-menu-toggle aria-expanded="false" aria-controls="target-mobile-menu" aria-label="Open menu"><span></span><span></span></button></div></div><div class="target-mobile-menu" id="target-mobile-menu" hidden><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a><a href="#/login" data-link>Sign in</a></div></nav>'+
     '<section class="target-stage" id="top" data-hero-stage><div class="target-sticky">'+
     '<canvas class="target-canvas" data-hero-canvas aria-label="Glass and metal robotics module, rotating and separating into layers as you scroll" role="img"></canvas>'+
     '<div class="target-hero"><div class="target-wrap"><div class="target-hero__copy" data-hero-copy><span class="lab">[ '+esc((event.kicker||'Season 04').toUpperCase())+' — 2026 · '+esc((event.city||'PESHAWAR, PAKISTAN').toUpperCase())+' ]</span>'+
@@ -66,4 +66,17 @@ export function mountHome(root){
   }));
   const close=root.querySelector('[data-dismiss-notice]');
   close?.addEventListener('click',()=>close.closest('.target-notice')?.remove());
+  const menuButton=root.querySelector('[data-target-menu-toggle]');
+  const menu=root.querySelector('#target-mobile-menu');
+  menuButton?.addEventListener('click',()=>{
+    const open=menuButton.getAttribute('aria-expanded')==='true';
+    menuButton.setAttribute('aria-expanded',String(!open));
+    menuButton.setAttribute('aria-label',open?'Open menu':'Close menu');
+    if(menu)menu.hidden=open;
+  });
+  menu?.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+    if(menu)menu.hidden=true;
+    menuButton?.setAttribute('aria-expanded','false');
+    menuButton?.setAttribute('aria-label','Open menu');
+  }));
 }
