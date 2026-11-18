@@ -37,7 +37,7 @@ export async function mountHero3D(stage) {
 
   stage.dataset.hero3d = 'loading';
   try {
-    // The sculptural hand-and-crystal renderer is self-contained WebGL; it has no remote runtime dependency.
+    // Loads the reference Three.js scene for the scroll-driven glass robotics module.
     const module = await import('./hero3d-target.js');
     if (!stage.isConnected) return null;
 
