@@ -18,7 +18,7 @@ assert.match(auth,/bootAuth3D\(root\)/);
 assert.match(admin,/data-auth-hero-canvas/);
 assert.match(admin,/bootAuth3D\(root\)/);
 assert.match(scene,/transmission\s*:\s*1/);
-assert.doesNotMatch(scene,/\\\\n\s*hero\.position\.y/,'scene module must not contain an escaped newline that breaks parsing');
+assert.doesNotMatch(scene,/\\n\s*hero\.position\.y/,'scene module must not contain an escaped newline that breaks parsing');
 assert.match(scene,/pointermove/);
 assert.match(scene,/getBoundingClientRect\(\)/);
 assert.match(scene,/baseScale=1\.28/);
