@@ -1128,7 +1128,7 @@ html[data-theme="light"] .pmrs-target-home .target-hero-poster img{opacity:.16}
 
 
 /* 2026-11 mobile and artwork correction. */
-.pmrs-target-home .target-hero-poster,.pmrs-target-home .target-canvas,.pmrs-target-home .target-legacy-assets{display:none!important}
+.pmrs-target-home .target-hero-poster,.pmrs-target-home .target-legacy-assets{display:none!important}
 .auth-art img,.auth-art picture{display:none!important}
 .auth-art--message{display:none;position:relative;overflow:hidden;align-content:end;min-height:100%;padding:clamp(2rem,5vw,4rem);border-left:1px solid var(--line);background:radial-gradient(ellipse at 75% 20%,rgba(240,106,58,.13),transparent 58%),linear-gradient(145deg,#19191d,#0b0b0d 72%)}
 .auth-art--message::before{content:"";position:absolute;inset:12% 10% auto;height:1px;background:linear-gradient(90deg,transparent,rgba(240,106,58,.65),transparent)}
@@ -1164,3 +1164,30 @@ img,svg,video,canvas{max-width:100%}
   .site-head__actions .theme-toggle{display:none!important}
   .site-head__actions .btn[data-auth-out]{display:none!important}
 }
+
+
+/* Restore the original scroll-opening glass centrepiece, without its gear poster. */
+.pmrs-target-home .target-sticky{position:sticky;top:0;height:100svh;min-height:620px;overflow:hidden;isolation:isolate}
+.pmrs-target-home .target-canvas{position:absolute;inset:0;width:100%;height:100%;max-width:none;display:block;z-index:1;pointer-events:none;opacity:0;transition:opacity .7s ease}
+.pmrs-target-home .target-canvas.is-live{opacity:1}
+.pmrs-target-home .target-canvas[hidden]{display:none!important}
+.pmrs-target-home .target-hero{position:relative;z-index:2;pointer-events:none}
+.pmrs-target-home .target-hero a{pointer-events:auto}
+.pmrs-target-home .target-side,.pmrs-target-home .target-call,.pmrs-target-home .target-count{position:relative;z-index:2}
+@media(prefers-reduced-motion:reduce){.pmrs-target-home .target-canvas{transition:none}}
+
+/* Interactive 3D visual on both authentication screens. */
+.auth-art.auth-art--interactive{display:grid!important;grid-template-rows:minmax(0,1fr) auto;position:relative;min-height:620px;overflow:hidden;padding:clamp(1.5rem,3vw,3rem);border-left:1px solid var(--line);background:radial-gradient(ellipse at 50% 42%,rgba(54,150,190,.12),transparent 60%),linear-gradient(145deg,#191c21,#090b0e 76%)}
+.auth-art__scene{position:relative;min-height:360px;display:grid;place-items:center;overflow:hidden}
+.auth-art__canvas{display:block;width:100%;height:100%;min-height:360px;max-width:none!important;cursor:grab}
+.auth-art__canvas:active{cursor:grabbing}
+.auth-art__scene-label{position:absolute;left:0;top:1rem;color:rgba(226,236,245,.58);font:600 .62rem var(--mono);letter-spacing:.16em;pointer-events:none}
+.auth-art__caption{position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.13);padding-top:1.2rem}
+.auth-art__caption .lab{color:#f18a62;font-size:.62rem;letter-spacing:.16em}
+.auth-art__caption p{max-width:18ch;margin:.5rem 0 0;color:#f4f1eb;font:italic clamp(1.6rem,3vw,2.8rem)/1.05 var(--serif)}
+.auth-art--control{background:radial-gradient(ellipse at 50% 42%,rgba(240,106,58,.13),transparent 62%),linear-gradient(145deg,#1d1918,#090b0e 76%)}
+@media(max-width:760px){.auth-art.auth-art--interactive{display:none!important}}
+
+/* Registration labels: remove the decorative orange marker from the whole form. */
+#registerForm .field::before,#registerForm .field::after,#registerForm .field label::before,#registerForm .field label::after,#registerForm .field .label::before,#registerForm .field .label::after{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important;transform:none!important}
+#registerForm .field label{position:static!important;display:block!important;padding:0!important;margin:0 0 .45rem!important;text-indent:0!important}
