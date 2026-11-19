@@ -597,6 +597,19 @@ async function renderRequests(body, reload) {
 }
 
 /* ---------------------------------------------------------------- fields */
+async function uploadAdminImage(file) {
+  if (!file) throw new Error('Choose an image first.');
+  if (!/^image\/(png|jpeg|webp|svg\+xml|x-icon)$/i.test(file.type)) throw new Error('Use a PNG, JPEG, WebP or SVG image.');
+  if (file.size > 1.5 * 1024 * 1024) throw new Error('Image must be under 1.5 MB.');
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  return post('/admin/assets', { dataUrl });
+}
+
 async function renderFields(body, reload) {
   const { categories } = await get('/admin/categories');
   body.innerHTML = `
@@ -662,6 +675,17 @@ function fieldModal(category, reload) {
       </div>
       ${editing ? '' : `<div class="field"><label>Link slug <span class="label__opt">optional — generated from the name</span></label><input class="input" name="id" placeholder="e.g. robotics"><span class="field__error"></span></div>`}
       <div class="field"><label>One-line summary</label><input class="input" name="summary" value="${editing ? esc(category.summary) : ''}" required maxlength="180"><span class="field__error"></span></div>
+      <div class="field"><label>Front image <span class="label__opt">required</span></label>
+        <div class="row"><input class="input" name="imageUrl" value="${editing ? esc(category.imageUrl || '') : ''}" placeholder="Upload the main field image" required><input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-field-front class="sr-only" id="fieldFrontUpload"><label for="fieldFrontUpload" class="btn btn--ghost btn--sm">Upload front image</label></div>
+        <img class="admin-field-preview" data-field-front-preview src="${editing ? esc(category.imageUrl || '') : ''}" alt="Front image preview" ${editing && category.imageUrl ? '' : 'hidden'}>
+        <span class="field__hint">This is the main image used on the homepage, Fields page and field detail page.</span>
+      </div>
+      <div class="field"><label>Additional images <span class="label__opt">optional · up to 8</span></label>
+        <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-field-gallery multiple>
+        <input type="hidden" name="images" value="${esc(JSON.stringify(category?.images || []))}">
+        <div class="admin-field-gallery" data-field-gallery-preview></div>
+        <span class="field__hint">Upload extra photos for the field detail page. All files are stored by the site.</span>
+      </div>
       <div class="field"><label>Full brief</label><textarea class="textarea" name="details" rows="5">${editing ? esc(category.details) : ''}</textarea><span class="field__error"></span></div>
       <div class="field"><label>Entry rules</label><textarea class="textarea" name="rules" rows="3">${editing ? esc(category.rules) : ''}</textarea><span class="field__error"></span></div>
       <label class="checkline"><input type="checkbox" name="isActive" ${!editing || category.isActive !== false ? 'checked' : ''}><span>Visible on the public site</span></label>
@@ -677,6 +701,12 @@ function fieldModal(category, reload) {
           const raw = Object.fromEntries(new FormData(form));
           raw.isActive = form.elements.isActive.checked;
           try {
+            raw.images = JSON.parse(raw.images || '[]');
+            if (!raw.imageUrl) {
+              toast('A front image is required for every field.', 'error');
+              form.elements.imageUrl.focus();
+              return true;
+            }
             if (editing) await patch(`/admin/categories/${category.id}`, raw);
             else await post('/admin/categories', raw);
             toast(editing ? 'Field updated.' : 'Field created.', 'ok');
@@ -691,6 +721,63 @@ function fieldModal(category, reload) {
       },
     ],
   });
+
+  const form = document.querySelector('#fieldFormModal');
+  if (!form) return;
+  const frontFile = form.querySelector('[data-field-front]');
+  frontFile?.addEventListener('change', async () => {
+    const file = frontFile.files?.[0];
+    if (!file) return;
+    try {
+      const { url } = await uploadAdminImage(file);
+      form.elements.imageUrl.value = url;
+      const preview = form.querySelector('[data-field-front-preview]');
+      preview.src = url;
+      preview.hidden = false;
+      toast('Front image uploaded.', 'ok');
+    } catch (error) {
+      toast(error.message, 'error');
+    }
+  });
+
+  const galleryFile = form.querySelector('[data-field-gallery]');
+  const galleryInput = form.elements.images;
+  const galleryPreview = form.querySelector('[data-field-gallery-preview]');
+  const renderGallery = () => {
+    const urls = JSON.parse(galleryInput.value || '[]');
+    galleryPreview.innerHTML = urls.map((url, i) => `<div class="admin-field-gallery__item"><img src="${esc(url)}" alt="Additional field image ${i + 1}"><button type="button" class="btn btn--quiet btn--sm" data-remove-gallery="${i}">Remove</button></div>`).join('');
+  };
+  galleryPreview?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-remove-gallery]');
+    if (!button) return;
+    const urls = JSON.parse(galleryInput.value || '[]');
+    urls.splice(Number(button.dataset.removeGallery), 1);
+    galleryInput.value = JSON.stringify(urls);
+    renderGallery();
+  });
+  galleryFile?.addEventListener('change', async () => {
+    const files = [...(galleryFile.files || [])];
+    const urls = JSON.parse(galleryInput.value || '[]');
+    if (urls.length + files.length > 8) {
+      toast('A field can have up to 8 additional images.', 'error');
+      galleryFile.value = '';
+      return;
+    }
+    try {
+      for (const file of files) {
+        const uploaded = await uploadAdminImage(file);
+        urls.push(uploaded.url);
+      }
+      galleryInput.value = JSON.stringify(urls);
+      renderGallery();
+      toast('Additional images uploaded.', 'ok');
+    } catch (error) {
+      toast(error.message, 'error');
+    } finally {
+      galleryFile.value = '';
+    }
+  });
+  renderGallery();
 }
 
 /* -------------------------------------------------------------- articles */
@@ -969,22 +1056,33 @@ async function renderSettingsSection(body, section, reload) {
         <div class="field"><label>Short name</label><input class="input" name="name" value="${esc(s.name)}" required maxlength="40"><span class="field__hint">Shown in the header.</span></div>
         <div class="field"><label>Full name</label><input class="input" name="fullName" value="${esc(s.fullName)}" required maxlength="80"><span class="field__error"></span></div>
       </div>
-      <div class="field"><label>Tagline</label><input class="input" name="tagline" value="${esc(s.tagline)}" maxlength="160"></div>
       <div class="field"><label>Description</label><textarea class="textarea" name="description" rows="3" maxlength="600">${esc(s.description)}</textarea></div>
       <div class="field"><label>Meta description (search results)</label><textarea class="textarea" name="metaDescription" rows="2" maxlength="300">${esc(s.metaDescription)}</textarea></div>
       <div class="form-row">
-        <div class="field"><label>Logo mark (1–3 characters)</label><input class="input" name="logoMark" value="${esc(s.logoMark)}" maxlength="3"><span class="field__hint">Rendered in a circle in the header.</span></div>
-        <div class="field">
-          <label>Logo image <span class="label__opt">optional upload</span></label>
-          <div class="row"><input class="input" name="logoUrl" value="${esc(s.logoUrl)}" placeholder="https://… or upload"><input type="file" accept="image/*" data-upload="logoUrl" class="sr-only" id="logoUpload"><label for="logoUpload" class="btn btn--ghost btn--sm" style="white-space:nowrap">Upload</label></div>
-          <span class="field__hint">Uploads are stored in the database and served from /api/assets.</span>
-        </div>
+        <div class="field"><label>Campus name</label><input class="input" name="campusName" value="${esc(s.campusName || 'Dalazak Campus')}" maxlength="60"><span class="field__hint">Shown beside PMRSDC throughout the site.</span></div>
+        <div class="field"><label>Brand tagline</label><input class="input" name="tagline" value="${esc(s.tagline)}" maxlength="160"><span class="field__hint">Shown with the campus label in the site header.</span></div>
       </div>
       <div class="form-row">
-        <div class="field"><label>Favicon URL <span class="label__opt">optional</span></label><input class="input" name="faviconUrl" value="${esc(s.faviconUrl)}" placeholder="https://…"></div>
+        <div class="field">
+          <label>Logo for dark backgrounds</label>
+          <div class="row"><input class="input" name="logoMarkDarkUrl" value="${esc(s.logoMarkDarkUrl || '/assets/pmrs-logo-dark.jpg')}" placeholder="/api/assets/…"><input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-upload="logoMarkDarkUrl" class="sr-only" id="logoDarkUpload"><label for="logoDarkUpload" class="btn btn--ghost btn--sm">Upload</label></div>
+          <img class="admin-logo-preview" data-logo-preview="logoMarkDarkUrl" src="${esc(s.logoMarkDarkUrl || '/assets/pmrs-logo-dark.jpg')}" alt="Dark-background logo preview">
+        </div>
+        <div class="field">
+          <label>Logo for light backgrounds</label>
+          <div class="row"><input class="input" name="logoMarkLightUrl" value="${esc(s.logoMarkLightUrl || '/assets/pmrs-logo-light.jpg')}" placeholder="/api/assets/…"><input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-upload="logoMarkLightUrl" class="sr-only" id="logoLightUpload"><label for="logoLightUpload" class="btn btn--ghost btn--sm">Upload</label></div>
+          <img class="admin-logo-preview admin-logo-preview--light" data-logo-preview="logoMarkLightUrl" src="${esc(s.logoMarkLightUrl || '/assets/pmrs-logo-light.jpg')}" alt="Light-background logo preview">
+        </div>
+      </div>
+      <p class="field__hint">Use the black-background file for dark mode and the white-background file for light mode. The site crops the emblem for compact headers and blends away the matching background.</p>
+      <div class="form-row">
+        <div class="field"><label>Favicon <span class="label__opt">optional</span></label><div class="row"><input class="input" name="faviconUrl" value="${esc(s.faviconUrl)}" placeholder="https://… or upload"><input type="file" accept="image/png,image/x-icon,image/svg+xml" data-upload="faviconUrl" class="sr-only" id="faviconUpload"><label for="faviconUpload" class="btn btn--ghost btn--sm">Upload</label></div></div>
         <div class="field"><label>Footer note</label><input class="input" name="footerNote" value="${esc(s.footerNote)}" maxlength="200"></div>
       </div>
-      <div class="field"><label>Footer credit</label><input class="input" name="credit" value="${esc(settings.footer?.credit || '')}" maxlength="120"><span class="field__hint">Saved with the footer section.</span></div>`;
+      <div class="form-row">
+        <div class="field"><label>Footer credit</label><input class="input" name="credit" value="${esc(settings.footer?.credit || '')}" maxlength="120"><span class="field__hint">Displayed in the footer.</span></div>
+        <div class="field"><label>Copyright name</label><input class="input" name="copyright" value="${esc(settings.footer?.copyright || '')}" maxlength="120"><span class="field__hint">Displayed in the copyright line.</span></div>
+      </div>`;
   }
 
   if (section === 'event') {
@@ -1008,7 +1106,7 @@ async function renderSettingsSection(body, section, reload) {
       <div class="field"><label>Full address</label><input class="input" name="address" value="${esc(e.address)}" maxlength="200"></div>
       <div class="form-row">
         <div class="field"><label>Map link <span class="label__opt">optional</span></label><input class="input" name="mapUrl" value="${esc(e.mapUrl || '')}" placeholder="https://maps.google.com/…"></div>
-        <div class="field"><label>Hero image URL <span class="label__opt">optional</span></label><input class="input" name="heroImageUrl" value="${esc(e.heroImageUrl || '')}" placeholder="https://…"><span class="field__hint">Used for social sharing previews.</span></div>
+        <div class="field"><label>Hero image <span class="label__opt">optional</span></label><div class="row"><input class="input" name="heroImageUrl" value="${esc(e.heroImageUrl || '')}" placeholder="https://… or upload"><input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-upload="heroImageUrl" class="sr-only" id="heroImageUpload"><label for="heroImageUpload" class="btn btn--ghost btn--sm">Upload</label></div><span class="field__hint">Used for social sharing previews.</span></div>
       </div>
       <div class="field"><label>About heading</label><input class="input" name="aboutTitle" value="${esc(e.aboutTitle)}" maxlength="140"></div>
       <div class="field"><label>About body</label><textarea class="textarea" name="aboutBody" rows="7">${esc(e.aboutBody)}</textarea><span class="field__hint">Blank lines separate paragraphs.</span></div>
@@ -1098,15 +1196,11 @@ async function renderSettingsSection(body, section, reload) {
       const file = input.files?.[0];
       if (!file) return;
       if (file.size > 1.5 * 1024 * 1024) return toast('Image must be under 1.5 MB.', 'error');
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
       try {
-        const { url } = await post('/admin/assets', { dataUrl });
+        const { url } = await uploadAdminImage(file);
         form.elements[input.dataset.upload].value = url;
+        const preview = form.querySelector(`[data-logo-preview="${input.dataset.upload}"]`);
+        if (preview) preview.src = url;
         toast('Image uploaded — save to apply.', 'ok');
       } catch (error) {
         toast(error.message, 'error');
@@ -1122,7 +1216,7 @@ async function renderSettingsSection(body, section, reload) {
       const data = Object.fromEntries(new FormData(form));
       if (section === 'site') {
         await put('/admin/settings/site', data);
-        await put('/admin/settings/footer', { credit: data.credit });
+        await put('/admin/settings/footer', { credit: data.credit, copyright: data.copyright });
       } else if (section === 'event') {
         const stats = [];
         for (let i = 0; i < 4; i += 1) {
@@ -1148,10 +1242,14 @@ async function renderSettingsSection(body, section, reload) {
         data.requireSchoolMatch = form.elements.requireSchoolMatch.checked;
         data.maxMembers = Number(data.maxMembers);
         data.minMembers = Number(data.minMembers);
-        data.allowedSizes = String(data.allowedSizes || '')
-          .split(',')
-          .map((n) => Number(n.trim()))
-          .filter((n) => Number.isInteger(n) && n >= 2 && n <= 8);
+        const sizeTokens = String(data.allowedSizes || '').split(',').map((n) => n.trim()).filter(Boolean);
+        const sizes = sizeTokens.map(Number);
+        if (!sizes.length || sizes.some((n) => !Number.isInteger(n) || n < 2 || n > 8)) {
+          toast('Allowed team sizes must be whole numbers from 2 to 8.', 'error');
+          form.elements.allowedSizes.focus();
+          return;
+        }
+        data.allowedSizes = [...new Set(sizes)].sort((a, b) => a - b);
         await put('/admin/settings/registration', data);
       }
       toast('Settings saved. The public site now shows these values.', 'ok');
@@ -1170,8 +1268,9 @@ function socialRow(social) {
   return `<div class="social-editor__row" data-social-row data-platform="${esc(social.platform)}">
     <span class="row" style="gap:.45rem;font-size:.8rem;font-weight:600">
       <span style="width:16px;height:16px;display:inline-block">${socialIcons[social.platform] || ''}</span>
-      ${esc(social.label || social.platform)}
+      ${esc(social.platform)}
     </span>
+    <input class="input" data-key="label" value="${esc(social.label || social.platform)}" placeholder="Display label" aria-label="${esc(social.platform)} display label">
     <input class="input" data-key="handle" value="${esc(social.handle || '')}" placeholder="@handle" aria-label="${esc(social.label)} handle">
     <input class="input" data-key="url" value="${esc(social.url || '')}" placeholder="https://…" aria-label="${esc(social.label)} URL">
     <label class="checkline" style="white-space:nowrap"><input type="checkbox" data-key="enabled" ${social.enabled ? 'checked' : ''}><span class="tiny">Show</span></label>

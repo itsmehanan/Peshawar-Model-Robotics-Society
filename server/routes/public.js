@@ -9,7 +9,8 @@ import { wrap } from '../http.js';
 
 export const publicRouter = Router();
 
-const CATEGORY_FIELDS = `id, name, symbol, summary, rules, accent, image_url AS "imageUrl", sort_order AS "sortOrder"`;
+const CATEGORY_FIELDS = `id, name, symbol, summary, details, rules, accent,
+  image_url AS "imageUrl", coalesce(images, '[]'::jsonb) AS images, sort_order AS "sortOrder"`;
 
 export const categoryRows = async ({ activeOnly = true } = {}) =>
   (await query(`SELECT ${CATEGORY_FIELDS} FROM categories ${activeOnly ? 'WHERE is_active' : ''} ORDER BY sort_order, name`)).rows;

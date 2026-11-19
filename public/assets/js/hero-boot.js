@@ -28,6 +28,15 @@ export async function mountHero3D(stage) {
   const canvas = stage.querySelector('[data-hero-canvas]');
   if (!canvas) return null;
 
+  // Keep the still poster as the complete experience when motion or data
+  // saving is requested. Do this before probing WebGL so the state is stable
+  // on devices and in browsers without a graphics context.
+  if (prefersCalm() || saveData()) {
+    stage.dataset.hero3d = 'static';
+    stage.classList.add('hero-3d-static');
+    return null;
+  }
+
   if (!supportsWebGL()) {
     stage.dataset.hero3d = 'unsupported';
     stage.classList.add('hero-3d-unavailable');

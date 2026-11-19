@@ -1078,3 +1078,50 @@ button,.btn,a{ -webkit-tap-highlight-color:transparent }
 @media(prefers-reduced-motion:reduce){
   #adminBody *,#main>.view:has(#registerForm) *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+
+/* PMRSDC identity and admin-managed field photography */
+.pmrs-logo-crop{position:relative;display:inline-block;flex:none;width:40px;height:40px;overflow:hidden}
+.pmrs-logo-crop img{position:absolute!important;display:block;width:370%!important;max-width:none!important;height:auto!important;left:-100%!important;top:-57%!important;object-fit:initial!important}
+.pmrs-logo-dark{mix-blend-mode:screen}
+.pmrs-logo-light{mix-blend-mode:multiply}
+html[data-theme="dark"] .pmrs-logo-light,html:not([data-theme="light"]) .pmrs-logo-light{display:none!important}
+html[data-theme="light"] .pmrs-logo-dark{display:none!important}
+.brand__mark-crop{width:38px;height:38px}
+.pmrs-target-home .target-logo{gap:.55rem}
+.pmrs-target-home .target-logo__mark{width:27px;height:27px}
+.pmrs-target-home .target-logo__name{font-weight:750;letter-spacing:.07em}
+.pmrs-target-home .target-logo small{font-size:10px;letter-spacing:.08em;color:var(--target-muted);font-weight:500}
+.pmrs-foot-lockup{display:flex;align-items:center;gap:12px;width:max-content;max-width:100%;text-decoration:none}
+.pmrs-foot-lockup__mark{width:48px;height:48px}
+.pmrs-foot-lockup__copy{display:flex;flex-direction:column;gap:3px}
+.pmrs-foot-lockup__copy b{font-size:1rem;letter-spacing:.08em;color:var(--ink)}
+.pmrs-foot-lockup__copy small{font-size:.68rem;letter-spacing:.08em;color:var(--muted)}
+html[data-theme="dark"] .pmrs-foot-lockup__copy b{color:#f5f1e8}
+html[data-theme="dark"] .pmrs-foot-lockup__copy small{color:#a8a39a}
+.admin-logo-preview{display:block;width:100%;max-width:260px;height:116px;object-fit:contain;padding:8px;margin-top:8px;border:1px solid var(--line);border-radius:10px;background:#08080a}
+.admin-logo-preview--light{background:#fff}
+.admin-field-preview{display:block;width:min(100%,420px);max-height:220px;object-fit:cover;margin-top:10px;border:1px solid var(--line);border-radius:10px}
+.admin-field-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:10px}
+.admin-field-gallery__item{min-width:0;display:grid;gap:6px}
+.admin-field-gallery__item img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.target-card__image{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.field-card__image{display:block;width:100%;height:100%;object-fit:cover}
+.field-gallery__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.field-gallery__grid figure{margin:0;overflow:hidden;border-radius:12px;background:var(--surface)}
+.field-gallery__grid img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+@media(max-width:640px){.field-gallery__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.pmrs-foot-lockup__mark{width:40px;height:40px}}
+
+.pmrs-target-home .target-sticky{isolation:isolate}
+.pmrs-target-home .target-hero-poster{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;pointer-events:none}
+.pmrs-target-home .target-hero-poster img{display:block;width:min(64vw,780px);height:min(90vh,900px);object-fit:contain;margin-right:clamp(1rem,7vw,8rem);opacity:.52;mix-blend-mode:screen}
+.pmrs-target-home .target-canvas{z-index:1;pointer-events:none}
+.pmrs-target-home .target-canvas[hidden]{display:none!important}
+.pmrs-target-home .target-hero{z-index:2}
+.pmrs-target-home .target-side,.pmrs-target-home .target-call,.pmrs-target-home .target-count{z-index:2}
+html[data-theme="light"] .pmrs-target-home .target-hero-poster img{opacity:.16}
+@media(max-width:760px){
+  .pmrs-target-home .target-hero-poster{align-items:flex-end;justify-content:center}
+  .pmrs-target-home .target-hero-poster img{width:min(96vw,540px);height:auto;max-height:65vh;margin:0 -8% -4% 0;opacity:.34}
+  html[data-theme="light"] .pmrs-target-home .target-hero-poster img{opacity:.12}
+}

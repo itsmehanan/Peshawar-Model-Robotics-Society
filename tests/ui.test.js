@@ -137,6 +137,8 @@ await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
   assert.match(text(), /Fields of entry/);
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
+  assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
+  assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
   // The cover plate is a real studio render shipped as a static asset
   // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
   const plate = q('.plate .plate__object');
@@ -419,10 +421,34 @@ await test('admin students table lists the registered student', async () => {
   await waitFor(() => text().includes('ui-student@test.local'), 8000, 'students table');
 });
 
-await test('admin branding form renders current site name', async () => {
+await test('admin branding form exposes PMRSDC and both theme logos', async () => {
   window.location.hash = '#/admin/site';
   await waitFor(() => q('#settingsForm'), 8000, 'site settings');
-  assert.equal(q('#settingsForm').elements.name.value, 'PMRS');
+  assert.equal(q('#settingsForm').elements.name.value, 'PMRSDC');
+  assert.equal(q('#settingsForm').elements.campusName.value, 'Dalazak Campus');
+  assert.ok(q('#settingsForm').elements.logoMarkDarkUrl.value.includes('pmrs-logo-dark'));
+  assert.ok(q('#settingsForm').elements.logoMarkLightUrl.value.includes('pmrs-logo-light'));
+  assert.ok(q('#settingsForm').elements.copyright, 'copyright text is editable too');
+});
+
+await test('contact settings can save their social labels without errors', async () => {
+  window.location.hash = '#/admin/contact';
+  await waitFor(() => q('#settingsForm') && q('[data-social-row] [data-key="label"]'), 8000, 'contact settings');
+  const form = q('#settingsForm');
+  assert.ok(form.querySelector('[data-social-row] [data-key="label"]'), 'social label input exists');
+  form.dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  await waitFor(() => q('#toastStack')?.textContent.includes('Settings saved'), 8000, 'contact settings saved');
+});
+
+await test('field editor requires a front image and supports extra uploads', async () => {
+  window.location.hash = '#/admin/fields';
+  await waitFor(() => q('[data-action="new-field"]'), 8000, 'fields admin');
+  q('[data-action="new-field"]').click();
+  await waitFor(() => q('#fieldFormModal'), 3000, 'field editor modal');
+  assert.equal(q('#fieldFormModal').elements.imageUrl.required, true);
+  assert.ok(q('[data-field-front]'), 'front image upload control exists');
+  assert.equal(q('[data-field-gallery]').multiple, true, 'additional images support multiple files');
+  q('#modalRoot [data-modal-close]').click();
 });
 
 await test('approving the pending request moves the team field', async () => {
@@ -483,13 +509,9 @@ const failed = results.filter((r) => !r.ok);
 /* ------------------------------------------------------------------ brand */
 
 await test('the logo is the PMRS emblem, not a letter in a box', async () => {
-  const mark = q('.site-head .brand__img');
-  assert.ok(mark, 'the header shows a logo image');
-  const src = mark.getAttribute('src');
-  assert.ok(
-    src === '/assets/logo-mark.svg' || src.startsWith('http'),
-    `expected the SVG emblem, got ${src}`,
-  );
+  const mark = q('.site-head .brand__mark-crop .pmrs-logo-dark');
+  assert.ok(mark, 'the header shows the dark logo emblem');
+  assert.ok(mark.getAttribute('src').includes('pmrs-logo-dark'), 'the header uses the uploaded PMRSDC mark');
   // The old mark was a rotated <span> holding a monogram. It must be gone, or the
   // favicon, header and footer disagree about what the society looks like.
   assert.equal(q('.site-head .brand__mark'), null, 'the monogram box is gone');
@@ -513,15 +535,16 @@ await test('the footer carries the horizontal lockup, in both theme variants', a
 
   const lockup = q('#siteFoot .foot__lockup');
   const images = [...lockup.querySelectorAll('img')];
-  assert.equal(images.length, 2, 'one lockup per theme');
-  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full.svg'), 'the dark lockup');
-  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full-light.svg'), 'the light lockup');
+  assert.equal(images.length, 2, 'one logo per theme');
+  assert.ok(images.some((i) => i.classList.contains('pmrs-logo-dark') && i.getAttribute('src').includes('pmrs-logo-dark')), 'the dark logo');
+  assert.ok(images.some((i) => i.classList.contains('pmrs-logo-light') && i.getAttribute('src').includes('pmrs-logo-light')), 'the light logo');
+  assert.ok(lockup.querySelector('.pmrs-foot-lockup__copy'), 'the lockup carries the editable campus wordmark');
   assert.ok(lockup.getAttribute('aria-label'), 'the link is named for screen readers');
 
   // The navbar keeps the compact emblem, so the two variants do different jobs.
-  const head = q('#siteHead .brand__img');
+  const head = q('#siteHead .brand__mark-crop .pmrs-logo-dark');
   assert.ok(head, 'the navbar still uses the compact mark');
-  assert.equal(head.getAttribute('src'), '/assets/logo-mark.svg');
+  assert.ok(head.getAttribute('src').includes('pmrs-logo-dark'), 'the navbar uses the same editable logo as the footer');
 });
 
 /* ------------------------------------------------------------------ theme */

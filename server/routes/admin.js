@@ -349,13 +349,18 @@ adminRouter.post(
     const summary = str(body.summary, { max: 180, field: 'Summary', required: true });
     const details = multiline(body.details, { max: 4000, field: 'Details' });
     const rules = multiline(body.rules, { max: 2000, field: 'Rules' });
+    const imageUrl = vUrl(body.imageUrl, { field: 'Front image', allowEmpty: false });
+    const images = Array.isArray(body.images) ? body.images.map((url) =>
+      vUrl(url, { field: 'Additional image', allowEmpty: false }),
+    ) : [];
+    if (images.length > 8) throw new ValidationError('A field can have up to 8 additional images.', { images: 'too_many' });
     const exists = await q1('SELECT id FROM categories WHERE id=$1', [id]);
     if (exists) throw new ValidationError('A category with that link already exists.', { id: 'taken' });
     const { rows } = await query('SELECT coalesce(max(sort_order),0)+1 AS next FROM categories');
     await query(
-      `INSERT INTO categories (id, name, symbol, summary, details, rules, accent, image_url, sort_order, is_active)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-      [id, name, symbol, summary, details, rules, str(body.accent, { max: 20, field: 'Accent' }), vUrl(body.imageUrl), rows[0].next, body.isActive === false ? false : true],
+      `INSERT INTO categories (id, name, symbol, summary, details, rules, accent, image_url, images, sort_order, is_active)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+      [id, name, symbol, summary, details, rules, str(body.accent, { max: 20, field: 'Accent' }), imageUrl, JSON.stringify(images), rows[0].next, body.isActive === false ? false : true],
     );
     await audit('admin', req.admin.id, 'category.create', { id });
     res.status(201).json({ ok: true, categories: await categoryRows({ activeOnly: false }) });
@@ -368,9 +373,16 @@ adminRouter.patch(
     const existing = await q1('SELECT * FROM categories WHERE id=$1', [req.params.id]);
     if (!existing) fail(404, 'Category not found.');
     const body = req.body || {};
+    const imageUrl = vUrl(body.imageUrl ?? existing.image_url, { field: 'Front image', allowEmpty: false });
+    const images = body.images === undefined
+      ? (existing.images || [])
+      : Array.isArray(body.images)
+        ? body.images.map((url) => vUrl(url, { field: 'Additional image', allowEmpty: false }))
+        : (() => { throw new ValidationError('Additional images must be a list.', { images: 'invalid' }); })();
+    if (images.length > 8) throw new ValidationError('A field can have up to 8 additional images.', { images: 'too_many' });
     await query(
       `UPDATE categories SET name=$1, symbol=$2, summary=$3, details=$4, rules=$5, accent=$6,
-              image_url=$7, is_active=$8, sort_order=$9 WHERE id=$10`,
+              image_url=$7, images=$8, is_active=$9, sort_order=$10 WHERE id=$11`,
       [
         str(body.name ?? existing.name, { min: 2, max: 60, field: 'Name', required: true }),
         str(body.symbol ?? existing.symbol, { max: 4, field: 'Symbol' }) || '◇',
@@ -378,7 +390,8 @@ adminRouter.patch(
         multiline(body.details ?? existing.details, { max: 4000, field: 'Details' }),
         multiline(body.rules ?? existing.rules, { max: 2000, field: 'Rules' }),
         str(body.accent ?? existing.accent, { max: 20, field: 'Accent' }),
-        vUrl(body.imageUrl ?? existing.image_url),
+        imageUrl,
+        JSON.stringify(images),
         body.isActive === undefined ? existing.is_active : bool(body.isActive),
         int(body.sortOrder ?? existing.sort_order, { min: 0, max: 999, field: 'Order' }),
         existing.id,
@@ -532,8 +545,11 @@ adminRouter.put(
         tagline: str(body.tagline, { max: 160, field: 'Tagline' }),
         description: multiline(body.description, { max: 600, field: 'Description' }),
         metaDescription: multiline(body.metaDescription, { max: 300, field: 'Meta description' }),
-        logoMark: str(body.logoMark || 'O', { max: 3, field: 'Logo mark' }),
-        logoUrl: vUrl(body.logoUrl),
+        campusName: str(body.campusName ?? current.campusName ?? 'Dalazak Campus', { max: 60, field: 'Campus name' }),
+        logoMark: str(body.logoMark ?? current.logoMark ?? 'P', { max: 3, field: 'Logo mark' }),
+        logoMarkDarkUrl: vUrl(body.logoMarkDarkUrl ?? current.logoMarkDarkUrl ?? '/assets/pmrs-logo-dark.jpg'),
+        logoMarkLightUrl: vUrl(body.logoMarkLightUrl ?? current.logoMarkLightUrl ?? '/assets/pmrs-logo-light.jpg'),
+        logoUrl: vUrl(body.logoUrl ?? current.logoUrl),
         faviconUrl: vUrl(body.faviconUrl),
         footerNote: str(body.footerNote, { max: 200, field: 'Footer note' }),
       };

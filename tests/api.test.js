@@ -88,6 +88,8 @@ await test('content endpoint returns site, categories and faqs', async () => {
   assert.equal(status, 200);
   assert.ok(body.site.name.length > 0);
   assert.equal(body.categories.length, 4);
+  assert.ok(body.categories[0].details !== undefined, 'public fields include the saved full brief');
+  assert.ok(Array.isArray(body.categories[0].images), 'public fields include the image gallery');
   assert.ok(body.faqs.length >= 3);
 });
 
@@ -439,12 +441,26 @@ await test('registration can be closed and re-opened', async () => {
   await admin('PUT', '/api/admin/settings/registration', { ...registration, open: true });
 });
 
-await test('branding updates reach the public content payload', async () => {
+await test('uploaded logos and campus settings save to the public content payload', async () => {
   const current = await admin('GET', '/api/admin/settings');
-  const site = { ...current.body.settings.site, name: 'ORBIT TEST', logoMark: 'T' };
-  await admin('PUT', '/api/admin/settings/site', site);
+  const uploaded = await admin('POST', '/api/admin/assets', {
+    dataUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/FZ0AAAAASUVORK5CYII=',
+  });
+  assert.equal(uploaded.status, 201);
+  assert.ok(uploaded.body.url.startsWith('/api/assets/'));
+  const site = {
+    ...current.body.settings.site,
+    name: 'PMRSDC TEST',
+    campusName: 'Dalazak Campus',
+    logoMarkDarkUrl: uploaded.body.url,
+    logoMarkLightUrl: '/assets/pmrs-logo-light.jpg',
+  };
+  const saved = await admin('PUT', '/api/admin/settings/site', site);
+  assert.equal(saved.status, 200, JSON.stringify(saved.body));
   const content = await client('GET', '/api/content');
-  assert.equal(content.body.site.name, 'ORBIT TEST');
+  assert.equal(content.body.site.name, 'PMRSDC TEST');
+  assert.equal(content.body.site.logoMarkDarkUrl, uploaded.body.url);
+  assert.equal(content.body.site.logoMarkLightUrl, '/assets/pmrs-logo-light.jpg');
 });
 
 await test('csv export is gated and returns CSV for admins', async () => {
@@ -491,8 +507,16 @@ await test('an unused category can be deleted', async () => {
     name: 'Test Field',
     symbol: '◎',
     summary: 'A temporary field for the test suite.',
+    details: 'The full brief is stored and returned to public pages.',
+    imageUrl: '/assets/pmrs-logo-dark.jpg',
+    images: ['/assets/pmrs-logo-light.jpg'],
   });
-  assert.equal(created.status, 201);
+  assert.equal(created.status, 201, JSON.stringify(created.body));
+  const content = await client('GET', '/api/content');
+  const field = content.body.categories.find((item) => item.id === 'test-field');
+  assert.equal(field.details, 'The full brief is stored and returned to public pages.');
+  assert.equal(field.imageUrl, '/assets/pmrs-logo-dark.jpg');
+  assert.deepEqual(field.images, ['/assets/pmrs-logo-light.jpg']);
   const { status } = await admin('DELETE', '/api/admin/categories/test-field');
   assert.equal(status, 200);
 });

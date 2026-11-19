@@ -10,18 +10,19 @@ export const DEFAULT_SETTINGS = {
   site: {
     // The organisation is the identity; an acronym alone tells a first-time
     // visitor nothing, so the full name always appears alongside it.
-    name: 'PMRS',
-    fullName: 'Peshawar Model Robotics Society',
+    name: 'PMRSDC',
+    fullName: 'Peshawar Model Robotics Society — Dalazak Campus',
+    campusName: 'Dalazak Campus',
     tagline: 'Innovate · Build · Compete',
     description:
       'The student robotics and engineering society of Peshawar Model School — where students design, build and compete with machines they made themselves.',
     logoMark: 'P',
-    // Empty means "use the built-in SVG identity" (logo-mark.svg / favicon.svg),
-    // which is the shipped brand. Set a URL only to override it.
+    logoMarkDarkUrl: '/assets/pmrs-logo-dark.jpg',
+    logoMarkLightUrl: '/assets/pmrs-logo-light.jpg',
     logoUrl: '',
     faviconUrl: '',
     metaDescription:
-      'Peshawar Model Robotics Society — a student robotics and engineering society in Peshawar. Register your team, choose a field of entry and present the machine you built.',
+      'Peshawar Model Robotics Society — Dalazak Campus. Register your team, choose a field of entry and present the machine you built.',
     footerNote: 'Run by students, for students.',
   },
   event: {

@@ -22,9 +22,16 @@ export function artPicture(base, { width, height, eager = false, className = '' 
 
 
 const pad=n=>String(n).padStart(2,'0');
+function logoMark(site){
+  const dark=site.logoMarkDarkUrl||'/assets/pmrs-logo-dark.jpg';
+  const light=site.logoMarkLightUrl||'/assets/pmrs-logo-light.jpg';
+  return '<span class="pmrs-logo-crop target-logo__mark" aria-hidden="true"><img class="pmrs-logo-dark" src="'+esc(dark)+'" alt="" width="1536" height="1536"><img class="pmrs-logo-light" src="'+esc(light)+'" alt="" width="1536" height="1536"></span>';
+}
 function fieldCard(category,index){
-  const key=['robotics','science','engineering','technology'].includes(category.id)?category.id:'technology';
-  return '<a class="target-card" href="#/fields/'+esc(category.id)+'" data-link><span class="target-card__num">'+pad(index+1)+'</span>'+artPicture(fieldArt(category.id),{width:320,height:320})+'<h3>'+esc(category.name)+'</h3><span class="target-card__go" aria-hidden="true">↗</span></a>';
+  const media=category.imageUrl
+    ? '<img class="target-card__image" src="'+esc(category.imageUrl)+'" alt="'+esc(category.name)+'" width="880" height="660" loading="lazy" decoding="async">'
+    : artPicture(fieldArt(category.id),{width:320,height:320});
+  return '<a class="target-card" href="#/fields/'+esc(category.id)+'" data-link><span class="target-card__num">'+pad(index+1)+'</span>'+media+'<h3>'+esc(category.name)+'</h3><span class="target-card__go" aria-hidden="true">↗</span></a>';
 }
 function journalCard(article){
   return '<a class="target-journal-card" href="#/journal/'+esc(article.slug)+'" data-link><span class="lab">'+esc(article.label)+' · '+article.readMinutes+' MIN READ</span><h3>'+esc(article.title)+'</h3><p>'+esc(article.excerpt)+'</p><span class="target-card__go" aria-hidden="true">↗</span></a>';
@@ -47,11 +54,12 @@ export function homePage(){
   const socialsHtml=socials.map(s=>'<a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.label||s.handle||s.platform)+' ↗</a>').join('');
   return '<div class="view pmrs-target-home">'+
     '<nav class="target-nav" aria-label="Primary navigation"><div class="target-wrap target-nav__inner">'+
-    '<a class="target-logo" href="#/" data-link><i aria-hidden="true"></i> '+esc(site.name||'PMRS')+' <span>2026</span></a>'+
+    '<a class="target-logo" href="#/" data-link>'+logoMark(site)+'<span class="target-logo__name">'+esc(site.name||'PMRSDC')+'</span><small>'+esc([site.campusName||'Dalazak Campus',site.tagline].filter(Boolean).join(' · '))+'</small></a>'+
     '<div class="target-links"><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a></div>'+
     '<div class="target-nav__actions"><button class="theme-toggle target-theme" type="button" data-theme-toggle aria-label="Switch theme"><span aria-hidden="true">◐</span></button>'+navAction+registerAction+'<button class="target-menu-toggle" type="button" data-target-menu-toggle aria-expanded="false" aria-controls="target-mobile-menu" aria-label="Open menu"><span></span><span></span></button></div></div><div class="target-mobile-menu" id="target-mobile-menu" hidden><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a><a href="#/login" data-link>Sign in</a></div></nav>'+
     '<section class="target-stage" id="top" data-hero-stage><div class="target-sticky">'+
-    '<canvas class="target-canvas" data-hero-canvas aria-label="Glass and metal robotics module, rotating and separating into layers as you scroll" role="img"></canvas>'+
+    '<picture class="target-hero-poster" aria-hidden="true"><img src="/assets/art/hero.webp" alt="" width="1000" height="1000" fetchpriority="high" decoding="async"></picture>'+
+    '<canvas class="target-canvas" data-hero-canvas hidden aria-label="Glass and metal robotics module, rotating and separating into layers as you scroll" role="img"></canvas>'+
     '<div class="target-hero"><div class="target-wrap"><div class="target-hero__copy" data-hero-copy><span class="lab">[ '+esc((event.kicker||'Season 04').toUpperCase())+' — 2026 · '+esc((event.city||'PESHAWAR, PAKISTAN').toUpperCase())+' ]</span>'+
     '<h1>'+headline(event.headline)+'</h1><p>'+esc(event.intro||'One day. Four fields. Hundreds of students presenting the work they made when nobody told them what to make. PMRS is where school science stops being a worksheet and becomes a public exhibition.')+'</p>'+
     '<div class="target-cta"><a class="target-btn target-btn--primary" href="'+href+'" data-link>'+esc(label)+' <b>↗</b></a><a class="target-btn target-btn--outline" href="#fields" data-scroll>Explore the fields</a></div></div></div></div>'+
@@ -67,7 +75,7 @@ export function homePage(){
     '<section class="target-journal" id="journal"><div class="target-wrap"><div class="target-section-head"><h2>Field notes for<br><span>first-time exhibitors.</span></h2><a href="#/journal" class="target-text-link" data-link>All writing ↗</a></div><div class="target-journal-grid">'+(articles.length?articles.map(journalCard).join(''):'<p class="lab">New field notes will be published here.</p>')+'</div></div></section>'+
     (faqs.length?'<section class="target-faq"><div class="target-wrap target-faq__grid"><div><span class="lab">[ Questions ]</span><h2>Good to know.</h2></div><div class="faq" data-faq>'+faqHtml+'</div></div></section>':'')+
     '<section class="target-end" id="register"><div class="target-wrap"><span class="lab">[ Season 04 ]</span><h2>'+(registration.open===false?'The next exhibition starts here.':'Bring the thing you made.')+'</h2><p>'+esc(registration.open===false?(registration.closedMessage||'Contact the coordination desk to learn when the next season opens.'):'Teams register in minutes. You keep control of your profile, your team and your field — and you can change all of it from your dashboard.')+'</p><a class="target-btn target-btn--primary" href="'+href+'" data-link>'+esc(label)+' <b>↗</b></a></div></section>'+
-    '<footer class="target-footer" id="contact"><div class="target-wrap"><a class="target-logo" href="#/" data-link><i aria-hidden="true"></i> '+esc(site.name||'PMRS')+' <span>2026</span></a><span>'+esc(site.fullName||'Peshawar Model Robotics Society')+'</span><span>'+esc(contact.address||event.city||'Peshawar, Pakistan')+'</span><div class="target-footer__links">'+(contact.email?'<a href="mailto:'+esc(contact.email)+'">'+esc(contact.email)+'</a>':'')+socialsHtml+'</div></div></footer>'+
+    '<footer class="target-footer" id="contact"><div class="target-wrap"><a class="target-logo" href="#/" data-link>'+logoMark(site)+'<span class="target-logo__name">'+esc(site.name||'PMRSDC')+'</span><small>'+esc(site.campusName||'Dalazak Campus')+'</small></a><span>'+esc(site.fullName||'Peshawar Model Robotics Society — Dalazak Campus')+'</span><span>'+esc(contact.address||event.city||'Peshawar, Pakistan')+'</span><div class="target-footer__links">'+(contact.email?'<a href="mailto:'+esc(contact.email)+'">'+esc(contact.email)+'</a>':'')+socialsHtml+'</div></div></footer>'+
     '<div class="target-legacy-assets" aria-hidden="true"><span class="sr-only">Fields of entry</span>'+
     '<div class="plate"><div class="plate__object"><picture><source media="(max-width: 640px)" type="image/webp" srcset="/assets/art/hero-sm.webp"><source media="(max-width: 640px)" srcset="/assets/art/hero-sm.png"><source type="image/webp" srcset="/assets/art/hero.webp"><img src="/assets/art/hero-sm.png" alt="" width="800" height="800"></picture></div><div class="plate__guides"></div><div class="plate__ticks"><span></span></div></div>'+
     ['robotics','science','engineering','technology'].map(id=>'<div class="field-card"><div class="field-card__media"><picture><source media="(max-width: 640px)" type="image/webp" srcset="/assets/art/field-'+id+'-sm.webp"><source media="(max-width: 640px)" srcset="/assets/art/field-'+id+'-sm.png"><source type="image/webp" srcset="/assets/art/field-'+id+'.webp"><img src="/assets/art/field-'+id+'-sm.png" alt="" width="880" height="660"></picture></div></div>').join('')+
