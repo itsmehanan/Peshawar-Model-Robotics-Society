@@ -144,7 +144,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     top.position.y=.62+explode*1.5;
     bottom.position.y=-.62-explode*1;
     mid.position.y=explode*.25;
-    hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene?.9:.82);
+    hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene ? 0.9 : 0.82);
     hero.rotation.x=.42+my*.48-explode*.12;
     hero.position.x=baseX+mx*.13;
     hero.position.y=baseY-my*.10;
