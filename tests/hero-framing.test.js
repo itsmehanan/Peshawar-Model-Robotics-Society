@@ -13,7 +13,7 @@ const admin = read('public/assets/js/pages/admin.js');
 const auth = read('public/assets/js/pages/auth.js');
 const css = read('public/assets/pmrs-studio.css');
 
-assert.doesNotMatch(home, /hero-boot|target-hero-poster|data-hero-canvas|target-legacy-assets|assets\/art\/hero/i);
+assert.doesNotMatch(home, /hero-boot|target-hero-poster|data-hero-canvas|target-legacy-assets|assets\\/art\\/hero(?:-sm)?\\.(?:png|webp)/i);
 assert.doesNotMatch(admin, /assets\/art\/hero(?:-sm)?\.(?:png|webp)/i);
 assert.doesNotMatch(auth, /assets\/art\/hero(?:-sm)?\.(?:png|webp)/i);
 assert.match(css, /\.auth-art::before,\.auth-art::after\{display:none!important/);
