@@ -141,6 +141,7 @@ await test('renders the hero, nav and footer from API content', async () => {
   assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
   // The original glass object is back, while its static gear poster stays absent.
   assert.ok(q('[data-hero-canvas]'), 'homepage retains its interactive 3D canvas');
+  assert.equal(qAll('[data-hero-call]').length, 4, 'homepage has four scroll-revealed field callouts');
   assert.equal(q('.target-hero-poster'), null, 'the gear poster remains removed');
   assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork remains absent');
   const cardMedia = q('.target-card img');
@@ -459,6 +460,7 @@ await test('homepage restores the glass 3D canvas without the gear poster', asyn
   await waitFor(() => q('[data-hero-stage]'), 5000, 'homepage stage');
   assert.equal(q('.target-hero-poster'), null);
   assert.ok(q('[data-hero-canvas]'));
+  assert.equal(document.querySelectorAll('[data-hero-call]').length, 4, 'four field callouts are present for the scroll sequence');
   assert.equal(q('.target-hero-poster'), null);
   assert.equal(q('.target-legacy-assets'), null);
 });

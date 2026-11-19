@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - fix/admin-cms-branding-field-media
+      - polish-hero-scroll-interaction-and-auth-3d
 
 permissions:
   contents: read
