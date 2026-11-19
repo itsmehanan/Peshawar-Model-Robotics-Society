@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PMRS 2026 — Build something the future needs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070809;--s1:#101113;--s2:#17181b;--line:rgba(255,255,255,.1);--tx:#f4f4f2;--mu:#a3a3a0;--ac:#ff5a1f;--paper:#e8e7e3;--ink:#0b0b0c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px;color-scheme:dark}
+body{background:var(--bg);color:var(--tx);font:400 17px/1.6 "Inter Tight",system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.lab{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(20px,4vw,48px)}
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:rgba(7,8,9,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+nav .wrap{height:68px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-weight:600;letter-spacing:.08em;font-size:15px;display:flex;align-items:center;gap:10px}
+.logo i{width:22px;height:22px;border:2px solid var(--tx);border-radius:50%;position:relative;display:inline-block}
+.logo i:after{content:"";position:absolute;left:50%;top:50%;width:8px;height:2px;background:var(--ac);transform:translate(-50%,-50%) rotate(-45deg)}
+.links{display:flex;gap:34px;font-size:14px;color:var(--mu)}
+.links a:hover{color:var(--tx)}
+.btn{display:inline-flex;align-items:center;gap:12px;height:48px;padding:0 8px 0 24px;border-radius:99px;font-weight:500;font-size:15px;transition:transform .2s,background .2s,border-color .2s;white-space:nowrap}
+.btn:focus-visible,a:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+.btn.p{background:var(--tx);color:var(--ink)}
+.btn.p b{width:34px;height:34px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-weight:500}
+.btn.p:hover{transform:translateY(-2px)}
+.btn.o{border:1px solid rgba(255,255,255,.28);padding:0 24px}
+.btn.o:hover{border-color:var(--tx)}
+.btn.s{height:40px;padding:0 18px;font-size:14px}
+.nr{display:flex;gap:10px;align-items:center}
+/* hero stage */
+.stage{height:260vh;position:relative}
+.sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:radial-gradient(ellipse 60% 55% at 70% 50%,#101a26 0%,rgba(7,8,9,0) 70%)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero{position:absolute;inset:0;display:flex;align-items:center;pointer-events:none}
+.hero .wrap{width:100%}
+.hero .in{max-width:640px;pointer-events:auto}
+.hero .lab{margin-bottom:26px;display:block}
+h1{font-weight:500;font-size:clamp(46px,8.2vw,124px);line-height:.94;letter-spacing:-.035em;text-transform:uppercase}
+h1 span{color:#7b7d80}
+h1 em{font-style:normal;color:var(--ac)}
+.hero p{margin:28px 0 34px;max-width:480px;color:var(--mu);font-size:clamp(16px,1.5vw,19px)}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.side{position:absolute;right:clamp(20px,4vw,48px);top:110px;text-align:right;line-height:1.9}
+.cnt{position:absolute;left:clamp(20px,4vw,48px);bottom:calc(32px + env(safe-area-inset-bottom,0px));display:flex;gap:16px;align-items:center}
+.cnt:after{content:"";width:120px;height:1px;background:var(--line)}
+.call{position:absolute;right:clamp(20px,4vw,48px);opacity:0;display:flex;align-items:center;gap:14px;flex-direction:row-reverse;font-size:15px;pointer-events:none}
+.call:before{content:"";width:clamp(60px,9vw,140px);height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6))}
+.call b{font-weight:500;display:block}
+.call small{display:block;color:var(--mu);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+#c1{top:30%}#c2{top:50%}#c3{top:70%}
+@media(max-width:860px){.side,.call{display:none}.hero{align-items:flex-start;padding-top:110px}.hero .in{max-width:none}h1{font-size:clamp(40px,12vw,64px)}.hero p{margin:18px 0 22px}}
+/* paper info */
+.paper{background:var(--paper);color:var(--ink);clip-path:polygon(0 0,calc(100% - 56px) 0,100% 56px,100% 100%,0 100%);padding:clamp(56px,8vw,110px) 0}
+.paper .lab{color:#55554f}
+.paper h2{font-size:clamp(36px,5.5vw,76px);font-weight:500;line-height:1;letter-spacing:-.03em;text-transform:uppercase;margin:18px 0 0;max-width:12ch}
+.paper h2 em{font-style:normal;color:var(--ac)}
+.pg{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(30px,6vw,90px);align-items:end}
+.stats div{border-top:1px solid rgba(0,0,0,.18);padding:22px 0}
+.stats strong{display:block;font-weight:500;font-size:clamp(26px,3.4vw,46px);line-height:1.1;letter-spacing:-.02em}
+.stats .lab{display:block;margin-top:8px}
+@media(max-width:860px){.pg{grid-template-columns:1fr}.paper h2{max-width:none}}
+/* fields */
+section.f{padding:clamp(70px,10vw,140px) 0 clamp(40px,6vw,80px)}
+.fh{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:end;margin-bottom:56px}
+.fh h2{font-size:clamp(34px,5vw,68px);font-weight:500;line-height:1;letter-spacing:-.03em}
+.fh h2 span{color:#7b7d80}
+.fh p{color:var(--mu);max-width:420px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.card{position:relative;background:linear-gradient(180deg,var(--s2),var(--s1));border:1px solid var(--line);padding:22px;min-height:400px;display:flex;flex-direction:column;justify-content:space-between;clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,0 100%);transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .3s}
+.card:nth-child(2){margin-top:56px}.card:nth-child(4){margin-top:56px}
+.card:hover{transform:translateY(-8px);border-color:rgba(255,90,31,.6)}
+.card .n{color:var(--mu);font-size:13px;letter-spacing:.14em}
+.card img{width:100%;aspect-ratio:1;object-fit:contain;margin:6px 0 14px;filter:drop-shadow(0 24px 30px rgba(0,0,0,.6))}
+.card h3{font-weight:500;font-size:22px;line-height:1.15;letter-spacing:-.01em;padding-right:44px}
+.card .go{position:absolute;right:20px;bottom:20px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;transition:background .2s,border-color .2s}
+.card:hover .go{background:var(--ac);border-color:var(--ac)}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.card:nth-child(n){margin-top:0}.card:nth-child(even){margin-top:40px}.fh{grid-template-columns:1fr}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.card:nth-child(even){margin-top:0}.card{min-height:0}}
+/* process */
+section.pr{padding:clamp(60px,8vw,110px) 0;border-top:1px solid var(--line)}
+.pr h2{font-size:clamp(32px,4.6vw,62px);font-weight:500;line-height:1;letter-spacing:-.03em;margin:16px 0 60px;max-width:14ch}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative}
+.steps:before{content:"";position:absolute;left:0;right:0;top:8px;height:1px;background:var(--line)}
+.step{position:relative;padding-top:42px}
+.step:before{content:"";position:absolute;top:2px;left:0;width:13px;height:13px;border-radius:50%;background:var(--bg);border:1px solid var(--tx)}
+.step:first-child:before{background:var(--ac);border-color:var(--ac)}
+.step .lab{display:block;margin-bottom:10px}
+.step h3{font-weight:500;font-size:24px;margin-bottom:10px;letter-spacing:-.01em}
+.step p{color:var(--mu);max-width:340px}
+@media(max-width:760px){.steps{grid-template-columns:1fr}.steps:before{display:none}.step{padding:0 0 0 34px}.step:before{top:6px}}
+/* closing */
+.end{position:relative;text-align:center;padding:clamp(90px,14vw,190px) 0 clamp(150px,20vw,260px);overflow:hidden;border-top:1px solid var(--line)}
+.end:after{content:"";position:absolute;left:50%;bottom:-62vw;width:130vw;height:80vw;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 0,#0b0d10 58%,#0b0d10 60%);box-shadow:0 -2px 0 rgba(255,255,255,.35),0 -16px 60px rgba(120,170,255,.35),0 -80px 160px rgba(255,90,31,.18);pointer-events:none}
+.end .wrap{position:relative;z-index:2}
+.end h2{font-size:clamp(40px,7vw,104px);font-weight:500;line-height:.96;letter-spacing:-.035em;text-transform:uppercase;margin:18px auto 36px;max-width:12ch}
+.end p{color:var(--mu);max-width:520px;margin:0 auto 36px}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mu);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer nav{all:unset}
+@media(max-width:760px){.links{display:none}.btn.s.hide{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#top"><i></i>PMRS <span class="lab" style="letter-spacing:.1em">2026</span></a>
+  <div class="links"><a href="#fields">Fields</a><a href="#journal">Journal</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+  <div class="nr"><a class="btn o s hide" href="#signin">Sign in</a><a class="btn p s" href="#register" style="padding-left:18px">Register <b style="width:28px;height:28px">↗</b></a></div>
+</div></nav>
+
+<div class="stage" id="top">
+ <div class="sticky">
+  <canvas id="gl" aria-label="Interactive 3D robotics module that separates into layers as you scroll" role="img"></canvas>
+  <div class="hero"><div class="wrap"><div class="in" id="txt">
+    <span class="lab">[ Season 04 — 2026 · Peshawar, Pakistan ]</span>
+    <h1>Build something <span>the future <em>needs.</em></span></h1>
+    <p>One day. Four fields. Hundreds of students presenting the work they made when nobody told them what to make. PMRS is where school science stops being a worksheet and becomes a public exhibition.</p>
+    <div class="cta"><a class="btn p" href="#register">Register your team <b>↗</b></a><a class="btn o" href="#fields">Explore the fields</a></div>
+  </div></div></div>
+  <div class="side lab">Robotics<br>AI &amp; Vision<br>Sensors<br>Engineering</div>
+  <div class="call" id="c1"><div><b>Robotics &amp; AI</b><small>Field 01</small></div></div>
+  <div class="call" id="c2"><div><b>Engineering &amp; Design</b><small>Field 03</small></div></div>
+  <div class="call" id="c3"><div><b>Future Technology</b><small>Field 04</small></div></div>
+  <div class="cnt lab"><span>01 / 04</span></div>
+ </div>
+</div>
+
+<section class="paper" id="about"><div class="wrap pg">
+  <div><span class="lab">[ The exhibition ]</span><h2>A working <em>exhibition.</em></h2></div>
+  <div class="stats">
+    <div><strong>Saturday, 14 March 2026</strong><span class="lab">Date</span></div>
+    <div><strong>Peshawar Model School Auditorium</strong><span class="lab">Venue</span></div>
+    <div><strong>Teams close on 28 February 2026</strong><span class="lab">Teams</span></div>
+  </div>
+</div></section>
+
+<section class="f" id="fields"><div class="wrap">
+  <div class="fh"><h2>Four ways to enter.<br><span>One exhibition floor.</span></h2>
+  <p>Every team presents in exactly one field. Choose the one that matches the work you actually built, not the one that sounds most impressive.</p></div>
+  <div class="grid">
+    <a class="card" href="#fields/robotics"><span class="n">01</span><img data-k="robotics" alt="Glass and metal robotic eye module"><h3>Robotics &amp; AI</h3><span class="go">↗</span></a>
+    <a class="card" href="#fields/science"><span class="n">02</span><img data-k="science" alt="Glass flask with glowing orange liquid"><h3>Science &amp; Discovery</h3><span class="go">↗</span></a>
+    <a class="card" href="#fields/engineering"><span class="n">03</span><img data-k="engineering" alt="Metal gear with orange core"><h3>Engineering &amp; Design</h3><span class="go">↗</span></a>
+    <a class="card" href="#fields/technology"><span class="n">04</span><img data-k="technology" alt="Glass microchip with metal pins"><h3>Future Technology</h3><span class="go">↗</span></a>
+  </div>
+</div></section>
+
+<section class="pr" id="journal"><div class="wrap">
+  <span class="lab">[ How it works ]</span>
+  <h2>Teams register in minutes.</h2>
+  <div class="steps">
+    <div class="step"><span class="lab">01</span><h3>Create your account</h3><p>Name, class, school, one field of entry. About forty seconds, and you can edit all of it later.</p></div>
+    <div class="step"><span class="lab">02</span><h3>Start or join a team</h3><p>Leaders create a team, set its size and share the passcode. Everyone else joins with that code — same school, same field.</p></div>
+    <div class="step"><span class="lab">03</span><h3>Build, then present</h3><p>Prepare the object and a two-minute explanation. Judges visit every booth and leave written feedback.</p></div>
+  </div>
+</div></section>
+
+<section class="end" id="register"><div class="wrap">
+  <span class="lab">[ Season 04 ]</span>
+  <h2>Bring the thing you made.</h2>
+  <p>Teams register in minutes. You keep control of your profile, your team and your field — and you can change all of it from your dashboard.</p>
+  <a class="btn p" href="#signin">Register your team <b>↗</b></a>
+</div></section>
+
+<footer id="contact"><div class="wrap"><a class="logo" href="#top"><i></i>PMRS 2026</a><span>Peshawar Model Robotics Society</span><span>Peshawar, Pakistan</span></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+(function(){
+  var cv=document.getElementById('gl');
+  if(!window.THREE){return}
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var R;
+  try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true})}catch(e){return}
+  R.setPixelRatio(Math.min(devicePixelRatio||1,2));
+  R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.15;
+  /* environment for reflections */
+  var es=new THREE.Scene();
+  es.add(new THREE.Mesh(new THREE.BoxGeometry(30,30,30),new THREE.MeshBasicMaterial({color:0x05070b,side:THREE.BackSide})));
+  function panel(w,h,x,y,z,c,i){var m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(i),side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);es.add(m)}
+  panel(14,5,0,12,4,0x9fc4ff,5);panel(5,14,-12,2,3,0xffffff,3);panel(4,10,12,0,-4,0xff5a1f,4);panel(12,3,0,-9,6,0x6f8fbf,2);panel(8,8,0,3,-12,0xffffff,1.5);
+  var pm=new THREE.PMREMGenerator(R),env=pm.fromScene(es,0.02).texture;pm.dispose();
+  var glass=new THREE.MeshPhysicalMaterial({color:0xffffff,metalness:0,roughness:.06,transmission:1,thickness:.7,ior:1.5,envMap:env,envMapIntensity:1.5,transparent:true,opacity:1,specularIntensity:1});
+  var metal=new THREE.MeshStandardMaterial({color:0xb8bcc2,metalness:1,roughness:.25,envMap:env,envMapIntensity:1.3});
+  var dark=new THREE.MeshStandardMaterial({color:0x0e1013,metalness:.6,roughness:.45,envMap:env});
+  var org=new THREE.MeshStandardMaterial({color:0xff5a1f,metalness:.1,roughness:.45,envMap:env,envMapIntensity:.8});
+  var glow=new THREE.MeshBasicMaterial({color:0x6fd0ff});
+  function box(w,h,d,m,x,y,z){var o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x||0,y||0,z||0);return o}
+  /* hero module */
+  var hero=new THREE.Group(),top=new THREE.Group(),mid=new THREE.Group(),bot=new THREE.Group();
+  top.add(box(2.2,.62,2.2,glass));bot.add(box(2.2,.62,2.2,glass));
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){top.add(box(.28,.5,.28,org,c[0]*1.02,-.04,c[1]*1.02));bot.add(box(.28,.5,.28,org,c[0]*1.02,.04,c[1]*1.02))});
+  bot.add(box(1.4,.12,.5,dark,0,-.05,1.1));
+  mid.add(box(1.8,.09,1.8,dark));
+  mid.add(box(.8,.14,.8,metal,0,.11,0));mid.add(box(.5,.06,.5,dark,0,.21,0));mid.add(box(.16,.05,.16,glow,.12,.25,.1));
+  for(var i=0;i<6;i++){mid.add(box(.22,.06,.1,metal,-.7+i*.28,.07,.72));mid.add(box(.1,.06,.22,metal,-.74,.07,-.5+i*.2))}
+  mid.add(box(.4,.1,.4,org,.55,.08,-.55));
+  top.position.y=.62;bot.position.y=-.62;
+  hero.add(top,mid,bot);hero.rotation.x=.42;
+  var scene=new THREE.Scene();scene.add(hero);
+  var key=new THREE.DirectionalLight(0xffffff,1.2);key.position.set(3,5,4);scene.add(key);
+  var cam=new THREE.PerspectiveCamera(32,1,.1,50);cam.position.set(0,0,9);
+  /* posters for field cards */
+  function poster(k){
+    var g=new THREE.Group(),s=new THREE.Scene(),i,m;
+    if(k==='robotics'){
+      var t=new THREE.Mesh(new THREE.TorusGeometry(1,.2,32,96),metal);g.add(t);
+      var t2=new THREE.Mesh(new THREE.TorusGeometry(.8,.08,24,96),org);t2.rotation.y=1.2;g.add(t2);
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(.62,48,48),glass));
+      var e=new THREE.Mesh(new THREE.SphereGeometry(.28,32,32),glow);g.add(e);
+    }else if(k==='science'){
+      g.add(new THREE.Mesh(new THREE.SphereGeometry(.85,64,64),glass));
+      var n=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.9,48,1,true),glass);n.position.y=1.0;g.add(n);
+      var l=new THREE.Mesh(new THREE.SphereGeometry(.62,48,48),org);l.position.y=-.12;g.add(l);
+      var r=new THREE.Mesh(new THREE.TorusGeometry(.3,.05,16,48),metal);r.rotation.x=Math.PI/2;r.position.y=1.45;g.add(r);
+    }else if(k==='engineering'){
+      var c=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,.4,48),metal);c.rotation.x=Math.PI/2;g.add(c);
+      for(i=0;i<12;i++){var a=i/12*Math.PI*2,tt=box(.3,.34,.4,metal,Math.cos(a)*1.05,Math.sin(a)*1.05,0);tt.rotation.z=a;g.add(tt)}
+      var h=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.46,40),org);h.rotation.x=Math.PI/2;g.add(h);
+      var hh=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.5,32),dark);hh.rotation.x=Math.PI/2;g.add(hh);
+    }else{
+      g.add(box(1.7,.55,1.7,glass,0,.0,0));g.add(box(1.0,.16,1.0,metal,0,-.02,0));g.add(box(.5,.18,.5,dark,0,.04,0));g.add(box(.1,.04,.1,glow,.1,.15,.1));
+      for(i=0;i<7;i++){var p=-.7+i*.233;g.add(box(.09,.05,.34,org,p,-.05,1.0));g.add(box(.09,.05,.34,org,p,-.05,-1.0));g.add(box(.34,.05,.09,org,1.0,-.05,p));g.add(box(.34,.05,.09,org,-1.0,-.05,p))}
+    }
+    g.rotation.set(.5,-.6,.05);s.add(g);
+    var d=new THREE.DirectionalLight(0xffffff,1.1);d.position.set(3,4,5);s.add(d);
+    return {s:s,g:g};
+  }
+  function bakePosters(){
+    var cam2=new THREE.PerspectiveCamera(30,1,.1,50);cam2.position.set(0,0,7.2);
+    var op=R.getPixelRatio(),sz=new THREE.Vector2();R.getSize(sz);
+    R.setPixelRatio(1);R.setSize(560,560,false);R.setClearColor(0x000000,0);
+    document.querySelectorAll('img[data-k]').forEach(function(im){
+      var p=poster(im.dataset.k);R.render(p.s,cam2);
+      try{im.src=cv.toDataURL('image/png')}catch(e){}
+    });
+    R.setPixelRatio(op);R.setSize(sz.x,sz.y,false);
+  }
+  /* sizing */
+  var vw=0,vh=0;
+  function size(){
+    var st=cv.parentElement,w=st.clientWidth,h=st.clientHeight;
+    if(w===vw&&h===vh)return;vw=w;vh=h;
+    R.setSize(w,h,false);cam.aspect=w/h;
+    var wide=w/h>1.15&&w>860;
+    cam.fov=wide?32:38;cam.updateProjectionMatrix();
+    hero.position.set(wide?2.1:0,wide?0:-1.55,0);
+    hero.scale.setScalar(wide?1:.78);
+  }
+  function sm(a,b,x){x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x)}
+  var stage=document.getElementById('top'),txt=document.getElementById('txt'),calls=['c1','c2','c3'].map(function(i){return document.getElementById(i)});
+  var mx=0,my=0,tx=0,ty=0;
+  addEventListener('pointermove',function(e){tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5)},{passive:true});
+  var vis=true;
+  if('IntersectionObserver' in window){new IntersectionObserver(function(en){vis=en[0].isIntersecting},{threshold:0}).observe(stage)}
+  var t0=performance.now();
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(!vis)return;
+    size();
+    var sc=stage.offsetHeight-innerHeight,p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/sc));
+    var e=sm(.08,.62,p);
+    top.position.y=.62+e*1.5;bot.position.y=-.62-e*1.0;mid.position.y=e*.25;
+    mx+=(tx-mx)*.05;my+=(ty-my)*.05;
+    var spin=reduce?0:(now-t0)*.00012;
+    hero.rotation.y=-.5+spin+p*2.2+mx*.5;
+    hero.rotation.x=.42+my*.25-e*.12;
+    txt.style.opacity=1-sm(.04,.3,p);txt.style.transform='translateY('+(-sm(.04,.3,p)*30)+'px)';
+    txt.style.pointerEvents=p>.3?'none':'auto';
+    calls.forEach(function(c,i){var o=sm(.5+i*.05,.72+i*.05,p);c.style.opacity=o;c.style.transform='translateX('+((1-o)*30)+'px)'});
+    R.setClearColor(0x000000,0);R.render(scene,cam);
+  }
+  size();bakePosters();vw=0;size();
+  requestAnimationFrame(frame);
+  addEventListener('resize',size);
+})();
+</script>
+</body>
+</html>
