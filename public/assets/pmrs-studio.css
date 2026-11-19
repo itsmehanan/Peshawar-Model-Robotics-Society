@@ -1116,6 +1116,7 @@ html[data-theme="dark"] .pmrs-foot-lockup__copy small{color:#a8a39a}
 .pmrs-target-home .target-hero-poster{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;pointer-events:none}
 .pmrs-target-home .target-hero-poster img{display:block;width:min(64vw,780px);height:min(90vh,900px);object-fit:contain;margin-right:clamp(1rem,7vw,8rem);opacity:.52;mix-blend-mode:screen}
 .pmrs-target-home .target-canvas{z-index:1;pointer-events:none}
+.pmrs-target-home .target-canvas[hidden]{display:none!important}
 .pmrs-target-home .target-hero{z-index:2}
 .pmrs-target-home .target-side,.pmrs-target-home .target-call,.pmrs-target-home .target-count{z-index:2}
 html[data-theme="light"] .pmrs-target-home .target-hero-poster img{opacity:.16}
