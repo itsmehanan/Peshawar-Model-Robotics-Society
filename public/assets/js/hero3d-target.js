@@ -154,8 +154,13 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     hero.position.x=baseX+mx*.13;
     // Keep the glass object locked to the visual centre for the entire pinned chapter.
     // The scroll progress drives only the opening, never a vertical fly-out.
+    const wide=vw/vh>1.15&&vw>860;
     const mobileSettle=smooth(.08,.34,p);
-    hero.position.y=(vw/vh>1.15&&vw>860?baseY:baseY+(0-baseY)*mobileSettle)-my*.10;
+    hero.position.y=(wide?baseY:baseY+(0-baseY)*mobileSettle)-my*.10;
+    // On phones, reveal the object only as the headline/intro copy clears it.
+    // This prevents the glass model from sitting behind the main text at page load.
+    if(!wide){canvas.style.transition='none';canvas.style.opacity=String(smooth(.22,.38,p));}
+    else{canvas.style.opacity='1';}
     hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
     calls.forEach((call,i)=>{
