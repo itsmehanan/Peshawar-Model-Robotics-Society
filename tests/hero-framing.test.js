@@ -30,9 +30,10 @@ assert.doesNotMatch(scene,/scrollCenter|centeredY/,'glass object must not drift 
 assert.match(scene,/smooth\(\.04,\.98,p\)/,'opening animation runs until the white section reaches the viewport');
 assert.match(scene,/const sticky=stage\.querySelector\('\.target-sticky'\)/,'scroll progress is measured against the actual sticky viewport');
 assert.match(scene,/stage\.offsetHeight-\(sticky\?\.offsetHeight\|\|stage\.clientHeight\)/,'mobile browser chrome cannot distort the pinned progress');
-assert.match(scene,/baseY=wide\?0:-2\.15/,'mobile object starts below the intro copy');
-assert.match(scene,/const mobileSettle=smooth\(\.08,\.34,p\)/,'mobile object settles into the centre after the intro copy');
-assert.match(scene,/canvas\.style\.opacity=String\(smooth\(\.22,\.38,p\)\)/,'mobile object is revealed only as the main copy clears');
+assert.match(scene,/copyRect=textBlock\.getBoundingClientRect\(\)/,'mobile object position follows the actual intro copy height');
+assert.match(scene,/const mobileSettle=smooth\(\.12,\.40,p\)/,'mobile object settles into the centre after the intro copy');
+assert.match(scene,/canvas\.style\.opacity='1'/,'mobile model remains visible below the main copy instead of appearing behind it');
+assert.match(scene,/hero\.position\.y=belowCopyY\*\(1-mobileSettle\)/,'mobile model moves from below the copy into the centre and then stays there');
 assert.match(scene,/hero\.position\.y=/,'scroll-driven object position is applied');
 assert.match(css,/\.pmrs-target-home \.target-stage\{height:230vh/,'desktop pinned chapter ends close to the completed reveal');
 assert.doesNotMatch(home,/target-hero-poster|target-legacy-assets|assets\/art\/hero(?:-sm)?\.(?:png|webp)/i);
