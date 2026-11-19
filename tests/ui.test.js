@@ -460,6 +460,7 @@ await test('homepage restores the glass 3D canvas without the gear poster', asyn
   await waitFor(() => q('[data-hero-stage]'), 5000, 'homepage stage');
   assert.equal(q('.target-hero-poster'), null);
   assert.ok(q('[data-hero-canvas]'));
+  assert.equal(document.querySelectorAll('[data-hero-call]').length, 4, 'four field callouts are present for the scroll sequence');
   assert.equal(q('.target-hero-poster'), null);
   assert.equal(q('.target-legacy-assets'), null);
 });
