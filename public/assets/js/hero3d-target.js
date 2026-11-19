@@ -148,7 +148,8 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     hero.rotation.x=.42+my*.48-explode*.12;
     hero.position.x=baseX+mx*.13;
     const scrollCenter=smooth(.015,.30,p);
-    const centeredY=baseY+(isAuthScene?0:(vw/vh>1.15&&vw>860? .88:1.18)*scrollCenter);\n    hero.position.y=centeredY-my*.10;
+    const centeredY=baseY+(isAuthScene?0:(vw/vh>1.15&&vw>860? .88:1.18)*scrollCenter);
+    hero.position.y=centeredY-my*.10;
     hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
     calls.forEach((call,i)=>{
