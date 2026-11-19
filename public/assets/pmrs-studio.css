@@ -1206,11 +1206,11 @@ img,svg,video,canvas{max-width:100%}
 #registerForm label{background-image:none!important}
 
 /* Keep the glass centrepiece clear of the intro copy and preserve the full pinned scroll scene. */
-.pmrs-target-home .target-stage{height:300vh;min-height:1800px}
+.pmrs-target-home .target-stage{height:230vh;min-height:1380px}
 .pmrs-target-home .target-sticky{height:100svh;min-height:620px}
 .pmrs-target-home .target-call{will-change:opacity,transform}
 @media(max-width:760px){
- .pmrs-target-home .target-stage{height:250svh;min-height:1450px}
+ .pmrs-target-home .target-stage{height:210svh;min-height:1218px}
  .pmrs-target-home .target-call{right:16px;max-width:52vw;font-size:12px}
  .pmrs-target-home .target-call:nth-of-type(3){top:18%}
  .pmrs-target-home .target-call:nth-of-type(4){top:37%}
