@@ -24,7 +24,7 @@ assert.match(scene,/getBoundingClientRect\(\)/);
 assert.match(scene,/baseScale=1\.28/);
 assert.match(scene,/targetHover=1/);
 assert.match(scene,/mx\*\(isAuthScene \? 0\.9 : 0\.82\)/);
-assert.match(scene,/smooth\(\.27\+i\*\.055/);
+assert.match(scene,/smooth\(\.5\+i\*\.05/,'field callouts follow the original target reveal timing');
 assert.match(scene,/offsetHeight/);
 assert.doesNotMatch(scene,/scrollCenter|centeredY/,'glass object must not drift vertically during the pinned chapter');
 assert.match(scene,/smooth\(\.04,\.98,p\)/,'opening animation runs until the white section reaches the viewport');
