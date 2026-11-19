@@ -139,16 +139,10 @@ await test('renders the hero, nav and footer from API content', async () => {
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
   assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
   assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
-  // The cover plate is a real studio render shipped as a static asset
-  // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
-  const plate = q('.plate .plate__object');
-  assert.ok(plate, 'hero object must render');
-  const plateImg = plate.querySelector('img');
-  assert.ok(plateImg, 'hero object must contain an image');
-  assert.match(plateImg.getAttribute('src'), /\/assets\/art\/hero-sm\.png$/);
-  assert.ok(plate.querySelector('source[type="image/webp"]'), 'hero must offer WebP');
-  assert.ok(q('.plate .plate__guides'), 'orbital guides must frame the object');
-  assert.ok(q('.plate .plate__ticks span'), 'registration ticks must render');
+  // The former gear/clock illustration and its 3D canvas are intentionally removed.
+  assert.equal(q('.target-hero-poster'), null, 'homepage must not render the gear poster');
+  assert.equal(q('[data-hero-canvas]'), null, 'homepage must not mount the gear animation');
+  assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork must not remain in the DOM');
   const cardMedia = q('.field-card .field-card__media img');
   assert.ok(cardMedia, 'field cards must carry artwork');
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
