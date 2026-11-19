@@ -542,9 +542,9 @@ await test('the footer carries the horizontal lockup, in both theme variants', a
   assert.ok(lockup.getAttribute('aria-label'), 'the link is named for screen readers');
 
   // The navbar keeps the compact emblem, so the two variants do different jobs.
-  const head = q('#siteHead .brand__img');
+  const head = q('#siteHead .brand__mark-crop .pmrs-logo-dark');
   assert.ok(head, 'the navbar still uses the compact mark');
-  assert.equal(head.getAttribute('src'), '/assets/logo-mark.svg');
+  assert.ok(head.getAttribute('src').includes('pmrs-logo-dark'), 'the navbar uses the same editable logo as the footer');
 });
 
 /* ------------------------------------------------------------------ theme */
