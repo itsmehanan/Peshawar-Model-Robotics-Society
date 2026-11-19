@@ -1156,3 +1156,11 @@ img,svg,video,canvas{max-width:100%}
 #main>.view:has(#registerForm) .field input,#main>.view:has(#registerForm) .field select,#main>.view:has(#registerForm) .field textarea{position:relative;z-index:0;min-width:0}
 @media(max-width:760px){.auth-wrap{grid-template-columns:minmax(0,1fr)!important;width:100%;max-width:100%;overflow:hidden}.auth-panel{min-width:0;width:100%;padding-inline:clamp(1rem,5vw,2rem)}.auth-panel__inner{min-width:0;width:100%;max-width:440px}.auth-art{display:none!important}.site-head__inner{min-width:0;gap:.5rem;padding-inline:12px}.brand{flex:1 1 auto;min-width:0;max-width:44%}.brand__sub{max-width:100%;letter-spacing:.08em}.site-head__actions{flex:0 0 auto;min-width:0;gap:.25rem}.site-head__actions .btn{padding-inline:.55rem;font-size:.72rem}.nav-toggle{flex:0 0 36px;width:36px;height:36px}}
 @media(max-width:420px){.site-head__actions .theme-toggle{display:none}.site-head__actions .btn[data-auth-out]{display:none}.site-head__actions .btn[data-register-link]{padding-inline:.65rem}.brand__sub{display:none}}
+
+/* The former auth artwork was drawn with pseudo-element rings; keep sign-in calm and typographic. */
+.auth-art::before,.auth-art::after{display:none!important;content:none!important}
+.auth-art:not(.auth-art--message){background:radial-gradient(ellipse at 75% 20%,rgba(240,106,58,.1),transparent 58%),#101012!important}
+@media(max-width:760px){
+  .site-head__actions .theme-toggle{display:none!important}
+  .site-head__actions .btn[data-auth-out]{display:none!important}
+}
