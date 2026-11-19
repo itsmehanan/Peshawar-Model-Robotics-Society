@@ -428,6 +428,7 @@ await test('admin branding form exposes PMRSDC and both theme logos', async () =
   assert.equal(q('#settingsForm').elements.campusName.value, 'Dalazak Campus');
   assert.ok(q('#settingsForm').elements.logoMarkDarkUrl.value.includes('pmrs-logo-dark'));
   assert.ok(q('#settingsForm').elements.logoMarkLightUrl.value.includes('pmrs-logo-light'));
+  assert.ok(q('#settingsForm').elements.copyright, 'copyright text is editable too');
 });
 
 await test('contact settings can save their social labels without errors', async () => {

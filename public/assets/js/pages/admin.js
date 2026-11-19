@@ -1079,7 +1079,10 @@ async function renderSettingsSection(body, section, reload) {
         <div class="field"><label>Favicon <span class="label__opt">optional</span></label><div class="row"><input class="input" name="faviconUrl" value="${esc(s.faviconUrl)}" placeholder="https://… or upload"><input type="file" accept="image/png,image/x-icon,image/svg+xml" data-upload="faviconUrl" class="sr-only" id="faviconUpload"><label for="faviconUpload" class="btn btn--ghost btn--sm">Upload</label></div></div>
         <div class="field"><label>Footer note</label><input class="input" name="footerNote" value="${esc(s.footerNote)}" maxlength="200"></div>
       </div>
-      <div class="field"><label>Footer credit</label><input class="input" name="credit" value="${esc(settings.footer?.credit || '')}" maxlength="120"><span class="field__hint">Saved with the footer section.</span></div>`;
+      <div class="form-row">
+        <div class="field"><label>Footer credit</label><input class="input" name="credit" value="${esc(settings.footer?.credit || '')}" maxlength="120"><span class="field__hint">Displayed in the footer.</span></div>
+        <div class="field"><label>Copyright name</label><input class="input" name="copyright" value="${esc(settings.footer?.copyright || '')}" maxlength="120"><span class="field__hint">Displayed in the copyright line.</span></div>
+      </div>`;
   }
 
   if (section === 'event') {
@@ -1213,7 +1216,7 @@ async function renderSettingsSection(body, section, reload) {
       const data = Object.fromEntries(new FormData(form));
       if (section === 'site') {
         await put('/admin/settings/site', data);
-        await put('/admin/settings/footer', { credit: data.credit });
+        await put('/admin/settings/footer', { credit: data.credit, copyright: data.copyright });
       } else if (section === 'event') {
         const stats = [];
         for (let i = 0; i < 4; i += 1) {
@@ -1239,10 +1242,14 @@ async function renderSettingsSection(body, section, reload) {
         data.requireSchoolMatch = form.elements.requireSchoolMatch.checked;
         data.maxMembers = Number(data.maxMembers);
         data.minMembers = Number(data.minMembers);
-        data.allowedSizes = String(data.allowedSizes || '')
-          .split(',')
-          .map((n) => Number(n.trim()))
-          .filter((n) => Number.isInteger(n) && n >= 2 && n <= 8);
+        const sizeTokens = String(data.allowedSizes || '').split(',').map((n) => n.trim()).filter(Boolean);
+        const sizes = sizeTokens.map(Number);
+        if (!sizes.length || sizes.some((n) => !Number.isInteger(n) || n < 2 || n > 8)) {
+          toast('Allowed team sizes must be whole numbers from 2 to 8.', 'error');
+          form.elements.allowedSizes.focus();
+          return;
+        }
+        data.allowedSizes = [...new Set(sizes)].sort((a, b) => a - b);
         await put('/admin/settings/registration', data);
       }
       toast('Settings saved. The public site now shows these values.', 'ok');
