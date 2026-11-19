@@ -509,13 +509,9 @@ const failed = results.filter((r) => !r.ok);
 /* ------------------------------------------------------------------ brand */
 
 await test('the logo is the PMRS emblem, not a letter in a box', async () => {
-  const mark = q('.site-head .brand__img');
-  assert.ok(mark, 'the header shows a logo image');
-  const src = mark.getAttribute('src');
-  assert.ok(
-    src === '/assets/logo-mark.svg' || src.startsWith('http'),
-    `expected the SVG emblem, got ${src}`,
-  );
+  const mark = q('.site-head .brand__mark-crop .pmrs-logo-dark');
+  assert.ok(mark, 'the header shows the dark logo emblem');
+  assert.ok(mark.getAttribute('src').includes('pmrs-logo-dark'), 'the header uses the uploaded PMRSDC mark');
   // The old mark was a rotated <span> holding a monogram. It must be gone, or the
   // favicon, header and footer disagree about what the society looks like.
   assert.equal(q('.site-head .brand__mark'), null, 'the monogram box is gone');
@@ -539,9 +535,10 @@ await test('the footer carries the horizontal lockup, in both theme variants', a
 
   const lockup = q('#siteFoot .foot__lockup');
   const images = [...lockup.querySelectorAll('img')];
-  assert.equal(images.length, 2, 'one lockup per theme');
-  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full.svg'), 'the dark lockup');
-  assert.ok(images.some((i) => i.getAttribute('src') === '/assets/logo-full-light.svg'), 'the light lockup');
+  assert.equal(images.length, 2, 'one logo per theme');
+  assert.ok(images.some((i) => i.classList.contains('pmrs-logo-dark') && i.getAttribute('src').includes('pmrs-logo-dark')), 'the dark logo');
+  assert.ok(images.some((i) => i.classList.contains('pmrs-logo-light') && i.getAttribute('src').includes('pmrs-logo-light')), 'the light logo');
+  assert.ok(lockup.querySelector('.pmrs-foot-lockup__copy'), 'the lockup carries the editable campus wordmark');
   assert.ok(lockup.getAttribute('aria-label'), 'the link is named for screen readers');
 
   // The navbar keeps the compact emblem, so the two variants do different jobs.
