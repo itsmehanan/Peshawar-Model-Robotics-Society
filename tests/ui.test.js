@@ -143,7 +143,7 @@ await test('renders the hero, nav and footer from API content', async () => {
   assert.equal(q('.target-hero-poster'), null, 'homepage must not render the gear poster');
   assert.equal(q('[data-hero-canvas]'), null, 'homepage must not mount the gear animation');
   assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork must not remain in the DOM');
-  const cardMedia = q('.field-card .field-card__media img');
+  const cardMedia = q('.target-card img');
   assert.ok(cardMedia, 'field cards must carry artwork');
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
 });
