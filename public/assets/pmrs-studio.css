@@ -1171,9 +1171,18 @@ img,svg,video,canvas{max-width:100%}
 .pmrs-target-home .target-canvas{position:absolute;inset:0;width:100%;height:100%;max-width:none;display:block;z-index:1;pointer-events:none;opacity:0;transition:opacity .7s ease}
 .pmrs-target-home .target-canvas.is-live{opacity:1}
 .pmrs-target-home .target-canvas[hidden]{display:none!important}
-.pmrs-target-home .target-hero{position:relative;z-index:2;pointer-events:none}
+.pmrs-target-home .target-hero{position:absolute;inset:0;display:flex;align-items:center;z-index:2;pointer-events:none}
 .pmrs-target-home .target-hero a{pointer-events:auto}
-.pmrs-target-home .target-side,.pmrs-target-home .target-call,.pmrs-target-home .target-count{position:relative;z-index:2}
+.pmrs-target-home .target-side,.pmrs-target-home .target-call,.pmrs-target-home .target-count{position:absolute;z-index:3}
+.pmrs-target-home .target-call:nth-of-type(3){top:21%}
+.pmrs-target-home .target-call:nth-of-type(4){top:40%}
+.pmrs-target-home .target-call:nth-of-type(5){top:59%}
+.pmrs-target-home .target-call:nth-of-type(6){top:78%}
+.pmrs-target-home .target-side{top:90px;right:clamp(20px,4vw,48px)}
+.pmrs-target-home .target-count{left:clamp(20px,4vw,48px);bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+.pmrs-target-home .target-call{right:clamp(20px,4vw,48px);max-width:min(36vw,390px)}
+.pmrs-target-home .target-canvas{pointer-events:auto}
+.pmrs-target-home .target-hero__copy{max-width:600px}
 @media(prefers-reduced-motion:reduce){.pmrs-target-home .target-canvas{transition:none}}
 
 /* Interactive 3D visual on both authentication screens. */
@@ -1195,3 +1204,20 @@ img,svg,video,canvas{max-width:100%}
 /* Explicit label reset across all registration form labels, including legacy required markers. */
 #registerForm label::before,#registerForm label::after,#registerForm .field::before,#registerForm .field::after{content:none!important;display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
 #registerForm label{background-image:none!important}
+
+/* Keep the glass centrepiece clear of the intro copy and preserve the full pinned scroll scene. */
+.pmrs-target-home .target-stage{height:300vh;min-height:1800px}
+.pmrs-target-home .target-sticky{height:100svh;min-height:620px}
+.pmrs-target-home .target-call{will-change:opacity,transform}
+@media(max-width:760px){
+ .pmrs-target-home .target-stage{height:250svh;min-height:1450px}
+ .pmrs-target-home .target-call{right:16px;max-width:52vw;font-size:12px}
+ .pmrs-target-home .target-call:nth-of-type(3){top:18%}
+ .pmrs-target-home .target-call:nth-of-type(4){top:37%}
+ .pmrs-target-home .target-call:nth-of-type(5){top:56%}
+ .pmrs-target-home .target-call:nth-of-type(6){top:75%}
+ .pmrs-target-home .target-side{top:72px;right:16px;font-size:10px}
+}
+.auth-art__scene{min-height:420px}
+.auth-art__canvas{min-height:420px}
+@media(max-width:760px){.auth-art.auth-art--interactive .auth-art__scene,.auth-art.auth-art--interactive .auth-art__canvas{min-height:230px}}
