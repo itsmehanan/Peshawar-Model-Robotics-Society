@@ -135,7 +135,7 @@ window.__app = app;
 
 await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
-  assert.match(text(), /Fields of entry/);
+  assert.match(text(), /Four ways to enter/);
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
   assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
   assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
