@@ -138,7 +138,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     size();
     const travel=Math.max(1,stage.offsetHeight-innerHeight);
     const p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/travel));
-    const explode=smooth(.08,.62,p);
+    const explode=smooth(.06,.92,p);
     mx+=(tx-mx)*.075;my+=(ty-my)*.075;hover+=(targetHover-hover)*.09;
     const spin=reducedMotion?0:(now-t0)*.00012;
     top.position.y=.62+explode*1.5;
@@ -147,7 +147,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene ? 0.9 : 0.82);
     hero.rotation.x=.42+my*.48-explode*.12;
     hero.position.x=baseX+mx*.13;
-    hero.position.y=baseY-my*.10;
+    const scrollCenter=smooth(.015,.30,p);\n    const centeredY=baseY+(isAuthScene?0:(vw/vh>1.15&&vw>860? .88:1.18)*scrollCenter);\n    hero.position.y=centeredY-my*.10;
     hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
     calls.forEach((call,i)=>{
