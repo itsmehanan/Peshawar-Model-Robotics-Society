@@ -107,11 +107,11 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
       baseX=0;baseY=0;baseScale=1.28;
     }else{
       camera.fov=wide?32:38;
-      baseX=wide?2.35:0;
-      // The phone position is measured from the rendered intro copy each frame.
-      // Desktop remains centred from the first frame.
-      baseY=0;
-      baseScale=wide?1.08:.78;
+      baseX=wide?2.1:0;
+      // Match the supplied Claude homepage target: on phones the glass module
+      // sits beneath the intro copy from the first frame, not behind the title.
+      baseY=wide?0:-1.55;
+      baseScale=wide?1:.78;
     }
     camera.updateProjectionMatrix();
     hero.position.set(baseX,baseY,0);
@@ -143,7 +143,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     // changes as mobile browser chrome expands/collapses).
     const travel=Math.max(1,stage.offsetHeight-(sticky?.offsetHeight||stage.clientHeight));
     const p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/travel));
-    const explode=smooth(.04,.98,p);
+    const explode=smooth(.08,.62,p);
     mx+=(tx-mx)*.075;my+=(ty-my)*.075;hover+=(targetHover-hover)*.09;
     const spin=reducedMotion?0:(now-t0)*.00012;
     top.position.y=.62+explode*1.5;
@@ -152,36 +152,13 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene ? 0.9 : 0.82);
     hero.rotation.x=.42+my*.48-explode*.12;
     hero.position.x=baseX+mx*.13;
-    // Keep the glass object locked to the visual centre for the entire pinned chapter.
-    // The scroll progress drives only the opening, never a vertical fly-out.
-    const wide=vw/vh>1.15&&vw>860;
-    if(!wide&&textBlock){
-      // Place the model immediately below the real copy block on phones. A
-      // fixed world-space offset fails across different font wraps and screens.
-      const canvasRect=canvas.getBoundingClientRect();
-      const copyRect=textBlock.getBoundingClientRect();
-      const worldHeight=2*camera.position.z*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-      const pixelsPerUnit=canvasRect.height/worldHeight;
-      const modelHalfHeight=1.12*baseScale*pixelsPerUnit;
-      const targetScreenY=Math.min(
-        canvasRect.bottom-modelHalfHeight-18,
-        copyRect.bottom+24+modelHalfHeight
-      );
-      const belowCopyY=(canvasRect.top+canvasRect.height/2-targetScreenY)/pixelsPerUnit;
-      // Once the copy has faded, bring the object to centre and keep it there
-      // for the rest of the pinned chapter.
-      const mobileSettle=smooth(.12,.40,p);
-      hero.position.y=belowCopyY*(1-mobileSettle)-my*.10;
-      canvas.style.transition='none';
-      canvas.style.opacity='1';
-    }else{
-      hero.position.y=baseY-my*.10;
-      canvas.style.opacity='1';
-    }
+    // Preserve the exact mobile/desktop composition from the supplied target.
+    hero.position.y=baseY-my*.10;
+    canvas.style.opacity='1';
     hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
     calls.forEach((call,i)=>{
-      const opacity=smooth(.27+i*.055,.47+i*.055,p);
+      const opacity=smooth(.5+i*.05,.72+i*.05,p);
       call.style.opacity=opacity;
       call.style.transform='translateX('+((1-opacity)*34)+'px) translateY('+((1-opacity)*8)+'px)';
     });
