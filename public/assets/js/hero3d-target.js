@@ -94,23 +94,40 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     renderer.setPixelRatio(oldRatio);renderer.setSize(oldSize.x,oldSize.y,false);renderer.setClearColor(0x000000,0);
   }
 
+  const isAuthScene=!canvas.closest('[data-hero-stage]');
+  let baseScale=1,baseX=0,baseY=0,hover=0,targetHover=0;
   let vw=0,vh=0;
   function size(){
     const stage=canvas.parentElement,w=stage.clientWidth,h=stage.clientHeight;
     if(w===vw&&h===vh)return;
     vw=w;vh=h;renderer.setSize(w,h,false);camera.aspect=w/h;
     const wide=w/h>1.15&&w>860;
-    camera.fov=wide?32:38;camera.updateProjectionMatrix();
-    hero.position.set(wide?2.1:0,wide?0:-1.55,0);
-    hero.scale.setScalar(wide?1:.78);
+    if(isAuthScene){
+      camera.fov=27;
+      baseX=0;baseY=0;baseScale=1.28;
+    }else{
+      camera.fov=wide?32:38;
+      baseX=wide?2.35:0;
+      baseY=wide?-.88:-1.62;
+      baseScale=wide?1.08:.78;
+    }
+    camera.updateProjectionMatrix();
+    hero.position.set(baseX,baseY,0);
+    hero.scale.setScalar(baseScale);
   }
   const smooth=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x);};
   const stage=canvas.closest('[data-hero-stage]')||canvas.parentElement;
   const textBlock=stage.querySelector('[data-hero-copy]');
   const calls=[...stage.querySelectorAll('[data-hero-call]')];
   let mx=0,my=0,tx=0,ty=0,visible=true,disposed=false,frame=0;
-  const onPointer=e=>{tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5;};
-  const onLeave=()=>{tx=0;ty=0;};
+  const onPointer=e=>{
+    const rect=canvas.getBoundingClientRect();
+    if(!rect.width||!rect.height)return;
+    tx=Math.max(-1,Math.min(1,((e.clientX-rect.left)/rect.width-.5)*2));
+    ty=Math.max(-1,Math.min(1,((e.clientY-rect.top)/rect.height-.5)*2));
+    targetHover=1;
+  };
+  const onLeave=()=>{tx=0;ty=0;targetHover=0;};
   stage.addEventListener('pointermove',onPointer,{passive:true});
   stage.addEventListener('pointerleave',onLeave,{passive:true});
   const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)start();else stop();},{threshold:0});
@@ -122,15 +139,22 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     const travel=Math.max(1,stage.offsetHeight-innerHeight);
     const p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/travel));
     const explode=smooth(.08,.62,p);
-    mx+=(tx-mx)*.05;my+=(ty-my)*.05;
+    mx+=(tx-mx)*.075;my+=(ty-my)*.075;hover+=(targetHover-hover)*.09;
     const spin=reducedMotion?0:(now-t0)*.00012;
     top.position.y=.62+explode*1.5;
     bottom.position.y=-.62-explode*1;
     mid.position.y=explode*.25;
-    hero.rotation.y=-.5+spin+p*2.2+mx*.5;
-    hero.rotation.x=.42+my*.25-explode*.12;
+    hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene?.9:.82);
+    hero.rotation.x=.42+my*.48-explode*.12;
+    hero.position.x=baseX+mx*.13;
+    hero.position.y=baseY-my*.10;
+    hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
-    calls.forEach((call,i)=>{const opacity=smooth(.5+i*.05,.72+i*.05,p);call.style.opacity=opacity;call.style.transform='translateX('+((1-opacity)*30)+'px)';});
+    calls.forEach((call,i)=>{
+      const opacity=smooth(.27+i*.055,.47+i*.055,p);
+      call.style.opacity=opacity;
+      call.style.transform='translateX('+((1-opacity)*34)+'px) translateY('+((1-opacity)*8)+'px)';
+    });
     renderer.render(scene,camera);
     frame=requestAnimationFrame(render);
   }
