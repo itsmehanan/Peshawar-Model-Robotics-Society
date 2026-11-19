@@ -1186,8 +1186,12 @@ img,svg,video,canvas{max-width:100%}
 .auth-art__caption .lab{color:#f18a62;font-size:.62rem;letter-spacing:.16em}
 .auth-art__caption p{max-width:18ch;margin:.5rem 0 0;color:#f4f1eb;font:italic clamp(1.6rem,3vw,2.8rem)/1.05 var(--serif)}
 .auth-art--control{background:radial-gradient(ellipse at 50% 42%,rgba(240,106,58,.13),transparent 62%),linear-gradient(145deg,#1d1918,#090b0e 76%)}
-@media(max-width:760px){.auth-art.auth-art--interactive{display:none!important}}
+@media(max-width:760px){.auth-art.auth-art--interactive{display:grid!important;grid-template-rows:minmax(190px,1fr) auto;min-height:290px;padding:1.1rem;border-left:0;border-top:1px solid rgba(255,255,255,.12)}.auth-art.auth-art--interactive .auth-art__scene{min-height:190px}.auth-art.auth-art--interactive .auth-art__canvas{min-height:190px}.auth-art.auth-art--interactive .auth-art__caption p{font-size:1.55rem}}
 
 /* Registration labels: remove the decorative orange marker from the whole form. */
 #registerForm .field::before,#registerForm .field::after,#registerForm .field label::before,#registerForm .field label::after,#registerForm .field .label::before,#registerForm .field .label::after{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important;transform:none!important}
 #registerForm .field label{position:static!important;display:block!important;padding:0!important;margin:0 0 .45rem!important;text-indent:0!important}
+
+/* Explicit label reset across all registration form labels, including legacy required markers. */
+#registerForm label::before,#registerForm label::after,#registerForm .field::before,#registerForm .field::after{content:none!important;display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+#registerForm label{background-image:none!important}
