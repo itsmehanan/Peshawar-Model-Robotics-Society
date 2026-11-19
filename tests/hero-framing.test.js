@@ -22,7 +22,7 @@ assert.match(scene,/pointermove/);
 assert.match(scene,/getBoundingClientRect\(\)/);
 assert.match(scene,/baseScale=1\.28/);
 assert.match(scene,/targetHover=1/);
-assert.match(scene,/mx\*\(isAuthScene \\? 0\\.9 : 0\\.82\)/);
+assert.match(scene,/mx\*\(isAuthScene \? 0\.9 : 0\.82\)/);
 assert.match(scene,/smooth\(\.27\+i\*\.055/);
 assert.match(scene,/offsetHeight/);
 assert.doesNotMatch(home,/target-hero-poster|target-legacy-assets|assets\/art\/hero(?:-sm)?\.(?:png|webp)/i);
