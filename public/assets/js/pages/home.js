@@ -1,4 +1,5 @@
 import { esc, mountFaq } from '../ui.js';
+import { bootHero3D } from '../hero-boot.js';
 import { state } from '../store.js';
 
 /* Shared field artwork helpers used by the existing Fields routes. */
@@ -57,6 +58,7 @@ export function homePage(){
     '<div class="target-links"><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a></div>'+
     '<div class="target-nav__actions"><button class="theme-toggle target-theme" type="button" data-theme-toggle aria-label="Switch theme"><span aria-hidden="true">◐</span></button>'+navAction+registerAction+'<button class="target-menu-toggle" type="button" data-target-menu-toggle aria-expanded="false" aria-controls="target-mobile-menu" aria-label="Open menu"><span></span><span></span></button></div></div><div class="target-mobile-menu" id="target-mobile-menu" hidden><a href="#fields" data-scroll>Fields</a><a href="#journal" data-scroll>Journal</a><a href="#about" data-scroll>About</a><a href="#contact" data-scroll>Contact</a><a href="#/login" data-link>Sign in</a></div></nav>'+
     '<section class="target-stage" id="top" data-hero-stage><div class="target-sticky">'+
+    '<canvas class="target-canvas" data-hero-canvas hidden aria-label="Interactive glass robotics module that opens into its circuit core as you scroll" role="img"></canvas>'+
     '<div class="target-hero"><div class="target-wrap"><div class="target-hero__copy" data-hero-copy><span class="lab">[ '+esc((event.kicker||'Season 04').toUpperCase())+' — 2026 · '+esc((event.city||'PESHAWAR, PAKISTAN').toUpperCase())+' ]</span>'+
     '<h1>'+headline(event.headline)+'</h1><p>'+esc(event.intro||'One day. Four fields. Hundreds of students presenting the work they made when nobody told them what to make. PMRS is where school science stops being a worksheet and becomes a public exhibition.')+'</p>'+
     '<div class="target-cta"><a class="target-btn target-btn--primary" href="'+href+'" data-link>'+esc(label)+' <b>↗</b></a><a class="target-btn target-btn--outline" href="#fields" data-scroll>Explore the fields</a></div></div></div></div>'+
@@ -77,6 +79,7 @@ export function homePage(){
 }
 export function mountHome(root){
   mountFaq(root);
+  bootHero3D();
   root.querySelectorAll('[data-scroll]').forEach(link=>link.addEventListener('click',event=>{
     const id=link.getAttribute('href')?.slice(1),target=id&&root.querySelector('#'+CSS.escape(id));
     if(!target)return;

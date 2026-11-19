@@ -2,6 +2,7 @@ import { post } from '../api.js';
 import { state, setStudent } from '../store.js';
 import { storeToken } from '../api.js';
 import { esc, onSubmit, toast } from '../ui.js';
+import { bootAuth3D } from '../hero-boot.js';
 
 export function loginPage() {
   if (state.student) {
@@ -42,16 +43,18 @@ export function loginPage() {
         </div>
       </div>
     </div>
-    <aside class="auth-art" aria-hidden="true">
-      <div>
-        <p class="auth-art__quote">“Nobody remembers the booth with the most expensive parts. Everybody remembers the team that could explain <em>why</em>.”</p>
-        <p class="auth-art__cite">Judging notes, PMRS</p>
+    <aside class="auth-art auth-art--interactive" aria-label="Interactive glass robotics sculpture">
+      <div class="auth-art__scene" data-auth-3d-stage>
+        <canvas class="auth-art__canvas" data-auth-hero-canvas aria-label="Mouse-responsive glass robotics sculpture"></canvas>
+        <span class="auth-art__scene-label">PMRSDC · BUILD / EXPLORE / PRESENT</span>
       </div>
+      <div class="auth-art__caption"><span class="lab">THE EXHIBITION, IN MOTION</span><p>Ideas become objects. Objects become possibilities.</p></div>
     </aside>
   </div>`;
 }
 
 export function mountLogin(root, { navigate }) {
+  bootAuth3D(root);
   const form = root.querySelector('#loginForm');
   if (!form) return;
   onSubmit(form, async (data) => {

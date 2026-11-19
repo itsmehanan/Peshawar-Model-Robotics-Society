@@ -9,6 +9,7 @@ import { state, setAdmin, refreshContent } from '../store.js';
 import {
   esc, onSubmit, toast, modal, confirmDialog, formatDate, relative, applyFieldErrors, socialIcons, setBusy, linkLabels,
 } from '../ui.js';
+import { bootAuth3D } from '../hero-boot.js';
 
 const SECTIONS = [
   { group: 'Overview', key: 'overview', label: 'Dashboard' },
@@ -106,11 +107,12 @@ function adminLoginView() {
         <a class="link-arrow mt-2" href="#/" data-link><span aria-hidden="true">←</span> Back to the site</a>
       </div>
     </div>
-    <aside class="auth-art auth-art--message" aria-label="Control room information">
-      <span class="auth-art__eyebrow">PMRSDC · CONTROL ROOM</span>
-      <p class="auth-art__quote">One place to keep the exhibition moving.</p>
-      <p class="auth-art__message">Published updates appear across the public website. Registration records remain protected in the organiser system.</p>
-      <p class="auth-art__cite">Peshawar Model Robotics Society · Dalazak Campus</p>
+    <aside class="auth-art auth-art--interactive auth-art--control" aria-label="Interactive glass robotics sculpture">
+      <div class="auth-art__scene" data-auth-3d-stage>
+        <canvas class="auth-art__canvas" data-auth-hero-canvas aria-label="Mouse-responsive glass robotics sculpture"></canvas>
+        <span class="auth-art__scene-label">PMRSDC · CONTROL ROOM</span>
+      </div>
+      <div class="auth-art__caption"><span class="lab">THE CONTROL ROOM</span><p>One place to keep the exhibition moving.</p></div>
     </aside>
   </div>`;
 }
@@ -119,6 +121,7 @@ function adminLoginView() {
 export async function mountAdmin(root, { section = 'overview', navigate, refresh }) {
   const loginForm = root.querySelector('#adminLoginForm');
   if (loginForm) {
+    bootAuth3D(root);
     onSubmit(loginForm, async (data) => {
       const result = await post('/admin/login', { email: data.get('email'), password: data.get('password') });
       storeToken('admin', result.sessionToken);

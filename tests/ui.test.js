@@ -139,10 +139,10 @@ await test('renders the hero, nav and footer from API content', async () => {
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
   assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
   assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
-  // The former gear/clock illustration and its 3D canvas are intentionally removed.
-  assert.equal(q('.target-hero-poster'), null, 'homepage must not render the gear poster');
-  assert.equal(q('[data-hero-canvas]'), null, 'homepage must not mount the gear animation');
-  assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork must not remain in the DOM');
+  // The original glass object is back, while its static gear poster stays absent.
+  assert.ok(q('[data-hero-canvas]'), 'homepage retains its interactive 3D canvas');
+  assert.equal(q('.target-hero-poster'), null, 'the gear poster remains removed');
+  assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork remains absent');
   const cardMedia = q('.target-card img');
   assert.ok(cardMedia, 'field cards must carry artwork');
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
@@ -454,11 +454,12 @@ await test('approving the pending request moves the team field', async () => {
   await waitFor(() => text().includes('No pending requests'), 9000, 'approval applied');
 });
 
-await test('homepage has no legacy gear poster, canvas or hidden gear markup', async () => {
+await test('homepage restores the glass 3D canvas without the gear poster', async () => {
   window.location.hash = '#/';
   await waitFor(() => q('[data-hero-stage]'), 5000, 'homepage stage');
   assert.equal(q('.target-hero-poster'), null);
-  assert.equal(q('[data-hero-canvas]'), null);
+  assert.ok(q('[data-hero-canvas]'));
+  assert.equal(q('.target-hero-poster'), null);
   assert.equal(q('.target-legacy-assets'), null);
 });
 

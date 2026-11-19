@@ -101,3 +101,27 @@ export function bootHero3D() {
   );
   io.observe(stage);
 }
+
+
+/** Mount the same glass-and-circuit 3D object in a sign-in side panel. */
+export async function bootAuth3D(root) {
+  const stage = root?.querySelector('[data-auth-3d-stage]');
+  const canvas = stage?.querySelector('[data-auth-hero-canvas]');
+  if (!stage || !canvas || stage.dataset.hero3d === 'loading' || stage.dataset.hero3d === 'mounted') return;
+  stage.dataset.hero3d = 'loading';
+  try {
+    const module = await import('./hero3d-target.js');
+    if (!stage.isConnected) return;
+    const controller = module.mountHeroScene(canvas, { reducedMotion: prefersCalm() });
+    if (!controller.firstFrame()) { controller.dispose(); stage.dataset.hero3d = 'error'; return; }
+    stage.dataset.hero3d = 'mounted';
+    canvas.classList.add('is-live');
+    canvas.addEventListener('herocontextlost', () => {
+      stage.dataset.hero3d = 'context-lost';
+      canvas.classList.remove('is-live');
+    }, { once: true });
+  } catch (error) {
+    stage.dataset.hero3d = 'error';
+    console.error('[PMRS] Sign-in 3D object failed to initialise:', error);
+  }
+}
