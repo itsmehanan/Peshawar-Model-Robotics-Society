@@ -1,4 +1,6 @@
 /* PMRS Studio refresh — additive visual layer. No application logic or data hooks changed. */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap');
+
 :root{
  --void:#101014;--bg:#17171b;--bg-2:#1d1d22;--panel:#222228;--panel-2:#292930;--panel-3:#33333b;
  --ink:#f5f1eb;--ink-2:#d2cbc2;--ink-3:#aaa198;--ink-4:#817970;
@@ -406,7 +408,7 @@ html[data-theme='light'] .pmrs-target-home .target-sticky{background:radial-grad
 :root{
   --display:'Archivo',system-ui,sans-serif;
   --sans:'Archivo',system-ui,sans-serif;
-  --target-font:'Archivo',system-ui,sans-serif;
+  --target-font:'Inter Tight',system-ui,sans-serif;
 }
 body,button,input,select,textarea{
   font-family:var(--sans);
@@ -1206,7 +1208,7 @@ img,svg,video,canvas{max-width:100%}
 #registerForm label{background-image:none!important}
 
 /* Keep the glass centrepiece clear of the intro copy and preserve the full pinned scroll scene. */
-.pmrs-target-home .target-stage{height:230vh;min-height:1380px}
+.pmrs-target-home .target-stage{height:260vh;min-height:1380px}
 .pmrs-target-home .target-sticky{height:100svh;min-height:620px}
 .pmrs-target-home .target-call{will-change:opacity,transform}
 @media(max-width:760px){
