@@ -106,14 +106,11 @@ function adminLoginView() {
         <a class="link-arrow mt-2" href="#/" data-link><span aria-hidden="true">←</span> Back to the site</a>
       </div>
     </div>
-    <aside class="auth-art" aria-hidden="true">
-      <picture>
-        <source type="image/webp" srcset="/assets/art/hero-sm.webp">
-        <img src="/assets/art/hero-sm.png" alt="" width="1000" height="1000" loading="lazy" decoding="async">
-      </picture>
-      <p class="auth-art__quote">Every published change updates the public site immediately — the exhibition
-        database stays the single source of truth.</p>
-      <p class="auth-art__cite">Control room</p>
+    <aside class="auth-art auth-art--message" aria-label="Control room information">
+      <span class="auth-art__eyebrow">PMRSDC · CONTROL ROOM</span>
+      <p class="auth-art__quote">One place to keep the exhibition moving.</p>
+      <p class="auth-art__message">Published updates appear across the public website. Registration records remain protected in the organiser system.</p>
+      <p class="auth-art__cite">Peshawar Model Robotics Society · Dalazak Campus</p>
     </aside>
   </div>`;
 }

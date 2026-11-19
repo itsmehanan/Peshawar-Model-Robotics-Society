@@ -135,21 +135,15 @@ window.__app = app;
 
 await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
-  assert.match(text(), /Fields of entry/);
+  assert.match(text(), /Four ways to enter/);
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
   assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
   assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
-  // The cover plate is a real studio render shipped as a static asset
-  // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
-  const plate = q('.plate .plate__object');
-  assert.ok(plate, 'hero object must render');
-  const plateImg = plate.querySelector('img');
-  assert.ok(plateImg, 'hero object must contain an image');
-  assert.match(plateImg.getAttribute('src'), /\/assets\/art\/hero-sm\.png$/);
-  assert.ok(plate.querySelector('source[type="image/webp"]'), 'hero must offer WebP');
-  assert.ok(q('.plate .plate__guides'), 'orbital guides must frame the object');
-  assert.ok(q('.plate .plate__ticks span'), 'registration ticks must render');
-  const cardMedia = q('.field-card .field-card__media img');
+  // The former gear/clock illustration and its 3D canvas are intentionally removed.
+  assert.equal(q('.target-hero-poster'), null, 'homepage must not render the gear poster');
+  assert.equal(q('[data-hero-canvas]'), null, 'homepage must not mount the gear animation');
+  assert.equal(q('.target-legacy-assets'), null, 'hidden legacy gear artwork must not remain in the DOM');
+  const cardMedia = q('.target-card img');
   assert.ok(cardMedia, 'field cards must carry artwork');
   assert.match(cardMedia.getAttribute('src'), /\/assets\/art\/field-/);
 });
@@ -460,47 +454,14 @@ await test('approving the pending request moves the team field', async () => {
   await waitFor(() => text().includes('No pending requests'), 9000, 'approval applied');
 });
 
-await test('the hero ships a poster and only upgrades to 3D on top of it', async () => {
-  // Earlier tests navigate away, so go back to the home route and wait for the
-  // hero to paint before asserting anything about it.
+await test('homepage has no legacy gear poster, canvas or hidden gear markup', async () => {
   window.location.hash = '#/';
-  await waitFor(() => q('[data-hero-stage]'), 8000, 'the hero stage');
-  const stage = q('[data-hero-stage]');
-  assert.ok(stage, 'the hero stage exists');
-
-  // The poster is the fallback for reduced-motion, no-WebGL, save-data and any
-  // runtime failure, so it must ALWAYS be in the markup, not swapped in later.
-  const poster = stage.querySelector('picture img');
-  assert.ok(poster, 'a poster image is present');
-  assert.match(poster.getAttribute('src'), /hero/, 'the poster points at the render');
-
-  // The canvas starts hidden: it is revealed only after the scene proves it can
-  // draw a frame, otherwise a driver quirk would leave an empty black box.
-  const canvas = stage.querySelector('[data-hero-canvas]');
-  assert.ok(canvas, 'a canvas exists for the live scene');
-  assert.equal(canvas.hidden, true, 'the canvas starts hidden');
-
-  // Square stage + object-fit contain is what prevents the stretch the old
-  // 1408x768 render suffered when it was forced into a wide frame.
-  const plate = window.getComputedStyle(stage);
-  assert.ok(plate, 'the stage has computed styles');
+  await waitFor(() => q('[data-hero-stage]'), 5000, 'homepage stage');
+  assert.equal(q('.target-hero-poster'), null);
+  assert.equal(q('[data-hero-canvas]'), null);
+  assert.equal(q('.target-legacy-assets'), null);
 });
 
-await test('reduced motion keeps the still hero instead of animating it', async () => {
-  const { mountHero3D } = await import('../public/assets/js/hero-boot.js');
-  const realMatchMedia = window.matchMedia;
-  window.matchMedia = (query) => ({
-    matches: query.includes('prefers-reduced-motion'),
-    addEventListener() {},
-    removeEventListener() {},
-  });
-  const stage = q('[data-hero-stage]');
-  delete stage.dataset.hero3d;
-  const result = await mountHero3D(stage);
-  assert.equal(result, null, 'no scene is created');
-  assert.equal(stage.dataset.hero3d, 'static', 'the stage records the static fallback');
-  window.matchMedia = realMatchMedia;
-});
 
 
 /* --------------------------------------------------------------- report */
