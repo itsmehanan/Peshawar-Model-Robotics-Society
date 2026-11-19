@@ -108,7 +108,9 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     }else{
       camera.fov=wide?32:38;
       baseX=wide?2.35:0;
-      baseY=0;
+      // On phones, park the model below the intro copy, then bring it to centre
+      // as the copy scrolls away. Desktop remains centred from the first frame.
+      baseY=wide?0:-2.15;
       baseScale=wide?1.08:.78;
     }
     camera.updateProjectionMatrix();
@@ -136,7 +138,10 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
   function render(now){
     if(disposed||!visible)return;
     size();
-    const travel=Math.max(1,stage.offsetHeight-innerHeight);
+    const sticky=stage.querySelector('.target-sticky');
+    // Calculate progress from the real sticky viewport, not innerHeight (which
+    // changes as mobile browser chrome expands/collapses).
+    const travel=Math.max(1,stage.offsetHeight-(sticky?.offsetHeight||stage.clientHeight));
     const p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/travel));
     const explode=smooth(.04,.98,p);
     mx+=(tx-mx)*.075;my+=(ty-my)*.075;hover+=(targetHover-hover)*.09;
@@ -149,7 +154,8 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
     hero.position.x=baseX+mx*.13;
     // Keep the glass object locked to the visual centre for the entire pinned chapter.
     // The scroll progress drives only the opening, never a vertical fly-out.
-    hero.position.y=baseY-my*.10;
+    const mobileSettle=smooth(.08,.34,p);
+    hero.position.y=(vw/vh>1.15&&vw>860?baseY:baseY+(0-baseY)*mobileSettle)-my*.10;
     hero.scale.setScalar(baseScale*(1+hover*.045));
     if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
     calls.forEach((call,i)=>{
