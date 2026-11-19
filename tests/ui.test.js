@@ -430,6 +430,15 @@ await test('admin branding form exposes PMRSDC and both theme logos', async () =
   assert.ok(q('#settingsForm').elements.logoMarkLightUrl.value.includes('pmrs-logo-light'));
 });
 
+await test('contact settings can save their social labels without errors', async () => {
+  window.location.hash = '#/admin/contact';
+  await waitFor(() => q('#settingsForm') && q('[data-social-row] [data-key="label"]'), 8000, 'contact settings');
+  const form = q('#settingsForm');
+  assert.ok(form.querySelector('[data-social-row] [data-key="label"]'), 'social label input exists');
+  form.dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  await waitFor(() => q('#toastStack')?.textContent.includes('Settings saved'), 8000, 'contact settings saved');
+});
+
 await test('field editor requires a front image and supports extra uploads', async () => {
   window.location.hash = '#/admin/fields';
   await waitFor(() => q('[data-action="new-field"]'), 8000, 'fields admin');

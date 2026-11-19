@@ -1081,7 +1081,7 @@ button,.btn,a{ -webkit-tap-highlight-color:transparent }
 
 
 /* PMRSDC identity and admin-managed field photography */
-.pmrs-logo-crop{position:relative;display:inline-block;flex:none;width:40px;height:40px;overflow:hidden;isolation:isolate;border-radius:50%}
+.pmrs-logo-crop{position:relative;display:inline-block;flex:none;width:40px;height:40px;overflow:hidden}
 .pmrs-logo-crop img{position:absolute!important;display:block;width:370%!important;max-width:none!important;height:auto!important;left:-100%!important;top:-57%!important;object-fit:initial!important}
 .pmrs-logo-dark{mix-blend-mode:screen}
 .pmrs-logo-light{mix-blend-mode:multiply}
