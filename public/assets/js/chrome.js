@@ -14,19 +14,13 @@ export function renderFooter() {
     <div class="wrap">
       <div class="foot__top">
         <div class="foot__brand">
-          ${
-            // The footer is where the PRIMARY horizontal lockup belongs: emblem and
-            // wordmark locked together, at a size where the letterforms read. An
-            // uploaded logo still wins, so admin branding keeps working.
-            site.logoUrl
-              ? `<a class="brand" href="#/" data-link>
-                   <img class="brand__lockup" src="${esc(site.logoUrl)}" alt="${esc(site.fullName || site.name)}" height="46" loading="lazy" decoding="async">
-                 </a>`
-              : `<a class="foot__lockup" href="#/" data-link aria-label="${esc(site.fullName || site.name)} — home">
-                   <img class="lockup--dark" src="/assets/logo-full.svg" alt="" width="230" height="51" loading="lazy" decoding="async">
-                   <img class="lockup--light" src="/assets/logo-full-light.svg" alt="" width="230" height="51" loading="lazy" decoding="async">
-                 </a>`
-          }
+          <a class="foot__lockup pmrs-foot-lockup" href="#/" data-link aria-label="${esc(site.fullName || site.name)} — home">
+            <span class="pmrs-logo-crop pmrs-foot-lockup__mark" aria-hidden="true">
+              <img class="pmrs-logo-dark" src="${esc(site.logoMarkDarkUrl || '/assets/pmrs-logo-dark.jpg')}" alt="" width="1536" height="1536">
+              <img class="pmrs-logo-light" src="${esc(site.logoMarkLightUrl || '/assets/pmrs-logo-light.jpg')}" alt="" width="1536" height="1536">
+            </span>
+            <span class="pmrs-foot-lockup__copy"><b>${esc(site.name || 'PMRSDC')}</b><small>${esc(site.campusName || 'Dalazak Campus')}</small></span>
+          </a>
           <p class="foot__note">${esc(site.footerNote || site.description || '')}</p>
           ${
             socials?.length

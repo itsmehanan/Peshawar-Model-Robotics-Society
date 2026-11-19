@@ -137,6 +137,8 @@ await test('renders the hero, nav and footer from API content', async () => {
   await waitFor(() => text().includes('Build something'), 5000, 'hero');
   assert.match(text(), /Fields of entry/);
   assert.ok(q('#siteFoot').textContent.includes('PMRS'), 'the footer names the society');
+  assert.ok(q('.target-logo .pmrs-logo-dark'), 'homepage uses the shared logo asset');
+  assert.ok(q('.target-logo__name')?.textContent.includes('PMRS'), 'homepage logo text follows site settings');
   // The cover plate is a real studio render shipped as a static asset
   // (WebP with a PNG fallback), framed by hairline guides and registration ticks.
   const plate = q('.plate .plate__object');
@@ -419,10 +421,24 @@ await test('admin students table lists the registered student', async () => {
   await waitFor(() => text().includes('ui-student@test.local'), 8000, 'students table');
 });
 
-await test('admin branding form renders current site name', async () => {
+await test('admin branding form exposes PMRSDC and both theme logos', async () => {
   window.location.hash = '#/admin/site';
   await waitFor(() => q('#settingsForm'), 8000, 'site settings');
-  assert.equal(q('#settingsForm').elements.name.value, 'PMRS');
+  assert.equal(q('#settingsForm').elements.name.value, 'PMRSDC');
+  assert.equal(q('#settingsForm').elements.campusName.value, 'Dalazak Campus');
+  assert.ok(q('#settingsForm').elements.logoMarkDarkUrl.value.includes('pmrs-logo-dark'));
+  assert.ok(q('#settingsForm').elements.logoMarkLightUrl.value.includes('pmrs-logo-light'));
+});
+
+await test('field editor requires a front image and supports extra uploads', async () => {
+  window.location.hash = '#/admin/fields';
+  await waitFor(() => q('[data-action="new-field"]'), 8000, 'fields admin');
+  q('[data-action="new-field"]').click();
+  await waitFor(() => q('#fieldFormModal'), 3000, 'field editor modal');
+  assert.equal(q('#fieldFormModal').elements.imageUrl.required, true);
+  assert.ok(q('[data-field-front]'), 'front image upload control exists');
+  assert.equal(q('[data-field-gallery]').multiple, true, 'additional images support multiple files');
+  q('#modalRoot [data-modal-close]').click();
 });
 
 await test('approving the pending request moves the team field', async () => {

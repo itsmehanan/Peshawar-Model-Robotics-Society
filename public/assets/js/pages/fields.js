@@ -2,6 +2,13 @@ import { esc, richText } from '../ui.js';
 import { fieldArt, artPicture } from './home.js';
 import { state } from '../store.js';
 
+function categoryPicture(category, { width = 880, height = 660, eager = false } = {}) {
+  if (category.imageUrl) {
+    return `<img class="field-card__image" src="${esc(category.imageUrl)}" alt="${esc(category.name)}" width="${width}" height="${height}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+  }
+  return artPicture(fieldArt(category.id), { width, height, eager });
+}
+
 export function fieldsPage() {
   const categories = state.content?.categories || [];
   return `<div class="view">
@@ -26,7 +33,7 @@ export function fieldsPage() {
               (c, index) => `
             <a class="field-card reveal" data-delay="${Math.min(index, 3)}" href="#/fields/${esc(c.id)}" data-link>
               <div class="field-card__media">
-                ${artPicture(fieldArt(c.id), { width: 880, height: 660 })}
+                ${categoryPicture(c, { width: 880, height: 660 })}
               </div>
               <div class="field-card__top">
                 <span class="field-card__index">${String(index + 1).padStart(2, '0')} / Field</span>
@@ -60,6 +67,7 @@ export function fieldDetailPage({ id }) {
   if (!category) return notFoundField();
   const index = categories.findIndex((c) => c.id === id);
   const related = (articles || []).slice(0, 2);
+  const gallery = (category.images || []).filter(Boolean);
 
   return `<div class="view">
     <section class="page-hero">
@@ -81,12 +89,19 @@ export function fieldDetailPage({ id }) {
     </section>
 
     <figure class="art-band">
-      ${artPicture(fieldArt(category.id), { width: 880, height: 660, eager: true })}
+      ${categoryPicture(category, { width: 880, height: 660, eager: true })}
       <figcaption class="art-band__caption">
         <span>Object study / ${esc(category.name)}</span>
         <span>Plate ${String(index + 1).padStart(2, '0')}</span>
       </figcaption>
     </figure>
+
+    ${gallery.length ? `<section class="section section--tight field-gallery">
+      <div class="wrap">
+        <div class="section-head"><div><span class="eyebrow">Inside the field</span><h2 class="h3 mt-1">More from this field</h2></div></div>
+        <div class="field-gallery__grid">${gallery.map((url, i) => `<figure><img src="${esc(url)}" alt="${esc(category.name)} — image ${i + 1}" loading="lazy" decoding="async"></figure>`).join('')}</div>
+      </div>
+    </section>` : ''}
 
     <section class="section section--tight">
       <div class="wrap split split--wide">

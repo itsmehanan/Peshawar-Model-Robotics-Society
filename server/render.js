@@ -18,22 +18,26 @@ export async function renderDocument(settings) {
   const site = settings.site || {};
   const event = settings.event || {};
 
-  const name = site.name || 'PMRS';
-  const fullName = site.fullName || 'Peshawar Model Robotics Society';
+  const name = site.name || 'PMRSDC';
+  const fullName = site.fullName || 'Peshawar Model Robotics Society — Dalazak Campus';
   const description =
     site.metaDescription || site.description || 'The student robotics and engineering society of Peshawar Model School.';
-  const tagline = (event.kicker || 'Innovate · Build · Compete').replace(/^Season \d+\s*[-—]\s*/i, '');
+  const tagline = [site.campusName, site.tagline].filter(Boolean).join(' · ') ||
+    (event.kicker || 'Innovate · Build · Compete').replace(/^Season \\d+\\s*[-—]\\s*/i, '');
 
   const favicon = site.faviconUrl
     ? `<link rel="icon" href="${esc(site.faviconUrl)}">`
     : `<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">`;
-  const appleIcon = `<link rel="apple-touch-icon" href="/assets/logo-mark.svg">`;
+  const appleIcon = `<link rel="apple-touch-icon" href="/assets/pmrs-logo-light.jpg">`;
 
-  // The ticker-style monogram fallback is gone: an admin-uploaded logo is still
-  // honoured, otherwise the real emblem is used.
-  const logo = site.logoUrl
-    ? `<img class="brand__img" src="${esc(site.logoUrl)}" alt="" width="36" height="36" decoding="async">`
-    : `<img class="brand__img" src="/assets/logo-mark.svg" alt="" width="36" height="36" decoding="async" data-logo-mark>`;
+  // The shared header uses the emblem from the same two theme-matched logo files
+  // as the homepage. CSS crops the emblem and blends out the solid backplate.
+  const darkMark = site.logoMarkDarkUrl || '/assets/pmrs-logo-dark.jpg';
+  const lightMark = site.logoMarkLightUrl || '/assets/pmrs-logo-light.jpg';
+  const logo = `<span class="pmrs-logo-crop brand__mark-crop" aria-hidden="true">
+    <img class="pmrs-logo-dark" src="${esc(darkMark)}" alt="" width="1536" height="1536">
+    <img class="pmrs-logo-light" src="${esc(lightMark)}" alt="" width="1536" height="1536">
+  </span>`;
 
   return `<!doctype html>
 <html lang="en" data-theme="dark">
@@ -50,7 +54,7 @@ ${appleIcon}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(fullName)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:image" content="${esc(event.heroImageUrl || '/assets/logo-full.svg')}">
+<meta property="og:image" content="${esc(event.heroImageUrl || '/assets/pmrs-logo-dark.jpg')}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/archivo-var-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>

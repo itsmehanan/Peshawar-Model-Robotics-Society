@@ -61,6 +61,21 @@ export function bootstrap(cfg) {
   if (!ready) {
     ready = (async () => {
       await initDb(cfg);
+      // Upgrade only the untouched starter identity. Existing organiser edits
+      // are preserved; the schema migration itself is idempotent.
+      await query(`UPDATE settings
+        SET value = value || jsonb_build_object('campusName', 'Dalazak Campus'), updated_at = now()
+        WHERE key='site' AND NOT (value ? 'campusName')`);
+      await query(`UPDATE settings
+        SET value = value || jsonb_build_object(
+          'name', 'PMRSDC',
+          'fullName', 'Peshawar Model Robotics Society — Dalazak Campus',
+          'logoMarkDarkUrl', '/assets/pmrs-logo-dark.jpg',
+          'logoMarkLightUrl', '/assets/pmrs-logo-light.jpg'
+        ), updated_at = now()
+        WHERE key='site'
+          AND value->>'name'='PMRS'
+          AND value->>'fullName'='Peshawar Model Robotics Society'`);
       await ensureAdmin(cfg);
     })();
     // A failed boot must be retryable rather than cached forever.

@@ -66,6 +66,15 @@ export const url = (value, { field = 'URL', allowEmpty = true } = {}) => {
     }
     return out;
   }
+  // Uploaded assets use a same-origin URL. Accept only the database asset
+  // endpoint and committed /assets files; reject arbitrary relative paths.
+  if (out.startsWith('/')) {
+    const safeAssetPath =
+      /^\/api\/assets\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(out) ||
+      /^\/assets\/[a-z0-9._/-]+$/i.test(out);
+    if (safeAssetPath && !out.split('/').includes('..')) return out;
+    throw new ValidationError(`${field} must be a valid same-site asset path or full URL.`, { [field]: 'invalid' });
+  }
   let parsed;
   try {
     parsed = new URL(out);

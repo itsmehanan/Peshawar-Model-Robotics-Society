@@ -38,10 +38,12 @@ CREATE TABLE IF NOT EXISTS categories (
   rules      text NOT NULL DEFAULT '',
   accent     text NOT NULL DEFAULT '',
   image_url  text NOT NULL DEFAULT '',
+  images     jsonb NOT NULL DEFAULT '[]'::jsonb,
   sort_order integer NOT NULL DEFAULT 0,
   is_active  boolean NOT NULL DEFAULT true,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS images jsonb NOT NULL DEFAULT '[]'::jsonb;
 
 CREATE TABLE IF NOT EXISTS articles (
   id             uuid PRIMARY KEY,
