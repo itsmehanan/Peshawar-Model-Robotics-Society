@@ -95,7 +95,7 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
   }
 
   const isAuthScene=!canvas.closest('[data-hero-stage]');
-  let baseScale=1,baseX=0,baseY=0,hover=0,targetHover=0;
+  let baseScale=1,baseX=0,baseY=0;
   let vw=0,vh=0;
   function size(){
     const stage=canvas.parentElement,w=stage.clientWidth,h=stage.clientHeight;
@@ -121,52 +121,49 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
   const stage=canvas.closest('[data-hero-stage]')||canvas.parentElement;
   const textBlock=stage.querySelector('[data-hero-copy]');
   const calls=[...stage.querySelectorAll('[data-hero-call]')];
+  // Pointer response and scroll animation copied from the uploaded
+  // "PMRS 2026 — Homepage design target.html" reference.
   let mx=0,my=0,tx=0,ty=0,visible=true,disposed=false,frame=0;
   const onPointer=e=>{
-    const rect=canvas.getBoundingClientRect();
-    if(!rect.width||!rect.height)return;
-    tx=Math.max(-1,Math.min(1,((e.clientX-rect.left)/rect.width-.5)*2));
-    ty=Math.max(-1,Math.min(1,((e.clientY-rect.top)/rect.height-.5)*2));
-    targetHover=1;
+    tx=e.clientX/innerWidth-.5;
+    ty=e.clientY/innerHeight-.5;
   };
-  const onLeave=()=>{tx=0;ty=0;targetHover=0;};
-  stage.addEventListener('pointermove',onPointer,{passive:true});
-  stage.addEventListener('pointerleave',onLeave,{passive:true});
+  window.addEventListener('pointermove',onPointer,{passive:true});
   const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(visible)start();else stop();},{threshold:0});
   observer.observe(stage);
   const t0=performance.now();
   function render(now){
     if(disposed||!visible)return;
     size();
-    const sticky=stage.querySelector('.target-sticky');
-    // Calculate progress from the real sticky viewport, not innerHeight (which
-    // changes as mobile browser chrome expands/collapses).
-    const travel=Math.max(1,stage.offsetHeight-(sticky?.offsetHeight||stage.clientHeight));
-    const p=Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/travel));
+    const p=isAuthScene?0:Math.min(1,Math.max(0,-stage.getBoundingClientRect().top/(stage.offsetHeight-innerHeight)));
     const explode=smooth(.08,.62,p);
-    mx+=(tx-mx)*.075;my+=(ty-my)*.075;hover+=(targetHover-hover)*.09;
+    mx+=(tx-mx)*.05;my+=(ty-my)*.05;
     const spin=reducedMotion?0:(now-t0)*.00012;
     top.position.y=.62+explode*1.5;
     bottom.position.y=-.62-explode*1;
     mid.position.y=explode*.25;
-    hero.rotation.y=-.5+spin+p*2.2+mx*(isAuthScene ? 0.9 : 0.82);
-    hero.rotation.x=.42+my*.48-explode*.12;
-    hero.position.x=baseX+mx*.13;
-    // Preserve the exact mobile/desktop composition from the supplied target.
-    hero.position.y=baseY-my*.10;
-    canvas.style.opacity='1';
-    hero.scale.setScalar(baseScale*(1+hover*.045));
-    if(textBlock){const opacity=1-smooth(.04,.3,p);textBlock.style.opacity=opacity;textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';textBlock.style.pointerEvents=p>.3?'none':'auto';}
+    hero.rotation.y=-.5+spin+p*2.2+mx*.5;
+    hero.rotation.x=.42+my*.25-explode*.12;
+    if(textBlock){
+      textBlock.style.opacity=1-smooth(.04,.3,p);
+      textBlock.style.transform='translateY('+(-smooth(.04,.3,p)*30)+'px)';
+      textBlock.style.pointerEvents=p>.3?'none':'auto';
+    }
     calls.forEach((call,i)=>{
       const opacity=smooth(.5+i*.05,.72+i*.05,p);
       call.style.opacity=opacity;
-      call.style.transform='translateX('+((1-opacity)*34)+'px) translateY('+((1-opacity)*8)+'px)';
+      call.style.transform='translateX('+((1-opacity)*30)+'px)';
     });
+    renderer.setClearColor(0x000000,0);
     renderer.render(scene,camera);
     frame=requestAnimationFrame(render);
   }
   const start=()=>{if(disposed||!visible)return;cancelAnimationFrame(frame);frame=requestAnimationFrame(render);};
   const stop=()=>{cancelAnimationFrame(frame);frame=0;};
+  const onVisibility=()=>{if(document.visibilityState==='visible')start();else stop();};
+  document.addEventListener('visibilitychange',onVisibility);
+  const onLost=e=>{e.preventDefault();stop();canvas.dispatchEvent(new CustomEvent('herocontextlost',{bubbles:true}));};
+  canvas.addEventListener('webglcontextlost',onLost);
   const resizeObserver=new ResizeObserver(size);if(canvas.parentElement)resizeObserver.observe(canvas.parentElement);
   const onVisibility=()=>{if(document.visibilityState==='visible')start();else stop();};
   document.addEventListener('visibilitychange',onVisibility);
@@ -176,6 +173,6 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
   return {
     firstFrame(){renderer.render(scene,camera);return !renderer.getContext().isContextLost();},
     start,stop,
-    dispose(){disposed=true;stop();observer.disconnect();resizeObserver.disconnect();stage.removeEventListener('pointermove',onPointer);stage.removeEventListener('pointerleave',onLeave);document.removeEventListener('visibilitychange',onVisibility);canvas.removeEventListener('webglcontextlost',onLost);scene.traverse(o=>{o.geometry?.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});env.dispose();renderer.dispose();}
+    dispose(){disposed=true;stop();observer.disconnect();resizeObserver.disconnect();window.removeEventListener('pointermove',onPointer);document.removeEventListener('visibilitychange',onVisibility);canvas.removeEventListener('webglcontextlost',onLost);scene.traverse(o=>{o.geometry?.dispose();if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});env.dispose();renderer.dispose();}
   };
 }
