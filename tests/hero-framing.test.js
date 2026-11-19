@@ -27,7 +27,7 @@ assert.match(scene,/mx\*\(isAuthScene \? 0\.9 : 0\.82\)/);
 assert.match(scene,/smooth\(\.5\+i\*\.05/,'field callouts follow the original target reveal timing');
 assert.match(scene,/offsetHeight/);
 assert.doesNotMatch(scene,/scrollCenter|centeredY/,'glass object must not drift vertically during the pinned chapter');
-assert.match(scene,/smooth\(\.04,\.98,p\)/,'opening animation runs until the white section reaches the viewport');
+assert.match(scene,/smooth\(\.08,\.62,p\)/,'opening animation follows the supplied target timing');
 assert.match(scene,/const sticky=stage\.querySelector\('\.target-sticky'\)/,'scroll progress is measured against the actual sticky viewport');
 assert.match(scene,/stage\.offsetHeight-\(sticky\?\.offsetHeight\|\|stage\.clientHeight\)/,'mobile browser chrome cannot distort the pinned progress');
 assert.match(scene,/baseY=wide\?0:-1\.55/,'mobile glass module uses the target design position below the intro copy');
