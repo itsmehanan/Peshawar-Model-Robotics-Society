@@ -165,10 +165,6 @@ export function mountHeroScene(canvas,{reducedMotion=false}={}){
   const onLost=e=>{e.preventDefault();stop();canvas.dispatchEvent(new CustomEvent('herocontextlost',{bubbles:true}));};
   canvas.addEventListener('webglcontextlost',onLost);
   const resizeObserver=new ResizeObserver(size);if(canvas.parentElement)resizeObserver.observe(canvas.parentElement);
-  const onVisibility=()=>{if(document.visibilityState==='visible')start();else stop();};
-  document.addEventListener('visibilitychange',onVisibility);
-  const onLost=e=>{e.preventDefault();stop();canvas.dispatchEvent(new CustomEvent('herocontextlost',{bubbles:true}));};
-  canvas.addEventListener('webglcontextlost',onLost);
   size();bakePosters();vw=0;size();start();
   return {
     firstFrame(){renderer.render(scene,camera);return !renderer.getContext().isContextLost();},
