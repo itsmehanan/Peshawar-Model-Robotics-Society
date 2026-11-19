@@ -10,7 +10,7 @@ const auth=read('../public/assets/js/pages/auth.js');
 const admin=read('../public/assets/js/pages/admin.js');
 assert.match(home,/bootHero3D/);
 assert.match(home,/data-hero-canvas/);
-assert.equal((home.match(/data-hero-call/g)||[]).length,4,'homepage reveals all four field callouts');
+assert.match(home,/categories\.slice\(0,4\)\.map/,'homepage reveals the four live field names');
 assert.match(boot,/hero3d-target\.js/);
 assert.match(boot,/bootAuth3D/);
 assert.match(auth,/data-auth-hero-canvas/);
