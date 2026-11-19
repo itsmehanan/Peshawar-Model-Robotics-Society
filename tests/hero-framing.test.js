@@ -32,6 +32,7 @@ assert.match(scene,/const sticky=stage\.querySelector\('\.target-sticky'\)/,'scr
 assert.match(scene,/stage\.offsetHeight-\(sticky\?\.offsetHeight\|\|stage\.clientHeight\)/,'mobile browser chrome cannot distort the pinned progress');
 assert.match(scene,/baseY=wide\?0:-2\.15/,'mobile object starts below the intro copy');
 assert.match(scene,/const mobileSettle=smooth\(\.08,\.34,p\)/,'mobile object settles into the centre after the intro copy');
+assert.match(scene,/canvas\.style\.opacity=String\(smooth\(\.22,\.38,p\)\)/,'mobile object is revealed only as the main copy clears');
 assert.match(scene,/hero\.position\.y=/,'scroll-driven object position is applied');
 assert.match(css,/\.pmrs-target-home \.target-stage\{height:230vh/,'desktop pinned chapter ends close to the completed reveal');
 assert.doesNotMatch(home,/target-hero-poster|target-legacy-assets|assets\/art\/hero(?:-sm)?\.(?:png|webp)/i);
