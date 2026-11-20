@@ -270,7 +270,7 @@ body{background:var(--bg)!important}
 
 /* Exact visual layer from the supplied PMRS 2026 homepage target.
    Scoped to the homepage only; application chrome and all other routes stay intact. */
-body:has(.pmrs-target-home){background:#070809!important;color:#f4f4f2!important;font:400 17px/1.6 "Inter Tight",Archivo,system-ui,sans-serif!important;letter-spacing:0!important;overflow-x:hidden}
+body:has(.pmrs-target-home){background:#070809!important;color:#f4f4f2!important;font:400 17px/1.6 "Inter Tight",Archivo,system-ui,sans-serif!important;letter-spacing:0!important;overflow-x:clip}
 body:has(.pmrs-target-home) .site-head,
 body:has(.pmrs-target-home) .site-foot{display:none!important}
 .pmrs-target-home{--target-bg:#070809;--target-s1:#101113;--target-s2:#17181b;--target-line:rgba(255,255,255,.1);--target-text:#f4f4f2;--target-muted:#a3a3a0;--target-accent:#ff5a1f;--target-paper:#e8e7e3;--target-ink:#0b0b0c;background:var(--target-bg);color:var(--target-text);font:400 17px/1.6 "Inter Tight",Archivo,system-ui,sans-serif;overflow:clip}
