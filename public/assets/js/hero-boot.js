@@ -28,15 +28,9 @@ export async function mountHero3D(stage) {
   const canvas = stage.querySelector('[data-hero-canvas]');
   if (!canvas) return null;
 
-  // Keep the still poster as the complete experience when motion or data
-  // saving is requested. Do this before probing WebGL so the state is stable
-  // on devices and in browsers without a graphics context.
-  if (prefersCalm() || saveData()) {
-    stage.dataset.hero3d = 'static';
-    stage.classList.add('hero-3d-static');
-    return null;
-  }
-
+  // Reduced-motion and data-saving preferences must not suppress the 3D object.
+  // The scene receives reducedMotion below and renders a stationary frame when
+  // requested; this matters because the legacy poster is intentionally hidden.
   if (!supportsWebGL()) {
     stage.dataset.hero3d = 'unsupported';
     stage.classList.add('hero-3d-unavailable');
